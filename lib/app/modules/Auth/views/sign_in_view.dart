@@ -1,6 +1,13 @@
 import 'package:cho_nun_btk/app/components/custom_buttons.dart';
+import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
+import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Home/views/home_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
+import 'package:cho_nun_btk/app/modules/Chef%20App/views/chef_home.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/views/waiter_view.dart';
+import 'package:cho_nun_btk/app/provider/authProvider.dart';
+import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +28,7 @@ class _SignInViewState extends State<SignInView> {
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.find<AuthController>();
+    AuthProvider authService = serviceLocator.get<AuthProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -102,26 +110,161 @@ class _SignInViewState extends State<SignInView> {
                 SizedBox(height: 3.h),
 
                 // Login Button
-                CafePrimaryButton(
-                  buttonTitle: "Login",
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Perform Login
-                      // authController.signIn();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Logging in...'),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fix the errors'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    CafePrimaryButton(
+                      width: 20.w,
+                      buttonTitle: "Login",
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          // Perform Login
+                          // authController.signIn();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Logging in...'),
+                            ),
+                          );
+
+                          UserModel user = UserModel(
+                            uid: '',
+                            email: authController.emailController.text,
+                            name: '',
+                            photoUrl: '',
+                            phone: '',
+                            address: '',
+                            userType: authController.selectedUserType,
+                            password: authController.passwordController.text,
+                            blocked: false,
+                            joinedOn: DateTime.now(),
+                            lastLogin: DateTime.now(),
+                            fcmToken:
+                                '', // Update with actual token if using FCM
+                          );
+
+                          QueryStatus status = await authController.signIn(
+                            user.email,
+                            user.password,
+                            context,
+                          );
+
+                          if (status == QueryStatus.SUCCESS) {
+                            Widget view = Container();
+                            debugPrint('User Signed In');
+
+                            // Ensure user model is loaded
+                            await authController.loadUserModel();
+
+                            if (authController.firebaseUser != null) {
+                              // Make sure userModel is not null
+                              if (authController.userModel != null) {
+                                if (authController.userModel!.userType ==
+                                    UserType.ADMIN) {
+                                  view = AdminHomeView();
+                                } else if (authController.userModel!.userType ==
+                                    UserType.CHEF) {
+                                  view = ChefHomeView();
+                                } else if (authController.userModel!.userType ==
+                                    UserType.WAITER) {
+                                  view = WaiterView();
+                                }
+                              } else {
+                                debugPrint("User model is null after sign-in");
+                              }
+                            }
+
+                            Get.offAll(view);
+                          }
+
+                          // QueryStatus status = await authService.addNewAdmin(user);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fix the errors'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    CafePrimaryButton(
+                      buttonTitle: "SignUp",
+                      width: 20.w,
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          // Perform Login
+                          // authController.signIn();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Logging in...'),
+                            ),
+                          );
+
+                          UserModel user = UserModel(
+                            uid: '',
+                            email: authController.emailController.text,
+                            name: '',
+                            photoUrl: '',
+                            phone: '',
+                            address: '',
+                            userType: authController.selectedUserType,
+                            password: authController.passwordController.text,
+                            blocked: false,
+                            joinedOn: DateTime.now(),
+                            lastLogin: DateTime.now(),
+                            fcmToken:
+                                '', // Update with actual token if using FCM
+                          );
+
+                          QueryStatus status = await authController.signUp(
+                            context: context,
+                            email: user.email,
+                            password: user.password,
+                            name: user.name,
+                            phone: user.phone,
+                            address: user.address,
+                          );
+
+                          if (status == QueryStatus.SUCCESS) {
+                            Widget view = Container();
+                            debugPrint('User Signed In');
+
+                            // Ensure user model is loaded
+                            await authController.loadUserModel();
+
+                            if (authController.firebaseUser != null) {
+                              // Make sure userModel is not null
+                              if (authController.userModel != null) {
+                                if (authController.userModel!.userType ==
+                                    UserType.ADMIN) {
+                                  view = AdminHomeView();
+                                } else if (authController.userModel!.userType ==
+                                    UserType.CHEF) {
+                                  view = ChefHomeView();
+                                } else if (authController.userModel!.userType ==
+                                    UserType.WAITER) {
+                                  view = WaiterView();
+                                }
+                              } else {
+                                debugPrint("User model is null after sign-in");
+                              }
+                            }
+
+                            Get.offAll(view);
+                          }
+
+                          // QueryStatus status = await authService1.addNewAdmin(user);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fix the errors'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
 
                 // Additional Options
@@ -132,7 +275,7 @@ class _SignInViewState extends State<SignInView> {
                 //   },
                 //   child: const Text('Forgot Password?'),
                 // ),
-                // SizedBox(height: 1.h),
+                SizedBox(height: 1.h),
                 // TextButton(
                 //   onPressed: () {
                 //     Get.toNamed('/sign-up');
