@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ChonunBTK.app"
+    namespace = "com.Cho-nunBTK.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

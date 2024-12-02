@@ -1,13 +1,30 @@
 import 'package:cho_nun_btk/app/constants/colors.dart';
+import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Home/views/home_view.dart';
+import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/views/auth_view_home.dart';
+import 'package:cho_nun_btk/app/modules/Chef%20App/views/chef_home.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/views/waiter_view.dart';
+import 'package:cho_nun_btk/app/services/registry.dart';
+import 'package:cho_nun_btk/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  setupRegistry();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  Get.put(AuthController());
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -23,8 +40,6 @@ void setEasyLoading(bool isDarkMode) {
     ..loadingStyle = EasyLoadingStyle.custom
     ..indicatorSize = 45.0
     ..radius = 10.0
-    // ..progressColor =
-    //     isDarkMode ? AppColors.primaryDark : AppColors.primaryLight
     ..indicatorColor =
         isDarkMode ? AppColors.primaryDark : AppColors.onPrimaryDark
     ..backgroundColor = Colors.transparent
@@ -38,10 +53,14 @@ void setEasyLoading(bool isDarkMode) {
     ..errorWidget = const Icon(Icons.error, color: Colors.red, size: 50);
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -56,8 +75,61 @@ class MyApp extends StatelessWidget {
           darkTheme: themeProvider.darkTheme,
           themeMode:
               themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: AuthView(),
+          home: SplashScreen(), // Set SplashScreen as the initial view
           builder: EasyLoading.init());
     });
+  }
+}
+
+class SplashScreen extends StatelessWidget {
+  final AuthController auth = Get.find<AuthController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<UserType>(
+      future: auth.checkUserType(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          // Handle error state
+          return Scaffold(
+            body: Center(
+              child: Text('Error: ${snapshot.error}'),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          UserType userType = snapshot.data!;
+          Widget view;
+
+          switch (userType) {
+            case UserType.ADMIN:
+              view = AdminHomeView();
+              break;
+            case UserType.CHEF:
+              view = ChefHomeView();
+              break;
+            case UserType.WAITER:
+              view = WaiterView();
+              break;
+            default:
+              view = AuthView();
+              break;
+          }
+
+          return view;
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: Text('No user data available'),
+            ),
+          );
+        }
+      },
+    );
   }
 }

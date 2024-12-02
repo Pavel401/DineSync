@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "439501539620",
+    "project_id": "cho-nun-btk",
+    "storage_bucket": "cho-nun-btk.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439501539620:android:a9851185aeaefffe488bb1",
+        "android_client_info": {
+          "package_name": "com.ChonunBTK.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCj5i16FE-xUmavs185US1dS5dFt1nLkFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
