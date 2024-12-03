@@ -4,61 +4,61 @@ List<Allergens> allergens = [
   Allergens(
       allergenId: '1',
       allergenName: 'Gluten',
-      allergenImage: 'assets/svg/allergens/gluten.png'),
+      allergenImage: 'assets/allergens/gluten.svg'),
   Allergens(
       allergenId: '2',
       allergenName: 'Dairy',
-      allergenImage: 'assets/svg/allergens/dairy.png'),
+      allergenImage: 'assets/allergens/dairy.svg'),
   Allergens(
       allergenId: '3',
       allergenName: 'Eggs',
-      allergenImage: 'assets/svg/allergens/eggs.png'),
+      allergenImage: 'assets/allergens/eggs.svg'),
   Allergens(
       allergenId: '4',
       allergenName: 'Nuts',
-      allergenImage: 'assets/svg/allergens/nuts.png'),
+      allergenImage: 'assets/allergens/nuts.svg'),
   Allergens(
       allergenId: '5',
       allergenName: 'Peanuts',
-      allergenImage: 'assets/svg/allergens/peanuts.png'),
+      allergenImage: 'assets/allergens/nuts.svg'),
   Allergens(
       allergenId: '6',
       allergenName: 'Shellfish',
-      allergenImage: 'assets/svg/allergens/shellfish.png'),
+      allergenImage: 'assets/allergens/shellfish.svg'),
   Allergens(
       allergenId: '7',
       allergenName: 'Fish',
-      allergenImage: 'assets/svg/allergens/fish.png'),
+      allergenImage: 'assets/allergens/fish.svg'),
   Allergens(
       allergenId: '8',
       allergenName: 'Soy',
-      allergenImage: 'assets/svg/allergens/soy.png'),
+      allergenImage: 'assets/allergens/soya.svg'),
   Allergens(
       allergenId: '9',
       allergenName: 'Sesame',
-      allergenImage: 'assets/svg/allergens/sesame.png'),
+      allergenImage: 'assets/allergens/sesame.svg'),
   Allergens(
       allergenId: '10',
       allergenName: 'Mustard',
-      allergenImage: 'assets/svg/allergens/mustard.png'),
+      allergenImage: 'assets/allergens/mustard.svg'),
   Allergens(
       allergenId: '11',
       allergenName: 'Celery',
-      allergenImage: 'assets/svg/allergens/celery.png'),
+      allergenImage: 'assets/allergens/celery.svg'),
   Allergens(
       allergenId: '12',
       allergenName: 'Lupin',
-      allergenImage: 'assets/svg/allergens/lupin.png'),
+      allergenImage: 'assets/allergens/lupin.svg'),
   Allergens(
       allergenId: '13',
       allergenName: 'Sulfites',
-      allergenImage: 'assets/svg/allergens/sulfites.png'),
+      allergenImage: 'assets/allergens/sulphites.svg'),
   Allergens(
       allergenId: '14',
-      allergenName: 'Corn',
-      allergenImage: 'assets/svg/allergens/corn.png'),
+      allergenName: 'Mushrooms',
+      allergenImage: 'assets/allergens/mushroom.svg'),
   Allergens(
       allergenId: '15',
       allergenName: 'Bovine Proteins',
-      allergenImage: 'assets/svg/allergens/bovine_proteins.png'),
+      allergenImage: 'assets/allergens/beef.svg'),
 ];

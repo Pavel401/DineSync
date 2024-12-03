@@ -4,8 +4,10 @@ import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/add_category.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/add_item.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
@@ -49,9 +51,9 @@ class MenuView extends StatelessWidget {
 
                   return GetBuilder(builder: (FoodMenuController controller) {
                     return SingleChildScrollView(
+                      physics: NeverScrollableScrollPhysics(),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           // Center(
                           //   child: SvgPicture.asset(
@@ -111,9 +113,14 @@ class MenuView extends StatelessWidget {
                                           padding: EdgeInsets.all(1.w),
                                           child: GestureDetector(
                                             onTap: () {
-                                              menuController.selectCategory(
+                                              menuController.changecategory(
                                                   menuController
                                                       .categories[index]);
+
+                                              menuController
+                                                  .getItemsForCategory(
+                                                      menuController
+                                                          .selectedCategory!);
                                             },
                                             child: Container(
                                               padding: EdgeInsets.all(2.w),
@@ -177,8 +184,66 @@ class MenuView extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              Expanded(child: SizedBox()),
+                              GestureDetector(
+                                onTap: () {
+                                  Get.to(() => AddMenuItem());
+                                },
+                                child: DottedBorder(
+                                  borderType: BorderType.RRect,
+                                  radius: Radius.circular(12),
+                                  padding: EdgeInsets.all(6),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.add),
+                                      Text("Add Item"),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
-                          )
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+
+                          menuController.items.length > 0
+                              ? ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: controller.items.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      title: Text(
+                                          menuController.items[index].foodName),
+                                      subtitle: Text(menuController
+                                          .items[index].foodDescription),
+                                    );
+                                  })
+                              : Center(
+                                  // Ensures the entire content is centered
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .center, // Center vertically
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .center, // Center horizontally
+
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/svg/empty.svg",
+                                        height: 10.h,
+                                        width: 20.w,
+                                      ),
+                                      SizedBox(height: 2.h),
+                                      Text(
+                                        "No items found",
+                                        style: context.textTheme.titleMedium!
+                                            .copyWith(
+                                          color: AppColors.primaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                         ],
                       ),
                     );
