@@ -52,7 +52,7 @@ class FoodCategory extends Equatable {
 }
 
 // Represents a single food item
-class Food extends Equatable {
+class FoodItem extends Equatable {
   final String foodId;
   final String foodName;
   final String foodImage;
@@ -64,8 +64,8 @@ class Food extends Equatable {
   final bool containsEgg;
   final bool isGlutenFree; // Additional dietary marking
   final List<Allergens> allergies; // Allergy information
-  final List<Food> sides; // Side dishes
-  final List<Food> recommendations; // Recommended foods
+  final List<FoodItem> sides; // Side dishes
+  final List<FoodItem> recommendations; // Recommended foods
   final double? discount; // Discount value
   final int spiceLevel; // Spice level (1-5 or similar scale)
 
@@ -73,7 +73,7 @@ class Food extends Equatable {
 
   final bool isAvailable;
 
-  Food({
+  FoodItem({
     required this.foodId,
     required this.foodName,
     required this.foodImage,
@@ -93,7 +93,7 @@ class Food extends Equatable {
     this.isLactoseFree = false,
   });
 
-  Food copyWith({
+  FoodItem copyWith({
     String? foodId,
     String? foodName,
     String? foodImage,
@@ -104,12 +104,12 @@ class Food extends Equatable {
     bool? containsEgg,
     bool? isGlutenFree,
     List<Allergens>? allergies,
-    List<Food>? sides,
-    List<Food>? recommendations,
+    List<FoodItem>? sides,
+    List<FoodItem>? recommendations,
     double? discount,
     int? spiceLevel,
   }) {
-    return Food(
+    return FoodItem(
       foodId: foodId ?? this.foodId,
       foodName: foodName ?? this.foodName,
       foodImage: foodImage ?? this.foodImage,
@@ -170,8 +170,8 @@ class Food extends Equatable {
     };
   }
 
-  factory Food.fromJson(Map<String, dynamic> json) {
-    return Food(
+  factory FoodItem.fromJson(Map<String, dynamic> json) {
+    return FoodItem(
       foodId: json['foodId'] ?? '',
       foodName: json['foodName'] ?? '',
       foodImage: json['foodImage'] ?? '',
@@ -186,10 +186,10 @@ class Food extends Equatable {
           .map((a) => Allergens.fromJson(a))
           .toList(),
       sides: (json['sides'] as List<dynamic>? ?? [])
-          .map((s) => Food.fromJson(s))
+          .map((s) => FoodItem.fromJson(s))
           .toList(),
       recommendations: (json['recommendations'] as List<dynamic>? ?? [])
-          .map((r) => Food.fromJson(r))
+          .map((r) => FoodItem.fromJson(r))
           .toList(),
       discount: json['discount']?.toDouble(),
       spiceLevel: json['spiceLevel'] ?? 0,

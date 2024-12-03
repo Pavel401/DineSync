@@ -12,6 +12,10 @@ class FoodMenuController extends GetxController {
     super.onInit();
   }
 
+  RxList<FoodItem> items = <FoodItem>[].obs;
+
+  RxBool isItemsLoading = false.obs;
+
   RxList<FoodCategory> categories = <FoodCategory>[].obs;
 
   FoodCategory selectedCategory = FoodCategory(
@@ -22,8 +26,11 @@ class FoodMenuController extends GetxController {
   );
   Menuprovider menuprovider = Menuprovider();
 
-  Future<void> selectCategory(FoodCategory category) async {
+  Future<void> changecategory(FoodCategory category) async {
     selectedCategory = category;
+
+    items.clear();
+
     update();
   }
 
@@ -108,5 +115,70 @@ class FoodMenuController extends GetxController {
     categories.value = await menuprovider.getAllCategories();
     update();
     return categories;
+  }
+
+  Future<void> addNewMenuItem(FoodItem item, FoodCategory foodCategory) async {
+    EasyLoading.show(status: 'Adding item');
+    QueryStatus status = await menuprovider.addNewMenuItem(item, foodCategory);
+
+    if (status == QueryStatus.ERROR) {
+      CustomSnackBar.showError('Error', 'Failed to add item', Get.context!);
+      EasyLoading.dismiss();
+      return;
+    } else {
+      CustomSnackBar.showSuccess(
+          'Success', 'Item added successfully', Get.context!);
+    }
+
+    EasyLoading.dismiss();
+    update();
+  }
+
+  Future<void> removeMenuItem(FoodItem item, FoodCategory foodCategory) async {
+    EasyLoading.show(status: 'Removing item');
+    QueryStatus status = await menuprovider.removeMenuItem(item, foodCategory);
+
+    if (status == QueryStatus.ERROR) {
+      CustomSnackBar.showError('Error', 'Failed to remove item', Get.context!);
+      EasyLoading.dismiss();
+      return;
+    } else {
+      CustomSnackBar.showSuccess(
+          'Success', 'Item removed successfully', Get.context!);
+    }
+
+    EasyLoading.dismiss();
+    update();
+  }
+
+  Future<void> updateMenuItem(FoodItem item, FoodCategory foodCategory) async {
+    EasyLoading.show(status: 'Updating item');
+    QueryStatus status = await menuprovider.updateMenuItem(item, foodCategory);
+
+    if (status == QueryStatus.ERROR) {
+      CustomSnackBar.showError('Error', 'Failed to update item', Get.context!);
+      EasyLoading.dismiss();
+      return;
+    } else {
+      CustomSnackBar.showSuccess(
+          'Success', 'Item updated successfully', Get.context!);
+    }
+
+    EasyLoading.dismiss();
+    update();
+  }
+
+  Future<void> getItemsForCategory(FoodCategory category) async {
+    EasyLoading.show(status: 'Fetching items');
+    isItemsLoading.value = true;
+    print('Fetching items');
+    List<FoodItem> itemsT = await menuprovider.getAllItems(category);
+
+    items.value = itemsT;
+
+    isItemsLoading.value = false;
+    EasyLoading.dismiss();
+
+    update();
   }
 }
