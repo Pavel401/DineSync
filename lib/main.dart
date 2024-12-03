@@ -3,12 +3,15 @@ import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/views/home_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
+import 'package:cho_nun_btk/app/modules/Auth/controllers/fcm_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/views/auth_view_home.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/views/chef_home.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/views/waiter_view.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -23,8 +26,21 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Get.put(AuthController());
+  AuthController authController = Get.put(AuthController());
+  authController.loadUserModel();
+  await FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    debugPrint('FirebaseMessaging: Token refreshed');
+    debugPrint('FirebaseMessaging: New Token: $newToken');
+    if (FirebaseAuth.instance.currentUser != null) {
+      FcmProvider()
+          .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, newToken);
+    }
+  });
+  // Future.delayed(const Duration(seconds: 1), () {});
 
+  // final fcmToken = await FirebaseMessaging.instance.getToken();
+  // await FirebaseMessaging.instance.setAutoInitEnabled(true);
+  // debugPrint('FirebaseMessaging: FCM Token: $fcmToken');
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),

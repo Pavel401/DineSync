@@ -22,7 +22,7 @@ class CustomSnackBar {
       context: context,
       type: ToastificationType.error,
       style: ToastificationStyle.fillColored,
-      primaryColor: AppColors.primaryLight,
+      primaryColor: AppColors.errorLight,
       title: Text(title),
       description: Text(message),
       alignment: Alignment.bottomCenter,

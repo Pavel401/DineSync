@@ -41,6 +41,8 @@ class AppColors {
   static const searchBarDark = Color(0xFF272B25);
   static const errorDark = Color(0xFFCF6679);
 
+  static const transparent = Color(0x00000000);
+
   static Color hexToColor(String hexColor) {
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
     if (hexColor.length == 6) {

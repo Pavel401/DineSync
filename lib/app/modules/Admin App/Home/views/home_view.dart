@@ -1,6 +1,7 @@
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/menu_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,37 +16,41 @@ class AdminHomeView extends StatelessWidget {
 
     AuthController authController = Get.put(AuthController());
 
-    return Scaffold(
-      bottomNavigationBar: buildBottomNavBar(context, themeProvider),
-      body: Obx(
-        () => IndexedStack(
-          index: homeController.currentIndex.value,
-          children: [
-            Container(),
-            // Placeholder(),
-            Container(),
-            Container(),
-            Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      authController.signOut();
-                    },
-                    child: Text(
-                      'Logout',
-                      style: context.textTheme.headlineSmall!.copyWith(
-                        color: themeProvider.isDarkMode
-                            ? AppColors.secondaryDark
-                            : AppColors.secondaryLight,
+    return SafeArea(
+      child: Scaffold(
+        bottomNavigationBar: buildBottomNavBar(context, themeProvider),
+        body: Obx(
+          () => IndexedStack(
+            index: homeController.currentIndex.value,
+            children: [
+              Container(),
+              // Placeholder(),
+              Container(),
+              Container(),
+              MenuView(),
+
+              Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        authController.signOut();
+                      },
+                      child: Text(
+                        'Logout',
+                        style: context.textTheme.headlineSmall!.copyWith(
+                          color: themeProvider.isDarkMode
+                              ? AppColors.secondaryDark
+                              : AppColors.secondaryLight,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -124,15 +129,15 @@ class AdminHomeView extends StatelessWidget {
               label: 'Orders',
             ),
 
-            // NavigationDestination(
-            //   icon: Icon(
-            //     Icons.drag_indicator_outlined,
-            //     color: themeProvider.isDarkMode
-            //         ? AppColors.secondaryDark
-            //         : AppColors.secondaryLight,
-            //   ),
-            //   label: 'Tables',
-            // ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.analytics_outlined,
+                color: themeProvider.isDarkMode
+                    ? AppColors.secondaryDark
+                    : AppColors.secondaryLight,
+              ),
+              label: 'Analytics',
+            ),
             NavigationDestination(
               icon: Icon(
                 Icons.menu_book_outlined,

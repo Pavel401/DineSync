@@ -6,8 +6,6 @@ import 'package:cho_nun_btk/app/modules/Admin%20App/Home/views/home_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/views/chef_home.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/views/waiter_view.dart';
-import 'package:cho_nun_btk/app/provider/authProvider.dart';
-import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,7 +26,6 @@ class _SignInViewState extends State<SignInView> {
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.find<AuthController>();
-    AuthProvider authService = serviceLocator.get<AuthProvider>();
 
     return Scaffold(
       appBar: AppBar(
