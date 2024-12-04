@@ -15,8 +15,6 @@ class FoodMenuController extends GetxController {
   RxList<FoodItem> items = <FoodItem>[].obs;
   RxList<FoodItem> sideItems = <FoodItem>[].obs;
 
-  RxList<FoodItem> selectedSideItems = <FoodItem>[].obs;
-
   RxBool isItemsLoading = false.obs;
   RxBool isSideItemsLoading = false.obs;
 
@@ -225,19 +223,5 @@ class FoodMenuController extends GetxController {
 
   Future<String> generateFoodId() async {
     return await menuprovider.newId();
-  }
-
-  void selectSide(FoodItem food) {
-    if (selectedSideItems.contains(food)) {
-      selectedSideItems.remove(food);
-    } else {
-      selectedSideItems.add(food);
-    }
-    update();
-  }
-
-  void removeSide(FoodItem food) {
-    selectedSideItems.remove(food);
-    update();
   }
 }
