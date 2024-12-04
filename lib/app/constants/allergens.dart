@@ -61,4 +61,16 @@ List<Allergens> allergens = [
       allergenId: '15',
       allergenName: 'Bovine Proteins',
       allergenImage: 'assets/allergens/beef.svg'),
+  Allergens(
+      allergenId: '16',
+      allergenName: 'Crab',
+      allergenImage: 'assets/allergens/crab.svg'),
+  Allergens(
+      allergenId: '17',
+      allergenName: 'Seeds',
+      allergenImage: 'assets/allergens/seeds.svg'),
+  Allergens(
+      allergenId: '18',
+      allergenName: 'Shrimp',
+      allergenImage: 'assets/allergens/shrimp.svg'),
 ];
