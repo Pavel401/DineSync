@@ -6,17 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-class SelectSidesView extends StatelessWidget {
-  const SelectSidesView({super.key});
+class SelectSidesView extends StatefulWidget {
+  List<FoodItem> sides;
+  SelectSidesView({super.key, required this.sides});
 
+  @override
+  State<SelectSidesView> createState() => _SelectSidesViewState();
+}
+
+class _SelectSidesViewState extends State<SelectSidesView> {
   @override
   Widget build(BuildContext context) {
     final FoodMenuController controller = Get.find<FoodMenuController>();
-
+    List<FoodItem> selectedSideItems = widget.sides ?? [];
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.back();
+          Get.back(
+            result: selectedSideItems,
+          );
         },
         child: const Icon(Icons.check),
       ),
@@ -115,7 +123,7 @@ class SelectSidesView extends StatelessWidget {
                                   ),
                                   SizedBox(height: 1.h),
                                   Text(
-                                    '${foodItem.nutritionalInfo} kcal | \$${foodItem.foodPrice.toStringAsFixed(2)}',
+                                    '${foodItem.nutritionalInfo} kcal | \₱${foodItem.foodPrice.toStringAsFixed(2)}',
                                     style:
                                         context.textTheme.bodySmall?.copyWith(
                                       color: Colors.grey,
@@ -127,10 +135,14 @@ class SelectSidesView extends StatelessWidget {
 
                             // Checkbox
                             Checkbox(
-                              value: controller.selectedSideItems
-                                  .contains(foodItem),
+                              value: selectedSideItems.contains(foodItem),
                               onChanged: (value) {
-                                controller.selectSide(foodItem);
+                                if (value == true) {
+                                  selectedSideItems.add(foodItem);
+                                } else {
+                                  selectedSideItems.remove(foodItem);
+                                }
+                                setState(() {});
                               },
                             ),
                           ],
