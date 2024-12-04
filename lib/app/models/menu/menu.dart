@@ -212,7 +212,7 @@ class FoodItem extends Equatable {
 
 // }
 
-class Allergens {
+class Allergens extends Equatable {
   String allergenName;
   String allergenImage;
   String allergenId;
