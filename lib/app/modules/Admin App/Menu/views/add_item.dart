@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cho_nun_btk/app/components/allergen_chip.dart';
 import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/components/network_image.dart';
@@ -77,6 +76,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
     // TODO: implement initState
 
     if (widget.item != null) {
+      sides = widget.item!.sides;
       _nameController.text = widget.item!.foodName;
       _descriptionController.text = widget.item!.foodDescription;
       _priceController.text = widget.item!.foodPrice.toString();
@@ -89,9 +89,17 @@ class _AddMenuItemState extends State<AddMenuItem> {
 
       _nutritionController.text = widget.item!.nutritionalInfo.toString();
 
-      sides = widget.item!.sides;
+      // print('Image: ${widget.item!.foodImage}');
+      // for (int i = 0; i < _selectedAllergens.length; i++) {
+      //   print('Allergen: ${_selectedAllergens[i].allergenName}');
+      //   print('Allergen: ${_selectedAllergens[i].allergenId}');
+      //   print('Allergen: ${_selectedAllergens[i].allergenImage}');
 
-      print('Image: ${widget.item!.foodImage}');
+      //   if (allergens.contains(_selectedAllergens[i])) {
+      //     print('Allergen: ${_selectedAllergens[i].allergenName} found');
+      //   }
+      // }
+      setState(() {});
     }
     super.initState();
   }
@@ -130,33 +138,70 @@ class _AddMenuItemState extends State<AddMenuItem> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.outlineLight),
                   ),
-                  child: _selectedImage != null
-                      ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                      : widget.item?.foodImage != null &&
-                              widget.item!.foodImage.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: widget.item!.foodImage,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  Center(child: CircularProgressIndicator()),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.camera_alt,
-                                  color: AppColors.primaryLight,
-                                  size: 50,
-                                ),
-                                Text(
-                                  'Tap to Select Image',
-                                  style:
-                                      TextStyle(color: AppColors.outlineLight),
-                                ),
-                              ],
+                  child: Stack(
+                    children: [
+                      // Display selected image or default placeholders
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: _selectedImage != null
+                            ? Image.file(_selectedImage!,
+                                fit: BoxFit.cover, width: double.infinity)
+                            : widget.item?.foodImage != null &&
+                                    widget.item!.foodImage.isNotEmpty
+                                ? CustomNetworkImage(
+                                    imageUrl: widget.item!.foodImage,
+                                    fit: BoxFit.cover,
+                                    size: double.infinity,
+                                  )
+                                : Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_a_photo,
+                                            size: 50,
+                                            color: AppColors.onSurfaceLight),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          "Add Image",
+                                          style: TextStyle(
+                                              color: AppColors.onSurfaceLight,
+                                              fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                      ),
+
+                      // Overlay for edit and upload actions
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.black.withOpacity(0.2),
+                          ),
+                        ),
+                      ),
+
+                      // Action icons (Edit and Upload)
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              shape: BoxShape.circle,
                             ),
+                            child: Icon(Icons.edit,
+                                color: AppColors.onSurfaceLight),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -187,7 +232,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
-                maxLength: 300,
+                maxLength: 400,
                 decoration: InputDecoration(
                   labelText: 'Food Description',
                   border: OutlineInputBorder(
@@ -226,7 +271,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Price',
-                  prefixText: '\$',
+                  prefixText: '\₱',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -375,7 +420,16 @@ class _AddMenuItemState extends State<AddMenuItem> {
                   Expanded(child: SizedBox()),
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => SelectSidesView());
+                      Get.to(() => SelectSidesView(
+                                sides: sides,
+                              ))!
+                          .then((value) {
+                        if (value != null) {
+                          setState(() {
+                            sides = List.from(value);
+                          });
+                        }
+                      });
                     },
                     child: DottedBorder(
                       borderType: BorderType.RRect,
@@ -392,14 +446,13 @@ class _AddMenuItemState extends State<AddMenuItem> {
                 ],
               ),
 
-              Obx(() => menuController.selectedSideItems.length > 0
+              sides.length > 0
                   ? ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: menuController.selectedSideItems.length,
+                      itemCount: sides.length,
                       itemBuilder: (context, index) {
-                        final foodItem =
-                            menuController.selectedSideItems[index];
+                        final foodItem = sides[index];
 
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8),
@@ -444,7 +497,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                                       ),
                                       SizedBox(height: 1.h),
                                       Text(
-                                        '${foodItem.nutritionalInfo} kcal | \$${foodItem.foodPrice.toStringAsFixed(2)}',
+                                        '${foodItem.nutritionalInfo} kcal | \₱${foodItem.foodPrice.toStringAsFixed(2)}',
                                         style: context.textTheme.bodySmall
                                             ?.copyWith(
                                           color: Colors.grey,
@@ -455,7 +508,8 @@ class _AddMenuItemState extends State<AddMenuItem> {
                                 ),
                                 IconButton(
                                     onPressed: () {
-                                      menuController.removeSide(foodItem);
+                                      sides.removeAt(index);
+                                      setState(() {});
                                     },
                                     icon: Icon(Icons.delete_outline))
                               ],
@@ -464,8 +518,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                         );
                       },
                     )
-                  : Center(child: Text("No sides selected"))),
-
+                  : Center(child: Text("No sides selected")),
               SizedBox(height: 2.h),
 
               // Submit Button
@@ -545,6 +598,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
           containsEgg: _containsEgg,
           allergies: _selectedAllergens,
           spiceLevel: _spiceLevel,
+          sides: sides,
         );
 
         if (widget.item == null) {
