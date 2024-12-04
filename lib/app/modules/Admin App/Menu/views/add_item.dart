@@ -39,7 +39,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
   final TextEditingController _priceController = TextEditingController();
 
   final TextEditingController _nutritionController = TextEditingController();
-
+  bool isAvailable = true;
   // Image picker
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
@@ -88,6 +88,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
       _spiceLevel = widget.item!.spiceLevel;
 
       _nutritionController.text = widget.item!.nutritionalInfo.toString();
+      isAvailable = widget.item!.isAvailable;
 
       // print('Image: ${widget.item!.foodImage}');
       // for (int i = 0; i < _selectedAllergens.length; i++) {
@@ -109,7 +110,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Add New Menu Item',
+          widget.item == null ? 'Add New Menu Item' : 'Edit Menu Item',
           style: TextStyle(color: AppColors.onPrimaryLight),
         ),
         backgroundColor: AppColors.primaryLight,
@@ -265,32 +266,61 @@ class _AddMenuItemState extends State<AddMenuItem> {
 
               SizedBox(height: 2.h),
 
-              // Price Field
-              TextFormField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Price',
-                  prefixText: '\₱',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceLight,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a price';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
+              // // Price Field
+              // TextFormField(
+              //   controller: _priceController,
+              //   keyboardType: TextInputType.number,
+              //   decoration: InputDecoration(
+              //     labelText: 'Price',
+              //     prefixText: '\₱',
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(10),
+              //     ),
+              //     filled: true,
+              //     fillColor: AppColors.surfaceLight,
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter a price';
+              //     }
+              //     if (double.tryParse(value) == null) {
+              //       return 'Please enter a valid number';
+              //     }
+              //     return null;
+              //   },
+              // ),
 
               // Category Dropdown
 
+              SizedBox(height: 2.h),
+
+              Text(
+                'Dish Availability',
+                style: context.textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  isAvailable
+                      ? Text(
+                          'Available',
+                          style: context.textTheme.bodyLarge,
+                        )
+                      : Text(
+                          'Not Available',
+                          style: context.textTheme.bodyLarge,
+                        ),
+                  Switch(
+                      value: isAvailable,
+                      onChanged: (value) {
+                        setState(() {
+                          isAvailable = value;
+                        });
+                      }),
+                ],
+              ),
               SizedBox(height: 2.h),
 
               // Spice Level Slider
@@ -598,6 +628,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
           containsEgg: _containsEgg,
           allergies: _selectedAllergens,
           spiceLevel: _spiceLevel,
+          isAvailable: isAvailable,
           sides: sides,
         );
 
