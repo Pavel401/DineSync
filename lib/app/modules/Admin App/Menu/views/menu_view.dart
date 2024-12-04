@@ -1,3 +1,4 @@
+import 'package:cho_nun_btk/app/components/food_card.dart';
 import 'package:cho_nun_btk/app/components/network_image.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
@@ -212,6 +213,7 @@ class MenuView extends StatelessWidget {
                               ? ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: controller.items.length,
+                                  physics: NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
@@ -223,30 +225,10 @@ class MenuView extends StatelessWidget {
                                               controller.selectedCategory!);
                                         });
                                       },
-                                      child: Container(
-                                        padding: EdgeInsets.all(2.w),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.searchBarLight,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  controller
-                                                      .items[index].foodName,
-                                                  style: context
-                                                      .textTheme.titleMedium!
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                      child: FoodCard(
+                                        foodItem: controller.items[index],
+                                        index: index,
+                                        onDelete: () {},
                                       ),
                                     );
                                   })
