@@ -13,12 +13,23 @@ class FoodMenuController extends GetxController {
   }
 
   RxList<FoodItem> items = <FoodItem>[].obs;
+  RxList<FoodItem> sideItems = <FoodItem>[].obs;
+
+  RxList<FoodItem> selectedSideItems = <FoodItem>[].obs;
 
   RxBool isItemsLoading = false.obs;
+  RxBool isSideItemsLoading = false.obs;
 
   RxList<FoodCategory> categories = <FoodCategory>[].obs;
 
   FoodCategory selectedCategory = FoodCategory(
+    categoryName: '',
+    categoryImage: '',
+    categoryId: '',
+    categoryDescription: '',
+  );
+
+  FoodCategory selectedSideCategory = FoodCategory(
     categoryName: '',
     categoryImage: '',
     categoryId: '',
@@ -29,8 +40,12 @@ class FoodMenuController extends GetxController {
   Future<void> changecategory(FoodCategory category) async {
     selectedCategory = category;
 
-    items.clear();
+    update();
+  }
 
+  Future<void> changeSideCategory(FoodCategory category) async {
+    selectedSideCategory = category;
+    await getSideItemsForCategory(category);
     update();
   }
 
@@ -47,6 +62,8 @@ class FoodMenuController extends GetxController {
   Future<void> selectInitialCategory() async {
     if (categories.isNotEmpty) {
       selectedCategory = categories[0];
+
+      getItemsForCategory(selectedCategory);
     }
     update();
   }
@@ -113,6 +130,9 @@ class FoodMenuController extends GetxController {
 
   Future<List<FoodCategory>> getAllCategories() async {
     categories.value = await menuprovider.getAllCategories();
+
+    selectInitialCategory();
+
     update();
     return categories;
   }
@@ -131,6 +151,7 @@ class FoodMenuController extends GetxController {
     }
 
     EasyLoading.dismiss();
+    Get.back();
     update();
   }
 
@@ -148,6 +169,7 @@ class FoodMenuController extends GetxController {
     }
 
     EasyLoading.dismiss();
+    Get.back();
     update();
   }
 
@@ -165,12 +187,15 @@ class FoodMenuController extends GetxController {
     }
 
     EasyLoading.dismiss();
+    Get.back();
     update();
   }
 
   Future<void> getItemsForCategory(FoodCategory category) async {
     EasyLoading.show(status: 'Fetching items');
     isItemsLoading.value = true;
+
+    items.clear();
     print('Fetching items');
     List<FoodItem> itemsT = await menuprovider.getAllItems(category);
 
@@ -179,6 +204,40 @@ class FoodMenuController extends GetxController {
     isItemsLoading.value = false;
     EasyLoading.dismiss();
 
+    update();
+  }
+
+  Future<void> getSideItemsForCategory(FoodCategory category) async {
+    EasyLoading.show(status: 'Fetching items');
+    isSideItemsLoading.value = true;
+
+    sideItems.clear();
+    print('Fetching items');
+    List<FoodItem> itemsT = await menuprovider.getAllItems(category);
+
+    sideItems.value = itemsT;
+
+    isSideItemsLoading.value = false;
+    EasyLoading.dismiss();
+
+    update();
+  }
+
+  Future<String> generateFoodId() async {
+    return await menuprovider.newId();
+  }
+
+  void selectSide(FoodItem food) {
+    if (selectedSideItems.contains(food)) {
+      selectedSideItems.remove(food);
+    } else {
+      selectedSideItems.add(food);
+    }
+    update();
+  }
+
+  void removeSide(FoodItem food) {
+    selectedSideItems.remove(food);
     update();
   }
 }
