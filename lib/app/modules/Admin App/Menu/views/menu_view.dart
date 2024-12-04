@@ -47,8 +47,6 @@ class MenuView extends StatelessWidget {
                   menuController.categories =
                       snapshot.data as RxList<FoodCategory>;
 
-                  menuController.selectInitialCategory();
-
                   return GetBuilder(builder: (FoodMenuController controller) {
                     return SingleChildScrollView(
                       physics: NeverScrollableScrollPhysics(),
@@ -187,7 +185,10 @@ class MenuView extends StatelessWidget {
                               Expanded(child: SizedBox()),
                               GestureDetector(
                                 onTap: () {
-                                  Get.to(() => AddMenuItem());
+                                  Get.to(() => AddMenuItem())!.then((value) {
+                                    menuController.getItemsForCategory(
+                                        menuController.selectedCategory!);
+                                  });
                                 },
                                 child: DottedBorder(
                                   borderType: BorderType.RRect,
@@ -212,11 +213,41 @@ class MenuView extends StatelessWidget {
                                   shrinkWrap: true,
                                   itemCount: controller.items.length,
                                   itemBuilder: (context, index) {
-                                    return ListTile(
-                                      title: Text(
-                                          menuController.items[index].foodName),
-                                      subtitle: Text(menuController
-                                          .items[index].foodDescription),
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Get.to(() => AddMenuItem(
+                                                  item: controller.items[index],
+                                                ))!
+                                            .then((value) {
+                                          controller.getItemsForCategory(
+                                              controller.selectedCategory!);
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(2.w),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.searchBarLight,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  controller
+                                                      .items[index].foodName,
+                                                  style: context
+                                                      .textTheme.titleMedium!
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
                                     );
                                   })
                               : Center(
