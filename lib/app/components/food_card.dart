@@ -22,12 +22,20 @@ class FoodCard extends StatefulWidget {
 class _FoodCardState extends State<FoodCard> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 6,
-      shape: RoundedRectangleBorder(
+    return Container(
+      // margin: const EdgeInsets.symmetric(vertical: 8),
+      // elevation: 6,
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(16),
+      // ),
+
+      margin: EdgeInsets.only(top: 2.h),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.outlineLight),
       ),
+
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -106,23 +114,23 @@ class _FoodCardState extends State<FoodCard> {
                         ],
                       ),
 
-                      // Price
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryDark,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.green.shade400),
-                        ),
-                        child: Text(
-                          '₱${widget.foodItem.foodPrice.toStringAsFixed(2)}',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: Colors.green.shade800,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                      // // Price
+                      // Container(
+                      //   padding: const EdgeInsets.symmetric(
+                      //       horizontal: 12, vertical: 6),
+                      //   decoration: BoxDecoration(
+                      //     color: AppColors.primaryDark,
+                      //     borderRadius: BorderRadius.circular(8),
+                      //     border: Border.all(color: Colors.green.shade400),
+                      //   ),
+                      //   child: Text(
+                      //     '₱${widget.foodItem.foodPrice.toStringAsFixed(2)}',
+                      //     style: context.textTheme.bodyMedium?.copyWith(
+                      //       color: Colors.green.shade800,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],
