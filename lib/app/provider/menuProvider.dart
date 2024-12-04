@@ -84,13 +84,17 @@ class Menuprovider {
   Future<QueryStatus> updateMenuItem(
       FoodItem item, FoodCategory foodCategory) async {
     try {
+      // debugPrint('Updating item');
+      // debugPrint("Category Id: ${foodCategory.categoryId}");
+      // debugPrint("Id: ${item.foodId}");
       await menuCollection
           .doc(foodCategory.categoryId)
           .collection('fooditems')
           .doc(item.foodId)
-          .update(item.toJson());
+          .set(item.toJson());
       return QueryStatus.SUCCESS;
     } catch (e) {
+      debugPrint('Error updating item: $e');
       return QueryStatus.ERROR;
     }
   }
