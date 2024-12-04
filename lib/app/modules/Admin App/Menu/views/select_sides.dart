@@ -123,7 +123,7 @@ class _SelectSidesViewState extends State<SelectSidesView> {
                                   ),
                                   SizedBox(height: 1.h),
                                   Text(
-                                    '${foodItem.nutritionalInfo} kcal | \₱${foodItem.foodPrice.toStringAsFixed(2)}',
+                                    '${foodItem.nutritionalInfo} kcal',
                                     style:
                                         context.textTheme.bodySmall?.copyWith(
                                       color: Colors.grey,
