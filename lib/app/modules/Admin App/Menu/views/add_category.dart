@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cho_nun_btk/app/components/snackBars.dart';
+import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
 import 'package:cho_nun_btk/app/provider/firebase_imageProvider.dart';
@@ -80,7 +81,18 @@ class _AddCategoryState extends State<AddCategory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Category'),
+        title: Text(
+          'Add Category',
+          style: TextStyle(color: AppColors.onPrimaryLight),
+        ),
+        backgroundColor: AppColors.primaryLight,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.chevron_left, color: AppColors.onPrimaryLight),
+          iconSize: 30,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
