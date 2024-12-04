@@ -1,17 +1,31 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cho_nun_btk/app/components/allergen_chip.dart';
+import 'package:cho_nun_btk/app/components/custom_buttons.dart';
+import 'package:cho_nun_btk/app/components/network_image.dart';
+import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/allergens.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/select_sides.dart';
+import 'package:cho_nun_btk/app/provider/firebase_imageProvider.dart';
+import 'package:cho_nun_btk/app/provider/menuProvider.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
 class AddMenuItem extends StatefulWidget {
-  const AddMenuItem({Key? key}) : super(key: key);
+  FoodItem? item;
+  AddMenuItem({
+    Key? key,
+    this.item,
+  }) : super(key: key);
 
   @override
   _AddMenuItemState createState() => _AddMenuItemState();
@@ -24,6 +38,8 @@ class _AddMenuItemState extends State<AddMenuItem> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+
+  final TextEditingController _nutritionController = TextEditingController();
 
   // Image picker
   File? _selectedImage;
@@ -42,6 +58,8 @@ class _AddMenuItemState extends State<AddMenuItem> {
   // Allergens selection
   List<Allergens> _selectedAllergens = [];
 
+  List<FoodItem> sides = [];
+
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
@@ -55,6 +73,30 @@ class _AddMenuItemState extends State<AddMenuItem> {
   FoodMenuController menuController = Get.find<FoodMenuController>();
 
   @override
+  void initState() {
+    // TODO: implement initState
+
+    if (widget.item != null) {
+      _nameController.text = widget.item!.foodName;
+      _descriptionController.text = widget.item!.foodDescription;
+      _priceController.text = widget.item!.foodPrice.toString();
+      _isVegan = widget.item!.isVegan;
+      _isGlutenFree = widget.item!.isGlutenFree;
+      _isLactoseFree = widget.item!.isLactoseFree;
+      _containsEgg = widget.item!.containsEgg;
+      _selectedAllergens = widget.item!.allergies;
+      _spiceLevel = widget.item!.spiceLevel;
+
+      _nutritionController.text = widget.item!.nutritionalInfo.toString();
+
+      sides = widget.item!.sides;
+
+      print('Image: ${widget.item!.foodImage}');
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -63,6 +105,13 @@ class _AddMenuItemState extends State<AddMenuItem> {
           style: TextStyle(color: AppColors.onPrimaryLight),
         ),
         backgroundColor: AppColors.primaryLight,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.chevron_left, color: AppColors.onPrimaryLight),
+          iconSize: 30,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -83,27 +132,40 @@ class _AddMenuItemState extends State<AddMenuItem> {
                   ),
                   child: _selectedImage != null
                       ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.camera_alt,
-                              color: AppColors.primaryLight,
-                              size: 50,
+                      : widget.item?.foodImage != null &&
+                              widget.item!.foodImage.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: widget.item!.foodImage,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  Center(child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.camera_alt,
+                                  color: AppColors.primaryLight,
+                                  size: 50,
+                                ),
+                                Text(
+                                  'Tap to Select Image',
+                                  style:
+                                      TextStyle(color: AppColors.outlineLight),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Tap to Select Image',
-                              style: TextStyle(color: AppColors.outlineLight),
-                            ),
-                          ],
-                        ),
                 ),
               ),
+
               SizedBox(height: 2.h),
 
               // Name Field
               TextFormField(
                 controller: _nameController,
+                maxLength: 100,
                 decoration: InputDecoration(
                   labelText: 'Food Name',
                   border: OutlineInputBorder(
@@ -125,6 +187,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
+                maxLength: 300,
                 decoration: InputDecoration(
                   labelText: 'Food Description',
                   border: OutlineInputBorder(
@@ -140,6 +203,21 @@ class _AddMenuItemState extends State<AddMenuItem> {
                   return null;
                 },
               ),
+              SizedBox(height: 2.h),
+              TextFormField(
+                controller: _nutritionController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Nutritional Info (kcal)',
+                  suffixText: 'kcal',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.surfaceLight,
+                ),
+              ),
+
               SizedBox(height: 2.h),
 
               // Price Field
@@ -256,11 +334,13 @@ class _AddMenuItemState extends State<AddMenuItem> {
               // Allergens Selection
               SizedBox(height: 2.h),
               Text(
-                'Allergens',
+                'Select Allergens',
                 style: context.textTheme.titleMedium!.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(height: 2.h),
+
               Wrap(
                 spacing: 1.h,
                 runSpacing: 2.w,
@@ -282,26 +362,144 @@ class _AddMenuItemState extends State<AddMenuItem> {
                 ],
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 2.h),
+
+              Row(
+                children: [
+                  Text(
+                    'Select Sides & Extras(Optional)',
+                    style: context.textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Expanded(child: SizedBox()),
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => SelectSidesView());
+                    },
+                    child: DottedBorder(
+                      borderType: BorderType.RRect,
+                      radius: Radius.circular(12),
+                      padding: EdgeInsets.all(6),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add),
+                          Text("Add "),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              Obx(() => menuController.selectedSideItems.length > 0
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: menuController.selectedSideItems.length,
+                      itemBuilder: (context, index) {
+                        final foodItem =
+                            menuController.selectedSideItems[index];
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Food Image
+                                CustomNetworkImage(
+                                  imageUrl: foodItem.foodImage,
+                                  size: 25.w,
+                                  fit: BoxFit.cover,
+                                ),
+                                SizedBox(width: 4.w),
+
+                                // Food Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        foodItem.foodName,
+                                        style: context.textTheme.bodyLarge
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 1.h),
+                                      Text(
+                                        foodItem.foodDescription,
+                                        style: context.textTheme.bodyMedium,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 1.h),
+                                      Text(
+                                        '${foodItem.nutritionalInfo} kcal | \$${foodItem.foodPrice.toStringAsFixed(2)}',
+                                        style: context.textTheme.bodySmall
+                                            ?.copyWith(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      menuController.removeSide(foodItem);
+                                    },
+                                    icon: Icon(Icons.delete_outline))
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Center(child: Text("No sides selected"))),
+
+              SizedBox(height: 2.h),
 
               // Submit Button
-              ElevatedButton(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryLight,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Add Menu Item',
-                  style: TextStyle(
-                    color: AppColors.onPrimaryLight,
-                    fontSize: 16,
-                  ),
-                ),
+              Row(
+                mainAxisAlignment: widget.item == null
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.spaceEvenly,
+                children: [
+                  // ElevatedButton.icon(
+                  //   onPressed: _submitForm,
+                  //   icon: Icon(Icons.add),
+                  //   label: Text(
+                  //     widget.item == null ? 'Add Item' : 'Update Item',
+                  //   ),
+                  // ),
+                  CafePrimaryButton(
+                      buttonTitle:
+                          widget.item == null ? 'Add Item' : 'Update Item',
+                      width: 20.w,
+                      onPressed: () {
+                        _submitForm();
+                      }),
+                  widget.item != null
+                      ? CafePrimaryButton(
+                          buttonTitle: "Remove",
+                          width: 20.w,
+                          onPressed: () {
+                            menuController.removeMenuItem(
+                                widget.item!, menuController.selectedCategory);
+                          })
+                      : SizedBox(),
+                ],
               ),
+              SizedBox(height: 2.h),
             ],
           ),
         ),
@@ -309,33 +507,61 @@ class _AddMenuItemState extends State<AddMenuItem> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Create FoodItem from form inputs
-      final newMenuItem = FoodItem(
-        foodId: DateTime.now()
-            .millisecondsSinceEpoch
-            .toString(), // Generate unique ID
-        foodName: _nameController.text,
-        foodDescription: _descriptionController.text,
-        foodPrice: double.parse(_priceController.text),
-        foodCategory: menuController.selectedCategory,
-        foodImage: _selectedImage?.path ?? '',
-        isVegan: _isVegan,
-        isGlutenFree: _isGlutenFree,
-        isLactoseFree: _isLactoseFree,
-        containsEgg: _containsEgg,
-        allergies: [],
-        spiceLevel: _spiceLevel,
-      );
+      EasyLoading.show(status: 'Uploading...');
 
-      // TODO: Implement saving logic (e.g., to database or API)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Menu Item Added: ${newMenuItem.foodName}'),
-          backgroundColor: AppColors.primaryLight,
-        ),
-      );
+      Menuprovider menuprovider = Menuprovider();
+
+      String? imageUrl =
+          widget.item?.foodImage; // Default to existing image URL
+
+      // If there's a new image, upload it
+      if (_selectedImage != null &&
+          _selectedImage!.path != widget.item?.foodImage) {
+        FirebaseImageprovider firebaseImageprovider = FirebaseImageprovider();
+        imageUrl = await firebaseImageprovider.uploadImageToFirebase(
+          menuController
+              .selectedCategory.categoryId, // Replace with the category ID
+          _selectedImage,
+          context,
+        );
+      }
+
+      if (imageUrl != null) {
+        EasyLoading.dismiss();
+
+        // Create FoodItem from form inputs
+        final newMenuItem = FoodItem(
+          foodId: widget.item?.foodId ?? menuprovider.newId(),
+          foodName: _nameController.text,
+          foodDescription: _descriptionController.text,
+          foodPrice: double.parse(_priceController.text),
+          foodCategory: menuController.selectedCategory,
+          foodImage: imageUrl,
+          isVegan: _isVegan,
+          isGlutenFree: _isGlutenFree,
+          isLactoseFree: _isLactoseFree,
+          containsEgg: _containsEgg,
+          allergies: _selectedAllergens,
+          spiceLevel: _spiceLevel,
+        );
+
+        if (widget.item == null) {
+          // Add new item
+          menuController.addNewMenuItem(
+              newMenuItem, menuController.selectedCategory);
+        } else {
+          // Update existing item
+          menuController.updateMenuItem(
+              newMenuItem, menuController.selectedCategory);
+        }
+
+        Get.back();
+      } else {
+        EasyLoading.dismiss();
+        CustomSnackBar.showError('Error', 'Failed to save item', context);
+      }
     }
   }
 
