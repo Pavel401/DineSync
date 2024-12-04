@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cho_nun_btk/app/components/network_image.dart';
 import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
@@ -12,7 +13,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddCategory extends StatefulWidget {
-  const AddCategory({super.key});
+  FoodCategory? category;
+  AddCategory({super.key, this.category});
 
   @override
   State<AddCategory> createState() => _AddCategoryState();
@@ -37,7 +39,7 @@ class _AddCategoryState extends State<AddCategory> {
   }
 
   void _saveCategory() async {
-    if (!_formKey.currentState!.validate() || _selectedImage == null) {
+    if (!_formKey.currentState!.validate()) {
       CustomSnackBar.showError(
           'Error', 'Please fill all fields and select an image', context);
       return;
@@ -49,9 +51,13 @@ class _AddCategoryState extends State<AddCategory> {
     Menuprovider _menuprovider = Menuprovider();
 
     try {
-      final categoryId = _menuprovider.newId();
-      final imageUrl = await _firebaseImageprovider.uploadImageToFirebase(
-          categoryId, _selectedImage, context);
+      final categoryId = widget.category != null
+          ? widget.category!.categoryId
+          : _menuprovider.newId();
+      final imageUrl = _selectedImage == null
+          ? widget.category!.categoryImage
+          : await _firebaseImageprovider.uploadImageToFirebase(
+              categoryId, _selectedImage, context);
 
       if (imageUrl == null) {
         EasyLoading.dismiss();
@@ -65,7 +71,12 @@ class _AddCategoryState extends State<AddCategory> {
         categoryDescription: _descriptionController.text,
       );
 
-      await _controller.addCategory(category, context); // Wait for addCategory
+      if (widget.category != null) {
+        await _controller.updateCategory(category, context);
+      } else {
+        await _controller.addCategory(
+            category, context); // Wait for addCategory
+      }
       EasyLoading.dismiss();
       if (mounted) {
         Get.back(); // Close only if still mounted
@@ -78,11 +89,22 @@ class _AddCategoryState extends State<AddCategory> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+
+    if (widget.category != null) {
+      _nameController.text = widget.category!.categoryName;
+      _descriptionController.text = widget.category!.categoryDescription!;
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Add Category',
+          widget.category != null ? 'Edit Category' : 'Add Category',
           style: TextStyle(color: AppColors.onPrimaryLight),
         ),
         backgroundColor: AppColors.primaryLight,
@@ -104,30 +126,83 @@ class _AddCategoryState extends State<AddCategory> {
               GestureDetector(
                 onTap: _pickImage,
                 child: Container(
-                  height: 150,
+                  height: 200,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                    image: _selectedImage != null
-                        ? DecorationImage(
-                            image: FileImage(_selectedImage!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.outlineLight),
                   ),
-                  child: _selectedImage == null
-                      ? const Center(
-                          child: Text(
-                            'Tap to select an image',
-                            style: TextStyle(color: Colors.grey),
+                  child: Stack(
+                    children: [
+                      // Display selected image or default placeholders
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: _selectedImage != null
+                            ? Image.file(_selectedImage!,
+                                fit: BoxFit.cover, width: double.infinity)
+                            : widget.category?.categoryImage != null &&
+                                    widget.category!.categoryImage.isNotEmpty
+                                ? CustomNetworkImage(
+                                    imageUrl: widget.category!.categoryImage,
+                                    fit: BoxFit.cover,
+                                    size: double.infinity,
+                                  )
+                                : Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_a_photo,
+                                            size: 50,
+                                            color: AppColors.onSurfaceLight),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          "Add Image",
+                                          style: TextStyle(
+                                              color: AppColors.onSurfaceLight,
+                                              fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                      ),
+
+                      // Overlay for edit and upload actions
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.black.withOpacity(0.2),
                           ),
-                        )
-                      : null,
+                        ),
+                      ),
+
+                      // Action icons (Edit and Upload)
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.edit,
+                                color: AppColors.onSurfaceLight),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
+                maxLength: 50,
+                maxLines: 2,
                 decoration: const InputDecoration(
                   labelText: 'Category Name',
                 ),
@@ -141,6 +216,8 @@ class _AddCategoryState extends State<AddCategory> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descriptionController,
+                maxLength: 400,
+                minLines: 3,
                 decoration: const InputDecoration(
                   labelText: 'Category Description',
                 ),
@@ -149,7 +226,9 @@ class _AddCategoryState extends State<AddCategory> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _saveCategory,
-                child: const Text('Save Category'),
+                child: widget.category != null
+                    ? const Text('Update Category')
+                    : const Text('Add Category'),
               ),
             ],
           ),
