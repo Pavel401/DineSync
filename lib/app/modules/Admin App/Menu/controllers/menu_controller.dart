@@ -111,8 +111,8 @@ class FoodMenuController extends GetxController {
     EasyLoading.show(status: 'Updating category');
     QueryStatus status = await menuprovider.updateCategory(category);
 
-    categories[categories.indexWhere((element) => element == category)] =
-        category;
+    // categories[categories.indexWhere((element) => element == category)] =
+    //     category;
 
     if (status == QueryStatus.ERROR) {
       CustomSnackBar.showError('Error', 'Failed to update category', context);
@@ -122,6 +122,7 @@ class FoodMenuController extends GetxController {
           'Success', 'Category updated successfully', context);
     }
 
+    Get.back();
     EasyLoading.dismiss();
     update();
   }
