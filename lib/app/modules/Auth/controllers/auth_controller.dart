@@ -90,6 +90,22 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> updatePassword(String new_password, UserModel model) async {
+    debugPrint("Updating password...");
+    UserModel updatedModel = model.copyWith(password: new_password);
+    try {
+      await _firestore
+          .collection('users')
+          .doc(updatedModel.uid)
+          .update(updatedModel.toJson());
+      _userModel.value = model; // Update the cached user model
+
+      signOut();
+    } catch (e) {
+      debugPrint("Error updating password: $e");
+    }
+  }
+
   /// Handles user signup
   Future<QueryStatus> signUp({
     required String email,
@@ -235,7 +251,7 @@ class AuthController extends GetxController {
   }
 
   /// Handles user logout
-  Future<void> signOut() async {
+  Future<bool> signOut() async {
     try {
       await _auth.signOut();
       _userModel.value = null; // Clear the cached user model
@@ -248,8 +264,10 @@ class AuthController extends GetxController {
       selectedUserType = UserType.NONE;
 
       Get.offAll(() => SplashScreen());
+      return true;
     } catch (e) {
       debugPrint("Error signing out: $e");
+      return false;
     }
   }
 }

@@ -5,7 +5,7 @@ import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/views/home_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/views/chef_home.dart';
-import 'package:cho_nun_btk/app/modules/Waiter%20App/views/waiter_view.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Home/views/waiter_view.dart';
 import 'package:cho_nun_btk/app/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -163,7 +163,7 @@ class _SignInViewState extends State<SignInView> {
                                   view = ChefHomeView();
                                 } else if (authController.userModel!.userType ==
                                     UserType.WAITER) {
-                                  view = WaiterView();
+                                  view = WaiterHomeView();
                                 }
                               } else {
                                 debugPrint("User model is null after sign-in");
@@ -240,7 +240,7 @@ class _SignInViewState extends State<SignInView> {
                                   view = ChefHomeView();
                                 } else if (authController.userModel!.userType ==
                                     UserType.WAITER) {
-                                  view = WaiterView();
+                                  view = WaiterHomeView();
                                 }
                               } else {
                                 debugPrint("User model is null after sign-in");

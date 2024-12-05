@@ -41,6 +41,7 @@ dependencies:
   firebase_storage: ^12.3.6
   flutter:
     sdk: flutter
+  flutter_bounceable: ^1.1.0
   flutter_easyloading: ^3.0.5
   flutter_svg: ^2.0.16
   get: ^4.6.6
