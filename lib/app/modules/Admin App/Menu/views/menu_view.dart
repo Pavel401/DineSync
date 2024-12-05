@@ -159,7 +159,7 @@ class _MenuViewState extends State<MenuView> {
                                                     imageUrl: menuController
                                                         .categories[index]
                                                         .categoryImage,
-                                                    size: 100.0,
+                                                    size: 20.w,
                                                     isCircular: true,
                                                     borderWidth: 4.0,
                                                   ),
