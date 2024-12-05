@@ -3,6 +3,7 @@ import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/More/view/more_view.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/views/order_overview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -23,9 +24,9 @@ class WaiterHomeView extends StatelessWidget {
           () => IndexedStack(
             index: homeController.currentIndex.value,
             children: [
-              Container(),
+              // Container(),
               // Placeholder(),
-              Container(),
+              OrderOverview(),
 
               WaiterMoreView(),
             ],
@@ -67,15 +68,15 @@ class WaiterHomeView extends StatelessWidget {
           // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
 
           destinations: <Widget>[
-            NavigationDestination(
-              icon: Icon(
-                Icons.history_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
-              ),
-              label: 'History',
-            ),
+            // NavigationDestination(
+            //   icon: Icon(
+            //     Icons.history_outlined,
+            //     color: themeProvider.isDarkMode
+            //         ? AppColors.secondaryDark
+            //         : AppColors.secondaryLight,
+            //   ),
+            //   label: 'History',
+            // ),
             NavigationDestination(
               icon: Icon(
                 Icons.list_alt_outlined,
@@ -83,7 +84,7 @@ class WaiterHomeView extends StatelessWidget {
                     ? AppColors.secondaryDark
                     : AppColors.secondaryLight,
               ),
-              label: 'New Order',
+              label: 'Orders',
             ),
             // NavigationDestination(
             //   icon: Icon(
