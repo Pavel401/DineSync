@@ -6,7 +6,7 @@ import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/fcm_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/views/auth_view_home.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/views/chef_home.dart';
-import 'package:cho_nun_btk/app/modules/Waiter%20App/views/waiter_view.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Home/views/waiter_view.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -130,7 +130,7 @@ class SplashScreen extends StatelessWidget {
               view = ChefHomeView();
               break;
             case UserType.WAITER:
-              view = WaiterView();
+              view = WaiterHomeView();
               break;
             default:
               view = AuthView();
