@@ -1,3 +1,4 @@
+import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/components/food_card_v2.dart';
 import 'package:cho_nun_btk/app/components/network_image.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
@@ -60,333 +61,355 @@ class _AddNewOrderViewState extends State<AddNewOrderView> {
         children: [
           Padding(
             padding: AppPading.containerPadding,
-            child: FutureBuilder(
-              future: getCategories,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                }
+            child: Column(
+              children: [
+                Expanded(
+                  child: FutureBuilder(
+                    future: getCategories,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+                      }
 
-                menuController.categories =
-                    snapshot.data as RxList<FoodCategory>;
+                      menuController.categories =
+                          snapshot.data as RxList<FoodCategory>;
 
-                return GetBuilder(
-                  builder: (FoodMenuController controller) {
-                    return SingleChildScrollView(
-                      // physics: NeverScrollableScrollPhysics(),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Center(
-                          //   child: SvgPicture.asset(
-                          //     'assets/svg/empty.svg',
-                          //     height: 20.h,
-                          //     width: 50.w,
-                          //   ),
-                          // ),
+                      return GetBuilder(
+                        builder: (FoodMenuController controller) {
+                          return SingleChildScrollView(
+                            // physics: NeverScrollableScrollPhysics(),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Center(
+                                //   child: SvgPicture.asset(
+                                //     'assets/svg/empty.svg',
+                                //     height: 20.h,
+                                //     width: 50.w,
+                                //   ),
+                                // ),
 
-                          Row(
-                            children: [
-                              Text(
-                                "Categories",
-                                style: context.textTheme.titleMedium!.copyWith(
-                                  fontWeight: FontWeight.bold,
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Categories",
+                                      style: context.textTheme.titleMedium!
+                                          .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "(${menuController.categories.length.toString()})",
+                                      style: context.textTheme.titleSmall!
+                                          .copyWith(
+                                        color: AppColors.primaryLight,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              Text(
-                                "(${menuController.categories.length.toString()})",
-                                style: context.textTheme.titleSmall!.copyWith(
-                                  color: AppColors.primaryLight,
+                                SizedBox(
+                                  height: 1.h,
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 1.h,
-                          ),
-                          menuController.categories.length > 0
-                              ? SizedBox(
-                                  height: 18.h,
-                                  width: 100.w,
-                                  child: ListView.builder(
-                                      shrinkWrap: true,
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount:
-                                          menuController.categories.length,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: EdgeInsets.all(1.w),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              menuController.changecategory(
-                                                  menuController
-                                                      .categories[index]);
+                                menuController.categories.length > 0
+                                    ? SizedBox(
+                                        height: 18.h,
+                                        width: 100.w,
+                                        child: ListView.builder(
+                                            shrinkWrap: true,
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: menuController
+                                                .categories.length,
+                                            itemBuilder: (context, index) {
+                                              return Padding(
+                                                padding: EdgeInsets.all(1.w),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    menuController
+                                                        .changecategory(
+                                                            menuController
+                                                                    .categories[
+                                                                index]);
 
-                                              menuController
-                                                  .getItemsForCategory(
-                                                      menuController
-                                                          .selectedCategory!);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.all(2.w),
-                                              decoration: BoxDecoration(
-                                                color: menuController
-                                                            .categories[index]
-                                                            .categoryId ==
-                                                        menuController
-                                                            .selectedCategory!
-                                                            .categoryId
-                                                    ? AppColors.searchBarLight
-                                                    : AppColors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  CustomNetworkImage(
-                                                    imageUrl: menuController
-                                                        .categories[index]
-                                                        .categoryImage,
-                                                    size: 20.w,
-                                                    isCircular: true,
-                                                    borderWidth: 4.0,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 30.w,
-                                                    child: Text(
-                                                      menuController
-                                                          .categories[index]
-                                                          .categoryName,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: context.textTheme
-                                                          .titleMedium!
-                                                          .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                    menuController
+                                                        .getItemsForCategory(
+                                                            menuController
+                                                                .selectedCategory!);
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.all(2.w),
+                                                    decoration: BoxDecoration(
+                                                      color: menuController
+                                                                  .categories[
+                                                                      index]
+                                                                  .categoryId ==
+                                                              menuController
+                                                                  .selectedCategory!
+                                                                  .categoryId
+                                                          ? AppColors
+                                                              .searchBarLight
+                                                          : AppColors
+                                                              .transparent,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                    child: Column(
+                                                      children: [
+                                                        CustomNetworkImage(
+                                                          imageUrl:
+                                                              menuController
+                                                                  .categories[
+                                                                      index]
+                                                                  .categoryImage,
+                                                          size: 20.w,
+                                                          isCircular: true,
+                                                          borderWidth: 4.0,
+                                                        ),
+                                                        SizedBox(
+                                                          width: 30.w,
+                                                          child: Text(
+                                                            menuController
+                                                                .categories[
+                                                                    index]
+                                                                .categoryName,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: context
+                                                                .textTheme
+                                                                .titleMedium!
+                                                                .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        // Row(
+                                                        //   children: [
+                                                        //     Text("Edit"),
+                                                        //     Icon(Icons.edit)
+                                                        //   ],
+                                                        // )
+                                                      ],
                                                     ),
                                                   ),
-                                                  // Row(
-                                                  //   children: [
-                                                  //     Text("Edit"),
-                                                  //     Icon(Icons.edit)
-                                                  //   ],
-                                                  // )
-                                                ],
+                                                ),
+                                              );
+                                            }),
+                                      )
+                                    : Container(
+                                        width: 100.w,
+                                        child: DottedBorder(
+                                          borderType: BorderType.RRect,
+                                          child: Center(
+                                              child:
+                                                  Text("No Categories Found")),
+                                        ),
+                                      ),
+
+                                SizedBox(
+                                  height: 2.h,
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Menu Items",
+                                      style: context.textTheme.titleMedium!
+                                          .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "(${menuController.items.length.toString()})",
+                                      style: context.textTheme.titleSmall!
+                                          .copyWith(
+                                        color: AppColors.primaryLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 1.h,
+                                ),
+                                menuController.selectedCategory != null
+                                    ? Row(
+                                        children: [
+                                          CustomNetworkImage(
+                                            imageUrl: menuController
+                                                .selectedCategory.categoryImage,
+                                            size: 20.w,
+                                            isCircular: true,
+                                            borderWidth: 4.0,
+                                          ),
+                                          SizedBox(
+                                            width: 2.w,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 60.w,
+                                                child: Text(
+                                                  menuController
+                                                      .selectedCategory
+                                                      .categoryName,
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: context
+                                                      .textTheme.titleMedium!
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 60.w,
+                                                child: ReadMoreText(
+                                                  menuController
+                                                      .selectedCategory
+                                                      .categoryDescription!,
+                                                  trimMode: TrimMode.Line,
+                                                  trimLines: 2,
+                                                  colorClickableText:
+                                                      AppColors.primaryLight,
+                                                  trimCollapsedText:
+                                                      'Show more',
+                                                  trimExpandedText: 'Show less',
+                                                  moreStyle: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                    : SizedBox(),
+
+                                // SizedBox(
+                                //   height: 1.h,
+                                // ),
+                                // DottedLine(
+                                //   direction: Axis.horizontal,
+                                //   alignment: WrapAlignment.center,
+                                //   lineLength: double.infinity,
+                                //   lineThickness: 1.0,
+                                //   dashLength: 4.0,
+                                //   dashColor: Colors.black,
+                                //   dashRadius: 0.0,
+                                //   dashGapLength: 4.0,
+                                //   dashGapColor: Colors.transparent,
+                                //   dashGapRadius: 0.0,
+                                // ),
+
+                                SizedBox(
+                                  height: 1.h,
+                                ),
+                                menuController.items.length > 0
+                                    ? GetBuilder(
+                                        init: waiterOrderController,
+                                        builder: (WaiterOrderController
+                                            ordercontroller) {
+                                          return ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount:
+                                                  controller.items.length,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              itemBuilder: (context, index) {
+                                                return FoodCardReadWidget(
+                                                  onTap: () {
+                                                    Get.to(
+                                                      () => ViewOrderReadView(
+                                                          foodItem: controller
+                                                              .items[index]),
+                                                    );
+                                                  },
+                                                  foodItem:
+                                                      controller.items[index],
+                                                  itemCount: ordercontroller
+                                                      .totalItemCountForOrder(
+                                                          controller
+                                                              .items[index]),
+                                                  onRemove: () {
+                                                    ordercontroller
+                                                        .removeOrderItem(
+                                                            controller
+                                                                .items[index]);
+                                                  },
+                                                  onAdd: () {
+                                                    ordercontroller
+                                                        .addOrderItem(controller
+                                                            .items[index]);
+                                                  },
+                                                );
+                                              });
+                                        })
+                                    : Center(
+                                        // Ensures the entire content is centered
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment
+                                              .center, // Center vertically
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .center, // Center horizontally
+
+                                          children: [
+                                            SvgPicture.asset(
+                                              "assets/svg/empty.svg",
+                                              height: 10.h,
+                                              width: 20.w,
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Text(
+                                              "No items found",
+                                              style: context
+                                                  .textTheme.titleMedium!
+                                                  .copyWith(
+                                                color: AppColors.primaryLight,
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      }),
-                                )
-                              : Container(
-                                  width: 100.w,
-                                  child: DottedBorder(
-                                    borderType: BorderType.RRect,
-                                    child: Center(
-                                        child: Text("No Categories Found")),
-                                  ),
-                                ),
-
-                          SizedBox(
-                            height: 2.h,
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                "Menu Items",
-                                style: context.textTheme.titleMedium!.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "(${menuController.items.length.toString()})",
-                                style: context.textTheme.titleSmall!.copyWith(
-                                  color: AppColors.primaryLight,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 1.h,
-                          ),
-                          menuController.selectedCategory != null
-                              ? Row(
-                                  children: [
-                                    CustomNetworkImage(
-                                      imageUrl: menuController
-                                          .selectedCategory.categoryImage,
-                                      size: 20.w,
-                                      isCircular: true,
-                                      borderWidth: 4.0,
-                                    ),
-                                    SizedBox(
-                                      width: 2.w,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 60.w,
-                                          child: Text(
-                                            menuController
-                                                .selectedCategory.categoryName,
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: context
-                                                .textTheme.titleMedium!
-                                                .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 60.w,
-                                          child: ReadMoreText(
-                                            menuController.selectedCategory
-                                                .categoryDescription!,
-                                            trimMode: TrimMode.Line,
-                                            trimLines: 2,
-                                            colorClickableText:
-                                                AppColors.primaryLight,
-                                            trimCollapsedText: 'Show more',
-                                            trimExpandedText: 'Show less',
-                                            moreStyle: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                )
-                              : SizedBox(),
-
-                          // SizedBox(
-                          //   height: 1.h,
-                          // ),
-                          // DottedLine(
-                          //   direction: Axis.horizontal,
-                          //   alignment: WrapAlignment.center,
-                          //   lineLength: double.infinity,
-                          //   lineThickness: 1.0,
-                          //   dashLength: 4.0,
-                          //   dashColor: Colors.black,
-                          //   dashRadius: 0.0,
-                          //   dashGapLength: 4.0,
-                          //   dashGapColor: Colors.transparent,
-                          //   dashGapRadius: 0.0,
-                          // ),
-
-                          SizedBox(
-                            height: 1.h,
-                          ),
-                          menuController.items.length > 0
-                              ? GetBuilder(
-                                  init: waiterOrderController,
-                                  builder:
-                                      (WaiterOrderController ordercontroller) {
-                                    return ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: controller.items.length,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        itemBuilder: (context, index) {
-                                          return FoodCardReadWidget(
-                                            onTap: () {
-                                              Get.to(
-                                                () => ViewOrderReadView(
-                                                    foodItem: controller
-                                                        .items[index]),
-                                              );
-                                            },
-                                            foodItem: controller.items[index],
-                                            itemCount: ordercontroller
-                                                .totalItemCountForOrder(
-                                                    controller.items[index]),
-                                            onRemove: () {
-                                              ordercontroller.removeOrderItem(
-                                                  controller.items[index]);
-                                            },
-                                            onAdd: () {
-                                              ordercontroller.addOrderItem(
-                                                  controller.items[index]);
-                                            },
-                                          );
-                                        });
-                                  })
-                              : Center(
-                                  // Ensures the entire content is centered
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .center, // Center vertically
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .center, // Center horizontally
-
-                                    children: [
-                                      SvgPicture.asset(
-                                        "assets/svg/empty.svg",
-                                        height: 10.h,
-                                        width: 20.w,
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      Text(
-                                        "No items found",
-                                        style: context.textTheme.titleMedium!
-                                            .copyWith(
-                                          color: AppColors.primaryLight,
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
 
-                          SizedBox(
-                            height: 10.h,
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+                                SizedBox(
+                                  height: 10.h,
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Positioned(
-            bottom: 5.h,
-            width: 80.w,
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle Confirm Order Logic
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryLight,
-                padding: EdgeInsets.symmetric(vertical: 16), // Button height
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), // Rounded edges
-                ),
-              ),
-              child: Text(
-                "Confirm Order",
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+              bottom: 5.h,
+              left: 10.w,
+              right: 10.w,
+              child: Obx(() => CafePrimaryButton(
+                    buttonTitle: "Confirm Order",
+                    isEnabled: !waiterOrderController.isOrderEmpty.value,
+                    onPressed: () {},
+                  ))),
         ],
       ),
     );
