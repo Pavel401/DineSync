@@ -4,12 +4,15 @@ import 'package:get/get.dart';
 class WaiterOrderController extends GetxController {
   Map<FoodItem, int> orderItems = {};
 
+  RxBool isOrderEmpty = true.obs;
+
   void addOrderItem(FoodItem foodItem) {
     if (orderItems.containsKey(foodItem)) {
       orderItems[foodItem] = orderItems[foodItem]! + 1;
     } else {
       orderItems[foodItem] = 1;
     }
+    isOrderEmpty.value = false;
     update();
   }
 
@@ -20,6 +23,9 @@ class WaiterOrderController extends GetxController {
       } else {
         orderItems.remove(foodItem);
       }
+    }
+    if (orderItems.isEmpty) {
+      isOrderEmpty.value = true;
     }
     update();
   }
