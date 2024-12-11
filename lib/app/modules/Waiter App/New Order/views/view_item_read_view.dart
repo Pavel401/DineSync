@@ -11,152 +11,209 @@ import 'package:sizer/sizer.dart';
 class ViewOrderReadView extends StatefulWidget {
   final FoodItem foodItem;
 
-  ViewOrderReadView({super.key, required this.foodItem});
+  const ViewOrderReadView({Key? key, required this.foodItem}) : super(key: key);
 
   @override
   State<ViewOrderReadView> createState() => _ViewOrderReadViewState();
 }
 
-class _ViewOrderReadViewState extends State<ViewOrderReadView> {
+class _ViewOrderReadViewState extends State<ViewOrderReadView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  Color? _dominantColor;
+  final PageController _imageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..forward();
+
+    // // Safely generate palette color
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _generatePaletteColor();
+    // });
+  }
+
+  // Future<void> _generatePaletteColor() async {
+  //   // Prevent multiple color generation attempts
+  //   if (_isColorGenerating || !mounted) return;
+
+  //   setState(() {
+  //     _isColorGenerating = true;
+  //   });
+
+  //   try {
+  //     // final imageProvider = NetworkImage(widget.foodItem.foodImage);
+  //     // final paletteGenerator = await PaletteGenerator.fromImageProvider(
+  //     //   imageProvider,
+  //     //   size: const Size(100, 100),
+  //     // );
+
+  //     // Check if widget is still mounted before updating state
+  //     // if (mounted) {
+  //     //   setState(() {
+  //     //     _dominantColor =
+  //     //         paletteGenerator.dominantColor?.color ?? Colors.white;
+  //     //   });
+  //     // }
+  //   } catch (e) {
+  //     debugPrint('Error generating palette color: $e');
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         _isColorGenerating = false;
+  //       });
+  //     }
+  //   }
+  // }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _imageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final food = widget.foodItem;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          food.foodName,
-          style: TextStyle(color: AppColors.onPrimaryLight),
-        ),
-        backgroundColor: AppColors.primaryLight,
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Icon(Icons.chevron_left, color: AppColors.onPrimaryLight),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Hero Image
-            Hero(
-              tag: food.foodId,
-              child: GestureDetector(
-                onTap: () {
-                  Get.to(PhotoViewScreen(
-                    imageUrl: food.foodImage,
-                    heroId: food.foodId,
-                  ));
-                },
-                child: CachedNetworkImage(
-                  imageUrl: food.foodImage,
-                  fit: BoxFit.cover,
-                  height: 30.h,
-                  width: double.infinity,
-                  placeholder: (context, url) => Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[300],
-                    child: Icon(Icons.broken_image, color: Colors.red),
-                  ),
+      body: CustomScrollView(
+        slivers: [
+          // Enhanced App Bar with Dynamic Color
+          SliverAppBar(
+            expandedHeight: 35.h,
+            pinned: true,
+            // backgroundColor: _dominantColor?.withOpacity(0.8) ??
+            //     theme.appBarTheme.backgroundColor,
+            leading: IconButton(
+              icon: CircleAvatar(
+                backgroundColor: AppColors.searchBarLight,
+                child: Icon(
+                  Icons.chevron_left,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
+              onPressed: () => Get.back(),
             ),
-            // Food Details
-            Padding(
-              padding: AppPading.containerPadding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
                 children: [
-                  SizedBox(height: 2.h),
-                  Text(
-                    food.foodName,
-                    style: context.textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  // Dietary Icons
-                  Row(
-                    children: [
-                      if (food.isVegan)
-                        _buildDietaryChip('Vegan', Colors.green),
-                      if (food.isLactoseFree)
-                        _buildDietaryChip('Lactose Free', Colors.orange),
-                      if (food.containsEgg)
-                        _buildDietaryChip('Contains Egg', Colors.yellow[800]!),
-                      if (food.isGlutenFree)
-                        _buildDietaryChip('Gluten Free', Colors.blue),
-                    ],
-                  ),
-                  SizedBox(height: 2.h),
-
-                  Text(
-                    food.foodDescription,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Text(
-                  //       'Price: \$${food.foodPrice.toStringAsFixed(2)}',
-                  //       style: TextStyle(
-                  //         fontSize: 16.sp,
-                  //         fontWeight: FontWeight.w600,
-                  //         color: Colors.black87,
-                  //       ),
-                  //     ),
-                  //     if (food.discount != null)
-                  //       Text(
-                  //         'Discount: ${food.discount!.toStringAsFixed(1)}%',
-                  //         style: TextStyle(
-                  //           fontSize: 14.sp,
-                  //           fontWeight: FontWeight.w500,
-                  //           color: Colors.redAccent,
-                  //         ),
-                  //       ),
-                  //   ],
-                  // ),
-
-                  SizedBox(height: 2.h),
-                  Divider(),
-                  SizedBox(height: 2.h),
-
-                  // Allergen Chips
-                  Wrap(
-                    spacing: 1.h,
-                    runSpacing: 2.w,
-                    children: food.allergies
-                        .map((allergen) => AllergenChip(
-                              allergen: allergen,
-                              isSelected: true, // Static for view-only mode
-                              onSelected: (_) {}, // No-op for view mode
-                            ))
-                        .toList(),
-                  ),
-                  SizedBox(height: 2.h),
-                  // Nutritional Info
-                  if (food.nutritionalInfo > 0)
-                    Text(
-                      'Nutritional Info: ${food.nutritionalInfo} kcal',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[800],
+                  Hero(
+                    tag: food.foodId,
+                    child: GestureDetector(
+                      onTap: () => Get.to(() => PhotoViewScreen(
+                            imageUrl: food.foodImage,
+                            heroId: food.foodId,
+                          )),
+                      child: CachedNetworkImage(
+                        imageUrl: food.foodImage,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[300],
+                          child:
+                              const Icon(Icons.broken_image, color: Colors.red),
+                        ),
                       ),
                     ),
-                  SizedBox(height: 3.h),
-                  // Recommendations Section
-                  if (food.recommendations.isNotEmpty)
-                    _buildRecommendationSection(food.recommendations),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Main Content
+          SliverPadding(
+            padding: AppPading.containerPadding,
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Dietary and Nutritional Info
+                FadeTransition(
+                  opacity: _animationController,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 2.h),
+                            Text(
+                              food.foodName,
+                              style: context.textTheme.titleLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 2.h),
+
+                            // Spice Level, Nutritional Info, Availability
+
+                            // Dietary Icons
+                            Row(
+                              children: [
+                                if (food.isVegan)
+                                  _buildDietaryChip('Vegan', Colors.green),
+                                if (food.isLactoseFree)
+                                  _buildDietaryChip(
+                                      'Lactose Free', Colors.orange),
+                                if (food.containsEgg)
+                                  _buildDietaryChip(
+                                      'Contains Egg', Colors.yellow[800]!),
+                                if (food.isGlutenFree)
+                                  _buildDietaryChip('Gluten Free', Colors.blue),
+                              ],
+                            ),
+                            SizedBox(height: 2.h),
+
+                            // Food Description
+                            Text(
+                              food.foodDescription,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            SizedBox(height: 2.h),
+                            Divider(),
+                            SizedBox(height: 2.h),
+
+                            // Allergen Chips
+
+                            _buildFoodInfoSection(food),
+
+                            SizedBox(height: 2.h),
+                            Wrap(
+                              spacing: 1.h,
+                              runSpacing: 2.w,
+                              children: food.allergies
+                                  .map((allergen) => AllergenChip(
+                                        allergen: allergen,
+                                        isSelected:
+                                            true, // Static for view-only mode
+                                        onSelected:
+                                            (_) {}, // No-op for view mode
+                                      ))
+                                  .toList(),
+                            ),
+                            SizedBox(height: 2.h),
+
+                            // Recommendations Section
+                          ],
+                        ),
+                      ]),
+                ),
+              ]),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -180,58 +237,88 @@ class _ViewOrderReadViewState extends State<ViewOrderReadView> {
     );
   }
 
-  Widget _buildRecommendationSection(List<FoodItem> recommendations) {
+  Widget _buildFoodInfoSection(FoodItem food) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Recommended Dishes',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+        // Spice Level UI
+        Row(
+          children: [
+            Text(
+              'Spice Level:',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(width: 2.w),
+            Row(
+              children: List.generate(
+                food.spiceLevel,
+                (index) => Icon(
+                  Icons.local_fire_department,
+                  color: Colors.redAccent,
+                  size: 18.sp,
+                ),
+              ),
+            ),
+            if (food.spiceLevel < 5)
+              Row(
+                children: List.generate(
+                  5 - food.spiceLevel,
+                  (index) => Icon(
+                    Icons.local_fire_department,
+                    color: Colors.grey[300],
+                    size: 18.sp,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        SizedBox(height: 1.5.h),
+
+        // Nutritional Info UI
+        if (food.nutritionalInfo > 0)
+          Row(
+            children: [
+              Icon(
+                Icons.health_and_safety,
+                color: Colors.green,
+                size: 20.sp,
+              ),
+              SizedBox(width: 1.w),
+              Text(
+                '${food.nutritionalInfo.toStringAsFixed(0)} kcal',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
           ),
+        SizedBox(height: 1.5.h),
+
+        // Availability UI
+        Row(
+          children: [
+            Icon(
+              food.isAvailable ? Icons.check_circle : Icons.cancel,
+              color: food.isAvailable ? Colors.green : Colors.redAccent,
+              size: 20.sp,
+            ),
+            SizedBox(width: 1.w),
+            Text(
+              food.isAvailable ? 'Available' : 'Not Available',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: food.isAvailable ? Colors.green : Colors.redAccent,
+              ),
+            ),
+          ],
         ),
         SizedBox(height: 2.h),
-        SizedBox(
-          height: 20.h,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: recommendations.length,
-            separatorBuilder: (_, __) => SizedBox(width: 2.w),
-            itemBuilder: (_, index) {
-              final food = recommendations[index];
-              return GestureDetector(
-                onTap: () {
-                  // Navigate to another view if needed
-                },
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: food.foodImage,
-                        height: 15.h,
-                        width: 30.w,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(height: 1.h),
-                    Text(
-                      food.foodName,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
       ],
     );
   }
