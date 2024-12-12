@@ -5,6 +5,7 @@ import 'package:cho_nun_btk/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {
@@ -268,6 +269,33 @@ class AuthController extends GetxController {
     } catch (e) {
       debugPrint("Error signing out: $e");
       return false;
+    }
+  }
+
+  Future<void> updateProfile(
+      {required UserModel model, required BuildContext context}) async {
+    try {
+      EasyLoading.show(status: 'Updating profile...');
+      await _firestore
+          .collection('users')
+          .doc(model.uid)
+          .update(model.toJson());
+      await loadUserModel(); // Reload the updated user model
+      EasyLoading.dismiss();
+
+      CustomSnackBar.showSuccess(
+        "Success",
+        "Profile updated successfully!",
+        context,
+      );
+      Get.back();
+    } catch (e) {
+      EasyLoading.dismiss();
+      CustomSnackBar.showError(
+        "Error",
+        "Failed to update profile: $e",
+        context,
+      );
     }
   }
 }
