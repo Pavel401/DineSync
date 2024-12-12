@@ -1,13 +1,17 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
+import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Common/common_password_reset.dart';
+import 'package:cho_nun_btk/app/provider/firebase_imageProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +49,8 @@ class _WaiterProfileViewState extends State<WaiterProfileView> {
     }
   }
 
+  AuthController authController = Get.find<AuthController>();
+
   @override
   void initState() {
     super.initState();
@@ -60,218 +66,246 @@ class _WaiterProfileViewState extends State<WaiterProfileView> {
     }
   }
 
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Edit Profile",
-          style: TextStyle(color: AppColors.onPrimaryLight),
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Edit Profile",
+            style: TextStyle(color: AppColors.onPrimaryLight),
+          ),
+          backgroundColor: AppColors.primaryLight,
+          leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.chevron_left, color: AppColors.onPrimaryLight),
+            iconSize: 30,
+          ),
         ),
-        backgroundColor: AppColors.primaryLight,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(Icons.chevron_left, color: AppColors.onPrimaryLight),
-          iconSize: 30,
-        ),
-      ),
-      body: Padding(
-        padding: AppPading.containerPadding,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 2.h,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: _selectedImage != null
-                            ? FileImage(_selectedImage!)
-                            : (widget.userModel.photoUrl.isNotEmpty
-                                ? CachedNetworkImageProvider(
-                                    widget.userModel.photoUrl)
-                                : null),
-                        child: _selectedImage == null &&
-                                widget.userModel.photoUrl.isEmpty
-                            ? Icon(Icons.person, size: 50)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: () {
-                            _pickImage();
-                          },
-                          child: CircleAvatar(
-                            radius: 12.sp,
-                            backgroundColor: themeProvider.isDarkMode
-                                ? AppColors.searchBarDark
-                                : AppColors.searchBarLight,
-                            child: Icon(
-                              Icons.edit_outlined,
-                              size: 20,
-                              color: themeProvider.isDarkMode
-                                  ? AppColors.primaryDark
-                                  : AppColors.primaryLight,
+        body: Padding(
+          padding: AppPading.containerPadding,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 2.h,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: _selectedImage != null
+                              ? FileImage(_selectedImage!)
+                              : (widget.userModel.photoUrl.isNotEmpty
+                                  ? CachedNetworkImageProvider(
+                                      widget.userModel.photoUrl)
+                                  : null),
+                          child: _selectedImage == null &&
+                                  widget.userModel.photoUrl.isEmpty
+                              ? Icon(Icons.person, size: 50)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              _pickImage();
+                            },
+                            child: CircleAvatar(
+                              radius: 12.sp,
+                              backgroundColor: themeProvider.isDarkMode
+                                  ? AppColors.searchBarDark
+                                  : AppColors.searchBarLight,
+                              child: Icon(
+                                Icons.edit_outlined,
+                                size: 20,
+                                color: themeProvider.isDarkMode
+                                    ? AppColors.primaryDark
+                                    : AppColors.primaryLight,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryDark,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade400),
+                      ],
+                    ),
+                  ],
                 ),
-                child: Text(
-                  userType == UserType.WAITER
-                      ? 'Waiter'
-                      : userType == UserType.CHEF
-                          ? 'Chef'
-                          : 'Admin',
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: Colors.green.shade800,
-                    fontWeight: FontWeight.bold,
+                SizedBox(
+                  height: 2.h,
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryDark,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.shade400),
+                  ),
+                  child: Text(
+                    userType == UserType.WAITER
+                        ? 'Waiter'
+                        : userType == UserType.CHEF
+                            ? 'Chef'
+                            : 'Admin',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: Colors.green.shade800,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-              TextFormField(
-                controller: nameController,
-                maxLength: 40,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceLight,
+                SizedBox(
+                  height: 2.h,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-              TextFormField(
-                controller: emailController,
-                maxLength: 40,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                TextFormField(
+                  controller: nameController,
+                  maxLength: 40,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
                   ),
-                  filled: true,
-                  fillColor: AppColors.surfaceLight,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
+                SizedBox(
+                  height: 2.h,
+                ),
+                TextFormField(
+                  controller: emailController,
+                  maxLength: 40,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
 
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: passwordController,
-                maxLength: 12,
-                readOnly: true,
-                decoration: InputDecoration(
-                  suffix: GestureDetector(
-                      onTap: () {
-                        Get.to(() => CommonPasswordResetView());
-                      },
-                      child: Icon(Icons.edit_outlined)),
-                  labelText: 'Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceLight,
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-              TextFormField(
-                controller: phoneController,
-                maxLength: 12,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: 'Phone',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                TextFormField(
+                  controller: passwordController,
+                  maxLength: 13,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    suffix: GestureDetector(
+                        onTap: () {
+                          Get.to(() => CommonPasswordResetView());
+                        },
+                        child: Icon(Icons.edit_outlined)),
+                    labelText: 'Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
                   ),
-                  filled: true,
-                  fillColor: AppColors.surfaceLight,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-              TextFormField(
-                controller: addressController,
-                maxLength: 200,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  labelText: 'Address',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                SizedBox(
+                  height: 2.h,
+                ),
+                TextFormField(
+                  controller: phoneController,
+                  maxLength: 13,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: 'Phone',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
                   ),
-                  filled: true,
-                  fillColor: AppColors.surfaceLight,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your address';
-                  }
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
+                    }
 
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 2.h,
-              ),
-            ],
+                    return null;
+                  },
+                ),
+                SizedBox(
+                  height: 2.h,
+                ),
+                TextFormField(
+                  controller: addressController,
+                  maxLength: 200,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    labelText: 'Address',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your address';
+                    }
+
+                    return null;
+                  },
+                ),
+                SizedBox(
+                  height: 2.h,
+                ),
+                CafePrimaryButton(
+                    buttonTitle: "Save",
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        EasyLoading.show(status: 'Uploading Image...');
+                        String? url = await FirebaseImageprovider()
+                            .uploadImageToFirebase(
+                                "Profile", _selectedImage, context);
+                        EasyLoading.dismiss();
+                        UserModel updatedUser = UserModel(
+                          uid: widget.userModel.uid,
+                          email: emailController.text,
+                          name: nameController.text,
+                          photoUrl: url ?? widget.userModel.photoUrl,
+                          phone: phoneController.text,
+                          address: addressController.text,
+                          userType: userType,
+                          password: passwordController.text,
+                          blocked: isBlocked,
+                          joinedOn: widget.userModel.joinedOn,
+                          lastLogin: widget.userModel.lastLogin,
+                          fcmToken: widget.userModel.fcmToken,
+                        );
+
+                        authController.updateProfile(
+                          model: updatedUser,
+                          context: context,
+                        );
+                      }
+                    })
+              ],
+            ),
           ),
         ),
       ),
