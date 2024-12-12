@@ -8,13 +8,13 @@ class Foodorder {
   DateTime? cookingStartTime;
   DateTime? cookingEndTime;
   FoodOrderStatus orderStatus;
-  PreparationStatus preparationStatus;
   CustomerData customerData;
   double totalAmount;
   KitchenData? kitchenData;
-  List<String>? specialInstructions;
+  String? specialInstructions;
   String? kitchenComment;
   String? customerFeedback;
+  DiscountData? discountData;
 
   int? queuePosition;
   int priorityLevel;
@@ -27,7 +27,6 @@ class Foodorder {
     this.cookingStartTime,
     this.cookingEndTime,
     required this.orderStatus,
-    required this.preparationStatus,
     required this.customerData,
     required this.totalAmount,
     this.kitchenData,
@@ -47,7 +46,6 @@ class Foodorder {
         'cookingStartTime': cookingStartTime?.toIso8601String(),
         'cookingEndTime': cookingEndTime?.toIso8601String(),
         'orderStatus': orderStatus.name,
-        'preparationStatus': preparationStatus.name,
         'customerData': customerData.toJson(),
         'totalAmount': totalAmount,
         'kitchenData': kitchenData?.toJson(),
@@ -74,19 +72,43 @@ class Foodorder {
             : null,
         orderStatus = FoodOrderStatus.values
             .firstWhere((e) => e.name == json['orderStatus']),
-        preparationStatus = PreparationStatus.values
-            .firstWhere((e) => e.name == json['preparationStatus']),
         customerData = CustomerData.fromJson(json['customerData']),
         totalAmount = json['totalAmount'],
         kitchenData = json['kitchenData'] != null
             ? KitchenData.fromJson(json['kitchenData'])
             : null,
-        specialInstructions =
-            List<String>.from(json['specialInstructions'] ?? []),
-        kitchenComment = json['kitchenComment'],
-        queuePosition = json['queuePosition'],
-        priorityLevel = json['priorityLevel'],
-        customerFeedback = json['customerFeedback'];
+        specialInstructions = json['specialInstructions'] ?? "",
+        kitchenComment = json['kitchenComment'] ?? "",
+        queuePosition = json['queuePosition'] ?? 0,
+        priorityLevel = json['priorityLevel'] ?? 0,
+        customerFeedback = json['customerFeedback'] ?? "";
+}
+
+class DiscountData {
+  bool isDiscountApplied;
+  String? discountName;
+  String? discountCode;
+  double? discountAmount;
+
+  DiscountData({
+    required this.isDiscountApplied,
+    this.discountName,
+    this.discountCode,
+    this.discountAmount,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'isDiscountApplied': isDiscountApplied,
+        'discountName': discountName,
+        'discountCode': discountCode,
+        'discountAmount': discountAmount,
+      };
+
+  DiscountData.fromJson(Map<String, dynamic> json)
+      : isDiscountApplied = json['isDiscountApplied'],
+        discountName = json['discountName'],
+        discountCode = json['discountCode'],
+        discountAmount = json['discountAmount'];
 }
 
 class WaiterData {
@@ -115,27 +137,17 @@ class WaiterData {
 class CustomerData {
   String customerName;
   Gender? customerGender;
-  bool isDiscountApplied;
-  String? discountName;
-  String? discountCode;
-  double? discountAmount;
+  String? customerPhoneNumber;
 
   CustomerData({
     required this.customerName,
     this.customerGender,
-    required this.isDiscountApplied,
-    this.discountName,
-    this.discountCode,
-    this.discountAmount,
   });
 
   Map<String, dynamic> toJson() => {
         'customerName': customerName,
         'customerGender': customerGender?.name,
-        'isDiscountApplied': isDiscountApplied,
-        'discountName': discountName,
-        'discountCode': discountCode,
-        'discountAmount': discountAmount,
+        'customerPhoneNumber': customerPhoneNumber,
       };
 
   CustomerData.fromJson(Map<String, dynamic> json)
@@ -143,10 +155,7 @@ class CustomerData {
         customerGender = json['customerGender'] != null
             ? Gender.values.firstWhere((e) => e.name == json['customerGender'])
             : null,
-        isDiscountApplied = json['isDiscountApplied'],
-        discountName = json['discountName'],
-        discountCode = json['discountCode'],
-        discountAmount = json['discountAmount'];
+        customerPhoneNumber = json['customerPhoneNumber'];
 }
 
 class KitchenData {
