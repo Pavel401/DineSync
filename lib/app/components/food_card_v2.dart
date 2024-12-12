@@ -38,18 +38,6 @@ class _FoodCardReadWidgetState extends State<FoodCardReadWidget> {
     super.initState();
   }
 
-  void _incrementQuantity() {
-    _quantity++;
-    widget.onAdd();
-  }
-
-  void _decrementQuantity() {
-    if (_quantity > 0) {
-      _quantity--;
-      widget.onRemove();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Bounceable(
@@ -149,15 +137,14 @@ class _FoodCardReadWidgetState extends State<FoodCardReadWidget> {
                           children: [
                             // Remove Button
                             IconButton(
-                              onPressed:
-                                  _quantity > 0 ? _decrementQuantity : null,
+                              onPressed: widget.onRemove,
                               icon: Icon(Icons.remove_circle_outline),
                               color: _quantity > 0 ? Colors.red : Colors.grey,
                             ),
 
                             // Quantity
                             Text(
-                              '$_quantity',
+                              widget.itemCount.toString(),
                               style: context.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12.sp,
@@ -166,7 +153,7 @@ class _FoodCardReadWidgetState extends State<FoodCardReadWidget> {
 
                             // Add Button
                             IconButton(
-                              onPressed: _incrementQuantity,
+                              onPressed: widget.onAdd,
                               icon: Icon(Icons.add_circle_outline),
                               color: Colors.green,
                             ),
