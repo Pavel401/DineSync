@@ -1,11 +1,13 @@
 import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/components/food_card_v2.dart';
 import 'package:cho_nun_btk/app/components/network_image.dart';
+import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/views/checkout_view.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/views/view_item_read_view.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -356,6 +358,10 @@ class _AddNewOrderViewState extends State<AddNewOrderView> {
                                                     ordercontroller
                                                         .addOrderItem(controller
                                                             .items[index]);
+
+                                                    // ordercontroller
+                                                    //     .addOrderItem(controller
+                                                    //         .items[index]);
                                                   },
                                                 );
                                               });
@@ -408,7 +414,14 @@ class _AddNewOrderViewState extends State<AddNewOrderView> {
               child: Obx(() => CafePrimaryButton(
                     buttonTitle: "Confirm Order",
                     isEnabled: !waiterOrderController.isOrderEmpty.value,
-                    onPressed: () {},
+                    onPressed: () {
+                      if (waiterOrderController.orderItems.length > 0) {
+                        Get.to(() => CheckoutView());
+                      } else {
+                        CustomSnackBar.showError(
+                            'Error', 'Please  add items to order', context);
+                      }
+                    },
                   ))),
         ],
       ),
