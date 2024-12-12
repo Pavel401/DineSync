@@ -64,7 +64,7 @@ void setEasyLoading(bool isDarkMode) {
     ..maskColor = isDarkMode
         ? AppColors.surfaceDark.withOpacity(0.1)
         : AppColors.surfaceDark.withOpacity(0.2)
-    ..userInteractions = true
+    ..userInteractions = false
     ..boxShadow = <BoxShadow>[]
     ..errorWidget = const Icon(Icons.error, color: Colors.red, size: 50);
 }
