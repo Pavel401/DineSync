@@ -9,10 +9,8 @@ import 'package:cho_nun_btk/app/constants/allergens.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
-import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/select_sides.dart';
 import 'package:cho_nun_btk/app/provider/firebase_imageProvider.dart';
 import 'package:cho_nun_btk/app/provider/menuProvider.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -439,116 +437,116 @@ class _AddMenuItemState extends State<AddMenuItem> {
 
               SizedBox(height: 2.h),
 
-              Row(
-                children: [
-                  Text(
-                    'Select Sides & Extras(Optional)',
-                    style: context.textTheme.titleMedium!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Expanded(child: SizedBox()),
-                  GestureDetector(
-                    onTap: () {
-                      Get.to(() => SelectSidesView(
-                                sides: sides,
-                              ))!
-                          .then((value) {
-                        if (value != null) {
-                          setState(() {
-                            sides = List.from(value);
-                          });
-                        }
-                      });
-                    },
-                    child: DottedBorder(
-                      borderType: BorderType.RRect,
-                      radius: Radius.circular(12),
-                      padding: EdgeInsets.all(6),
-                      child: Row(
-                        children: [
-                          Icon(Icons.add),
-                          Text("Add "),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     Text(
+              //       'Select Sides & Extras(Optional)',
+              //       style: context.textTheme.titleMedium!.copyWith(
+              //         fontWeight: FontWeight.bold,
+              //       ),
+              //     ),
+              //     Expanded(child: SizedBox()),
+              //     GestureDetector(
+              //       onTap: () {
+              //         Get.to(() => SelectSidesView(
+              //                   sides: sides,
+              //                 ))!
+              //             .then((value) {
+              //           if (value != null) {
+              //             setState(() {
+              //               sides = List.from(value);
+              //             });
+              //           }
+              //         });
+              //       },
+              //       child: DottedBorder(
+              //         borderType: BorderType.RRect,
+              //         radius: Radius.circular(12),
+              //         padding: EdgeInsets.all(6),
+              //         child: Row(
+              //           children: [
+              //             Icon(Icons.add),
+              //             Text("Add "),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
 
-              sides.length > 0
-                  ? ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: sides.length,
-                      itemBuilder: (context, index) {
-                        final foodItem = sides[index];
+              // sides.length > 0
+              //     ? ListView.builder(
+              //         shrinkWrap: true,
+              //         physics: const NeverScrollableScrollPhysics(),
+              //         itemCount: sides.length,
+              //         itemBuilder: (context, index) {
+              //           final foodItem = sides[index];
 
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Food Image
-                                CustomNetworkImage(
-                                  imageUrl: foodItem.foodImage,
-                                  size: 25.w,
-                                  fit: BoxFit.cover,
-                                ),
-                                SizedBox(width: 4.w),
+              //           return Card(
+              //             margin: const EdgeInsets.symmetric(vertical: 8),
+              //             elevation: 4,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(12),
+              //             ),
+              //             child: Padding(
+              //               padding: const EdgeInsets.all(12.0),
+              //               child: Row(
+              //                 crossAxisAlignment: CrossAxisAlignment.start,
+              //                 children: [
+              //                   // Food Image
+              //                   CustomNetworkImage(
+              //                     imageUrl: foodItem.foodImage,
+              //                     size: 25.w,
+              //                     fit: BoxFit.cover,
+              //                   ),
+              //                   SizedBox(width: 4.w),
 
-                                // Food Details
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        foodItem.foodName,
-                                        style: context.textTheme.bodyLarge
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(height: 1.h),
-                                      Text(
-                                        foodItem.foodDescription,
-                                        style: context.textTheme.bodyMedium,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(height: 1.h),
-                                      Text(
-                                        '${foodItem.nutritionalInfo} kcal | \₱${foodItem.foodPrice.toStringAsFixed(2)}',
-                                        style: context.textTheme.bodySmall
-                                            ?.copyWith(
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      sides.removeAt(index);
-                                      setState(() {});
-                                    },
-                                    icon: Icon(Icons.delete_outline))
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(child: Text("No sides selected")),
+              //                   // Food Details
+              //                   Expanded(
+              //                     child: Column(
+              //                       crossAxisAlignment:
+              //                           CrossAxisAlignment.start,
+              //                       children: [
+              //                         Text(
+              //                           foodItem.foodName,
+              //                           style: context.textTheme.bodyLarge
+              //                               ?.copyWith(
+              //                             fontWeight: FontWeight.bold,
+              //                           ),
+              //                           maxLines: 2,
+              //                           overflow: TextOverflow.ellipsis,
+              //                         ),
+              //                         SizedBox(height: 1.h),
+              //                         Text(
+              //                           foodItem.foodDescription,
+              //                           style: context.textTheme.bodyMedium,
+              //                           maxLines: 3,
+              //                           overflow: TextOverflow.ellipsis,
+              //                         ),
+              //                         SizedBox(height: 1.h),
+              //                         Text(
+              //                           '${foodItem.nutritionalInfo} kcal | \₱${foodItem.foodPrice.toStringAsFixed(2)}',
+              //                           style: context.textTheme.bodySmall
+              //                               ?.copyWith(
+              //                             color: Colors.grey,
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ),
+              //                   IconButton(
+              //                       onPressed: () {
+              //                         sides.removeAt(index);
+              //                         setState(() {});
+              //                       },
+              //                       icon: Icon(Icons.delete_outline))
+              //                 ],
+              //               ),
+              //             ),
+              //           );
+              //         },
+              //       )
+              //     : Center(child: Text("No sides selected")),
               SizedBox(height: 2.h),
 
               // Submit Button
