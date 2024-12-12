@@ -120,6 +120,7 @@ class _CommonPasswordResetViewState extends State<CommonPasswordResetView> {
             children: [
               TextFormField(
                 controller: _oldPasswordController,
+                maxLength: 13,
                 decoration: InputDecoration(
                   labelText: 'Old Password',
                   suffixIcon: IconButton(
@@ -143,6 +144,7 @@ class _CommonPasswordResetViewState extends State<CommonPasswordResetView> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                maxLength: 13,
                 controller: _newPasswordController,
                 decoration: InputDecoration(
                   labelText: 'New Password',
@@ -170,6 +172,7 @@ class _CommonPasswordResetViewState extends State<CommonPasswordResetView> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                maxLength: 13,
                 controller: _confirmPasswordController,
                 decoration: InputDecoration(
                   labelText: 'Confirm New Password',
