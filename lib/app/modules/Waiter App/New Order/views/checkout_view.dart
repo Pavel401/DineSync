@@ -1,5 +1,7 @@
 import 'package:cho_nun_btk/app/components/network_image.dart';
+import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
+import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
@@ -8,6 +10,7 @@ import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
@@ -187,11 +190,13 @@ class _CheckoutViewState extends State<CheckoutView> {
                     SizedBox(height: 2.h),
                     _buildCustomerDetailsCard(context),
                     SizedBox(height: 2.h),
+                    _buildWaiterCard(context),
+                    SizedBox(height: 2.h),
                     _buildDiscountDetailsCard(context),
                     SizedBox(height: 2.h),
                     _buildSpecialInstruction(context),
                     SizedBox(height: 2.h),
-                    _summaryWidget(context, controller),
+                    _summaryWidget(context),
                   ],
                 ),
               );
@@ -372,7 +377,60 @@ class _CheckoutViewState extends State<CheckoutView> {
     );
   }
 
-  _summaryWidget(BuildContext context, WaiterOrderController controller) {
+  _buildWaiterCard(BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(4.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Waiter Details',
+              style: context.textTheme.bodyMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.sp,
+              ),
+            ),
+            SizedBox(height: 1.h),
+            Row(
+              children: [
+                CustomNetworkImage(
+                  imageUrl: authController.userModel!.photoUrl,
+                  size: 10.w,
+                  fit: BoxFit.cover,
+                  isCircular: true,
+                ),
+                SizedBox(width: 2.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      authController.userModel!.name!,
+                      style: context.textTheme.bodyMedium!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      authController.userModel!.email!,
+                      style: context.textTheme.bodySmall!.copyWith(
+                        color: AppColors.secondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  _summaryWidget(BuildContext context) {
     return GetBuilder(
         init: waiterOrderController,
         builder: (controller) {
@@ -386,30 +444,10 @@ class _CheckoutViewState extends State<CheckoutView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Summary',
-                    style: context.textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                  SizedBox(height: 1.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Total Items:'),
-                      Text(
-                        '${controller.orderItems.length}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 2.h),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (formKey.currentState!.validate()) {
+                        EasyLoading.show(status: 'Placing Order...');
                         String orderId = foodOrderProvider.getNewFoodOrderId();
                         CustomerData customerData = CustomerData(
                           customerName: customerNameController.text,
@@ -444,6 +482,26 @@ class _CheckoutViewState extends State<CheckoutView> {
                           totalAmount: 0,
                           queuePosition: 0,
                         );
+
+                        QueryStatus status =
+                            await foodOrderProvider.createOrder(foodOrder);
+
+                        if (status == QueryStatus.SUCCESS) {
+                          EasyLoading.dismiss();
+                          Get.until((route) => route.isFirst);
+                          CustomSnackBar.showSuccess(
+                            'Success',
+                            'Order has been placed successfully',
+                            context,
+                          );
+                        } else {
+                          EasyLoading.dismiss();
+                          CustomSnackBar.showError(
+                            'Error',
+                            'Failed to place order',
+                            context,
+                          );
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
