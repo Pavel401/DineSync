@@ -1,4 +1,4 @@
-package com.ChonunBTK.app-nunBTK.app
+package com.ChonunBTK.cho_nun_btk
 
 import io.flutter.embedding.android.FlutterActivity
 
