@@ -1,9 +1,9 @@
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Foodorder {
   String orderId;
   Map<FoodItem, int> orderItems = {};
-
   WaiterData waiterData;
   DateTime orderTime;
   DateTime? cookingStartTime;
@@ -16,7 +16,6 @@ class Foodorder {
   String? kitchenComment;
   String? customerFeedback;
   DiscountData? discountData;
-
   int? queuePosition;
 
   Foodorder({
@@ -46,9 +45,13 @@ class Foodorder {
                 })
             .toList(),
         'waiterData': waiterData.toJson(),
-        'orderTime': orderTime.toIso8601String(),
-        'cookingStartTime': cookingStartTime?.toIso8601String(),
-        'cookingEndTime': cookingEndTime?.toIso8601String(),
+        'orderTime': Timestamp.fromDate(orderTime), // Store as Timestamp
+        'cookingStartTime': cookingStartTime != null
+            ? Timestamp.fromDate(cookingStartTime!)
+            : null, // Store as Timestamp
+        'cookingEndTime': cookingEndTime != null
+            ? Timestamp.fromDate(cookingEndTime!)
+            : null, // Store as Timestamp
         'orderStatus': orderStatus.name,
         'customerData': customerData.toJson(),
         'totalAmount': totalAmount,
@@ -69,12 +72,13 @@ class Foodorder {
               )),
         ),
         waiterData = WaiterData.fromJson(json['waiterData']),
-        orderTime = DateTime.parse(json['orderTime']),
+        orderTime = (json['orderTime'] as Timestamp)
+            .toDate(), // Convert Timestamp to DateTime
         cookingStartTime = json['cookingStartTime'] != null
-            ? DateTime.parse(json['cookingStartTime'])
+            ? (json['cookingStartTime'] as Timestamp).toDate()
             : null,
         cookingEndTime = json['cookingEndTime'] != null
-            ? DateTime.parse(json['cookingEndTime'])
+            ? (json['cookingEndTime'] as Timestamp).toDate()
             : null,
         orderStatus = FoodOrderStatus.values
             .firstWhere((e) => e.name == json['orderStatus']),
