@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FoodOrderProvider {
   String getNewFoodOrderId() {
     String baseId = FirebaseFirestore.instance.collection('orders').doc().id;
-    return "#Oder-$baseId";
+    return "#Order-$baseId";
   }
 
   Future<QueryStatus> createOrder(Foodorder order) async {
