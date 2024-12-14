@@ -26,50 +26,69 @@ class CustomNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isCircular
-        ? Container(
-            height: size,
-            width: size,
-            decoration: BoxDecoration(
+    final isImageUrlEmpty = imageUrl.trim().isEmpty;
+
+    final Widget fallbackWidget = Container(
+      height: size,
+      width: size,
+      decoration: isCircular
+          ? BoxDecoration(
               shape: BoxShape.circle,
+              color: Colors.grey[300],
               border: Border.all(
                 color: borderColor,
                 width: borderWidth,
               ),
+            )
+          : BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              color: Colors.grey[300],
             ),
-            child: ClipOval(
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
+      child: Icon(
+        Icons.person,
+        size: size * 0.5, // Adjust icon size relative to the container
+        color: Colors.grey[700],
+      ),
+    );
+
+    return isImageUrlEmpty
+        ? fallbackWidget
+        : isCircular
+            ? Container(
                 height: size,
                 width: size,
-                fit: fit,
-                placeholder: (context, url) =>
-                    placeholder ?? const CircularProgressIndicator(),
-                errorWidget: (context, url, error) =>
-                    errorWidget ??
-                    Container(
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.broken_image, color: Colors.red),
-                    ),
-              ),
-            ),
-          )
-        : ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              height: size,
-              width: size,
-              fit: fit,
-              placeholder: (context, url) =>
-                  placeholder ?? const CircularProgressIndicator(),
-              errorWidget: (context, url, error) =>
-                  errorWidget ??
-                  Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.broken_image, color: Colors.red),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: borderColor,
+                    width: borderWidth,
                   ),
-            ),
-          );
+                ),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    height: size,
+                    width: size,
+                    fit: fit,
+                    placeholder: (context, url) =>
+                        placeholder ?? const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        errorWidget ?? fallbackWidget,
+                  ),
+                ),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  height: size,
+                  width: size,
+                  fit: fit,
+                  placeholder: (context, url) =>
+                      placeholder ?? const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) =>
+                      errorWidget ?? fallbackWidget,
+                ),
+              );
   }
 }
