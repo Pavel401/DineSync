@@ -2,7 +2,8 @@ import 'package:cho_nun_btk/app/models/menu/menu.dart';
 
 class Foodorder {
   String orderId;
-  List<FoodItem> foodItems;
+  Map<FoodItem, int> orderItems = {};
+
   WaiterData waiterData;
   DateTime orderTime;
   DateTime? cookingStartTime;
@@ -17,11 +18,10 @@ class Foodorder {
   DiscountData? discountData;
 
   int? queuePosition;
-  int priorityLevel;
 
   Foodorder({
     required this.orderId,
-    required this.foodItems,
+    required this.orderItems,
     required this.waiterData,
     required this.orderTime,
     this.cookingStartTime,
@@ -34,13 +34,17 @@ class Foodorder {
     this.kitchenComment,
     this.customerFeedback,
     this.queuePosition,
-    this.priorityLevel = 0,
   });
 
   // JSON serialization
   Map<String, dynamic> toJson() => {
         'orderId': orderId,
-        'foodItems': foodItems.map((item) => item.toJson()).toList(),
+        'foodItems': orderItems.entries
+            .map((entry) => {
+                  'foodItem': entry.key.toJson(),
+                  'quantity': entry.value,
+                })
+            .toList(),
         'waiterData': waiterData.toJson(),
         'orderTime': orderTime.toIso8601String(),
         'cookingStartTime': cookingStartTime?.toIso8601String(),
@@ -53,15 +57,17 @@ class Foodorder {
         'kitchenComment': kitchenComment,
         'customerFeedback': customerFeedback,
         'queuePosition': queuePosition,
-        'priorityLevel': priorityLevel,
       };
 
   // JSON deserialization
   Foodorder.fromJson(Map<String, dynamic> json)
       : orderId = json['orderId'],
-        foodItems = (json['foodItems'] as List)
-            .map((item) => FoodItem.fromJson(item))
-            .toList(),
+        orderItems = Map.fromEntries(
+          (json['foodItems'] as List).map((entry) => MapEntry(
+                FoodItem.fromJson(entry['foodItem']),
+                entry['quantity'],
+              )),
+        ),
         waiterData = WaiterData.fromJson(json['waiterData']),
         orderTime = DateTime.parse(json['orderTime']),
         cookingStartTime = json['cookingStartTime'] != null
@@ -80,7 +86,6 @@ class Foodorder {
         specialInstructions = json['specialInstructions'] ?? "",
         kitchenComment = json['kitchenComment'] ?? "",
         queuePosition = json['queuePosition'] ?? 0,
-        priorityLevel = json['priorityLevel'] ?? 0,
         customerFeedback = json['customerFeedback'] ?? "";
 }
 
@@ -142,6 +147,7 @@ class CustomerData {
   CustomerData({
     required this.customerName,
     this.customerGender,
+    this.customerPhoneNumber,
   });
 
   Map<String, dynamic> toJson() => {
