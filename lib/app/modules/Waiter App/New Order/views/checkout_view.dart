@@ -465,7 +465,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           ),
                         );
 
-                        Foodorder foodOrder = Foodorder(
+                        FoodOrder foodOrder = FoodOrder(
                           orderStatus: FoodOrderStatus.PENDING,
                           orderItems: controller.orderItems,
                           orderId: orderId,
@@ -481,6 +481,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           ),
                           totalAmount: 0,
                           queuePosition: 0,
+                          discountData: discountData,
                         );
 
                         QueryStatus status =
