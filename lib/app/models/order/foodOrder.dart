@@ -40,6 +40,7 @@ class FoodOrder {
     this.queuePosition,
     this.discountData,
     this.sendToKitchen,
+    this.orderType,
   });
 
   // JSON serialization
@@ -70,6 +71,7 @@ class FoodOrder {
         'discountData': discountData?.toJson(),
 
         'sendToKitchen': sendToKitchen,
+        'orderType': orderType?.name,
       };
 
   // JSON deserialization
@@ -105,6 +107,9 @@ class FoodOrder {
             : null,
         sendToKitchen = json['sendToKitchen'] != null
             ? List<String>.from(json['sendToKitchen'])
+            : null,
+        orderType = json['orderType'] != null
+            ? OrderType.values.firstWhere((e) => e.name == json['orderType'])
             : null,
         customerFeedback = json['customerFeedback'] ?? "";
 }
@@ -232,7 +237,6 @@ enum Gender {
 enum OrderType {
   DINE_IN,
   TAKE_AWAY,
-  DELIVERY,
 }
 
 enum PaymentMode {
