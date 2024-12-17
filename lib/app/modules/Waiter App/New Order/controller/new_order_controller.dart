@@ -6,6 +6,8 @@ class WaiterOrderController extends GetxController {
 
   RxBool isOrderEmpty = true.obs;
 
+  RxList<String> orderIdsToBeSendToKichen = <String>[].obs;
+
   void addOrderItem(FoodItem foodItem) {
     if (orderItems.containsKey(foodItem)) {
       orderItems[foodItem] = orderItems[foodItem]! + 1;
@@ -37,5 +39,16 @@ class WaiterOrderController extends GetxController {
 
   int totalItemCountForOrder(FoodItem foodItem) {
     return orderItems[foodItem] ?? 0;
+  }
+
+  //We will manage the ids of items that needs to be send to the kitchen
+  void saveOrderId(FoodItem item) {
+    if (orderIdsToBeSendToKichen.contains(item.foodId)) {
+      orderIdsToBeSendToKichen.remove(item.foodId);
+    } else {
+      orderIdsToBeSendToKichen.add(item.foodId);
+    }
+
+    // debugPrint(orderIdsToBeSendToKichen.toString());
   }
 }

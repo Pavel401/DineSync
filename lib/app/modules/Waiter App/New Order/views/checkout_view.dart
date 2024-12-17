@@ -109,78 +109,105 @@ class _CheckoutViewState extends State<CheckoutView> {
                             FoodItem foodItem =
                                 controller.orderItems.keys.elementAt(index);
                             int quantity = controller.orderItems[foodItem]!;
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            return Column(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CustomNetworkImage(
-                                    imageUrl: foodItem.foodImage,
-                                    size: 15.w,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(width: 3.w),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        foodItem.foodName,
-                                        style: context.textTheme.bodyMedium!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: CustomNetworkImage(
+                                        imageUrl: foodItem.foodImage,
+                                        size: 15.w,
+                                        fit: BoxFit.cover,
                                       ),
-                                      SizedBox(height: 0.5.h),
-                                      Text(
-                                        '₹${foodItem.foodPrice.toStringAsFixed(2)}',
-                                        style: context.textTheme.bodySmall!
-                                            .copyWith(
-                                                color:
-                                                    AppColors.secondaryLight),
+                                    ),
+                                    SizedBox(width: 3.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            foodItem.foodName,
+                                            style: context.textTheme.bodyMedium!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                          SizedBox(height: 0.5.h),
+                                          Text(
+                                            '₹${foodItem.foodPrice.toStringAsFixed(2)}',
+                                            style: context.textTheme.bodySmall!
+                                                .copyWith(
+                                                    color: AppColors
+                                                        .secondaryLight),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 2.w),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: AppColors.primaryLight),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              controller
+                                                  .removeOrderItem(foodItem);
+                                            },
+                                            icon: Icon(
+                                              Icons.remove_circle,
+                                              color: AppColors.primaryLight,
+                                            ),
+                                          ),
+                                          Text(
+                                            '$quantity',
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              controller.addOrderItem(foodItem);
+                                            },
+                                            icon: Icon(
+                                              Icons.add_circle,
+                                              color: AppColors.primaryLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.w),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: AppColors.primaryLight),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          controller.removeOrderItem(foodItem);
+                                SizedBox(height: 1.h),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Send to kitchen",
+                                      style: context.textTheme.bodySmall!
+                                          .copyWith(),
+                                    ),
+                                    Obx(
+                                      () => Checkbox(
+                                        value: waiterOrderController
+                                            .orderIdsToBeSendToKichen
+                                            .contains(foodItem.foodId),
+                                        onChanged: (value) {
+                                          waiterOrderController
+                                              .saveOrderId(foodItem);
                                         },
-                                        icon: Icon(
-                                          Icons.remove_circle,
-                                          color: AppColors.primaryLight,
-                                        ),
                                       ),
-                                      Text(
-                                        '$quantity',
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          controller.addOrderItem(foodItem);
-                                        },
-                                        icon: Icon(
-                                          Icons.add_circle,
-                                          color: AppColors.primaryLight,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  ],
+                                )
                               ],
                             );
                           },
@@ -482,6 +509,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                           totalAmount: 0,
                           queuePosition: 0,
                           discountData: discountData,
+                          sendToKitchen:
+                              waiterOrderController.orderIdsToBeSendToKichen,
                         );
 
                         QueryStatus status =
@@ -513,7 +542,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                       padding: EdgeInsets.symmetric(vertical: 1.5.h),
                     ),
                     child: Text(
-                      'Send to Kitchen',
+                      'Confirm',
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
