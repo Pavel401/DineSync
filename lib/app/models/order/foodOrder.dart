@@ -1,7 +1,7 @@
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Foodorder {
+class FoodOrder {
   String orderId;
   Map<FoodItem, int> orderItems = {};
   WaiterData waiterData;
@@ -17,8 +17,11 @@ class Foodorder {
   String? customerFeedback;
   DiscountData? discountData;
   int? queuePosition;
+  OrderType? orderType;
+  PaymentMode? paymentMode;
+  PaymentStatus? paymentStatus;
 
-  Foodorder({
+  FoodOrder({
     required this.orderId,
     required this.orderItems,
     required this.waiterData,
@@ -33,6 +36,7 @@ class Foodorder {
     this.kitchenComment,
     this.customerFeedback,
     this.queuePosition,
+    this.discountData,
   });
 
   // JSON serialization
@@ -60,10 +64,11 @@ class Foodorder {
         'kitchenComment': kitchenComment,
         'customerFeedback': customerFeedback,
         'queuePosition': queuePosition,
+        'discountData': discountData?.toJson(),
       };
 
   // JSON deserialization
-  Foodorder.fromJson(Map<String, dynamic> json)
+  FoodOrder.fromJson(Map<String, dynamic> json)
       : orderId = json['orderId'],
         orderItems = Map.fromEntries(
           (json['foodItems'] as List).map((entry) => MapEntry(
@@ -90,6 +95,9 @@ class Foodorder {
         specialInstructions = json['specialInstructions'] ?? "",
         kitchenComment = json['kitchenComment'] ?? "",
         queuePosition = json['queuePosition'] ?? 0,
+        discountData = json['discountData'] != null
+            ? DiscountData.fromJson(json['discountData'])
+            : null,
         customerFeedback = json['customerFeedback'] ?? "";
 }
 
@@ -201,16 +209,10 @@ class KitchenData {
 
 enum FoodOrderStatus {
   PENDING,
-  CONFIRMED,
   PREPARING,
   CANCELLED,
-  DELIVERED,
-}
-
-enum PreparationStatus {
-  NOT_STARTED,
-  IN_PROGRESS,
   READY,
+  DELIVERED,
 }
 
 enum Gender {
