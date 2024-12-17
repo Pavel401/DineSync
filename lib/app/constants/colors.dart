@@ -29,6 +29,8 @@ class AppColors {
   //Custom light theme colors
   static const searchBarLight = Color(0xFFE6E9DF);
   static const errorLight = Color(0xFFB00020);
+  static const white = Color(0xFFFFFFFF);
+  static const black = Color(0xFF000000);
 
   static const primaryDark = Color(0xFFA6D395);
   static const secondaryDark = Color(0xFFBBCBB1);
