@@ -135,68 +135,80 @@ class _CheckoutViewState extends State<CheckoutView> {
             FoodItem foodItem = controller.orderItems.keys.elementAt(index);
             int quantity = controller.orderItems[foodItem]!;
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       child: CustomNetworkImage(
                         imageUrl: foodItem.foodImage,
                         size: 15.w,
                         fit: BoxFit.cover,
                       ),
                     ),
-                    SizedBox(width: 3.w),
+                    SizedBox(width: 4.w),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             foodItem.foodName,
-                            style: context.textTheme.bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
+                            style: context.textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.sp,
+                            ),
                           ),
                           SizedBox(height: 0.5.h),
                           Text(
                             '₹${foodItem.foodPrice.toStringAsFixed(2)}',
-                            style: context.textTheme.bodySmall!
-                                .copyWith(color: AppColors.secondaryLight),
+                            style: context.textTheme.bodySmall!.copyWith(
+                              color: AppColors.secondaryLight,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 2.w),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
                       decoration: BoxDecoration(
+                        color: AppColors.surfaceLight,
                         border: Border.all(color: AppColors.primaryLight),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
-                          IconButton(
-                            onPressed: () {
+                          GestureDetector(
+                            onTap: () {
                               controller.removeOrderItem(foodItem);
                             },
-                            icon: Icon(
+                            child: Icon(
                               Icons.remove_circle,
                               color: AppColors.primaryLight,
+                              size: 20.sp,
                             ),
                           ),
-                          Text(
-                            '$quantity',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: Text(
+                              '$quantity',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {
+                          GestureDetector(
+                            onTap: () {
                               controller.addOrderItem(foodItem);
                             },
-                            icon: Icon(
+                            child: Icon(
                               Icons.add_circle,
                               color: AppColors.primaryLight,
+                              size: 20.sp,
                             ),
                           ),
                         ],
@@ -205,23 +217,34 @@ class _CheckoutViewState extends State<CheckoutView> {
                   ],
                 ),
                 SizedBox(height: 1.h),
-                Row(
-                  children: [
-                    Text(
-                      "Send to kitchen",
-                      style: context.textTheme.bodySmall!.copyWith(),
-                    ),
-                    Obx(
-                      () => Checkbox(
-                        value: waiterOrderController.orderIdsToBeSendToKichen
-                            .contains(foodItem.foodId),
-                        onChanged: (value) {
-                          waiterOrderController.saveOrderId(foodItem);
-                        },
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 1.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Send to kitchen",
+                        style: context.textTheme.bodySmall!.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
-                )
+                      Obx(
+                        () => Checkbox(
+                          value: controller.orderIdsToBeSendToKichen
+                              .contains(foodItem.foodId),
+                          onChanged: (value) {
+                            controller.saveOrderId(foodItem);
+                          },
+                          activeColor: AppColors.primaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             );
           },
@@ -578,6 +601,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           totalAmount: 0,
                           queuePosition: 0,
                           discountData: discountData,
+                          orderType: orderType,
                           sendToKitchen:
                               waiterOrderController.orderIdsToBeSendToKichen,
                         );
