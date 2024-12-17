@@ -41,6 +41,8 @@ class _CheckoutViewState extends State<CheckoutView> {
 
   AuthController authController = Get.put(AuthController());
 
+  OrderType orderType = OrderType.DINE_IN;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -90,130 +92,9 @@ class _CheckoutViewState extends State<CheckoutView> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(4.w),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: controller.orderItems.length,
-                          separatorBuilder: (context, index) => Divider(
-                            thickness: 1,
-                            color: AppColors.surfaceDark.withOpacity(0.1),
-                          ),
-                          itemBuilder: (context, index) {
-                            FoodItem foodItem =
-                                controller.orderItems.keys.elementAt(index);
-                            int quantity = controller.orderItems[foodItem]!;
-                            return Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: CustomNetworkImage(
-                                        imageUrl: foodItem.foodImage,
-                                        size: 15.w,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    SizedBox(width: 3.w),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            foodItem.foodName,
-                                            style: context.textTheme.bodyMedium!
-                                                .copyWith(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                          ),
-                                          SizedBox(height: 0.5.h),
-                                          Text(
-                                            '₹${foodItem.foodPrice.toStringAsFixed(2)}',
-                                            style: context.textTheme.bodySmall!
-                                                .copyWith(
-                                                    color: AppColors
-                                                        .secondaryLight),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 2.w),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: AppColors.primaryLight),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              controller
-                                                  .removeOrderItem(foodItem);
-                                            },
-                                            icon: Icon(
-                                              Icons.remove_circle,
-                                              color: AppColors.primaryLight,
-                                            ),
-                                          ),
-                                          Text(
-                                            '$quantity',
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              controller.addOrderItem(foodItem);
-                                            },
-                                            icon: Icon(
-                                              Icons.add_circle,
-                                              color: AppColors.primaryLight,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 1.h),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Send to kitchen",
-                                      style: context.textTheme.bodySmall!
-                                          .copyWith(),
-                                    ),
-                                    Obx(
-                                      () => Checkbox(
-                                        value: waiterOrderController
-                                            .orderIdsToBeSendToKichen
-                                            .contains(foodItem.foodId),
-                                        onChanged: (value) {
-                                          waiterOrderController
-                                              .saveOrderId(foodItem);
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                    _buildItemList(controller),
+                    SizedBox(height: 2.h),
+                    _buildOrderType(context),
                     SizedBox(height: 2.h),
                     _buildCustomerDetailsCard(context),
                     SizedBox(height: 2.h),
@@ -229,6 +110,194 @@ class _CheckoutViewState extends State<CheckoutView> {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  Card _buildItemList(WaiterOrderController controller) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(4.w),
+        child: ListView.separated(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: controller.orderItems.length,
+          separatorBuilder: (context, index) => Divider(
+            thickness: 1,
+            color: AppColors.surfaceDark.withOpacity(0.1),
+          ),
+          itemBuilder: (context, index) {
+            FoodItem foodItem = controller.orderItems.keys.elementAt(index);
+            int quantity = controller.orderItems[foodItem]!;
+            return Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CustomNetworkImage(
+                        imageUrl: foodItem.foodImage,
+                        size: 15.w,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(width: 3.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            foodItem.foodName,
+                            style: context.textTheme.bodyMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 0.5.h),
+                          Text(
+                            '₹${foodItem.foodPrice.toStringAsFixed(2)}',
+                            style: context.textTheme.bodySmall!
+                                .copyWith(color: AppColors.secondaryLight),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 2.w),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.primaryLight),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              controller.removeOrderItem(foodItem);
+                            },
+                            icon: Icon(
+                              Icons.remove_circle,
+                              color: AppColors.primaryLight,
+                            ),
+                          ),
+                          Text(
+                            '$quantity',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              controller.addOrderItem(foodItem);
+                            },
+                            icon: Icon(
+                              Icons.add_circle,
+                              color: AppColors.primaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 1.h),
+                Row(
+                  children: [
+                    Text(
+                      "Send to kitchen",
+                      style: context.textTheme.bodySmall!.copyWith(),
+                    ),
+                    Obx(
+                      () => Checkbox(
+                        value: waiterOrderController.orderIdsToBeSendToKichen
+                            .contains(foodItem.foodId),
+                        onChanged: (value) {
+                          waiterOrderController.saveOrderId(foodItem);
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Card _buildOrderType(BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(4.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Order Type',
+              style: context.textTheme.bodyMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.sp,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() {
+                    orderType = OrderType.DINE_IN;
+                  }),
+                  child: Container(
+                    child: Text(
+                      "Dine-In",
+                      style: context.textTheme.bodyMedium!.copyWith(
+                          color: orderType == OrderType.DINE_IN
+                              ? AppColors.white
+                              : AppColors.black),
+                    ),
+                    padding: EdgeInsets.all(2.w),
+                    decoration: BoxDecoration(
+                      color: orderType == OrderType.DINE_IN
+                          ? AppColors.primaryLight
+                          : AppColors.searchBarLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 2.w),
+                GestureDetector(
+                  onTap: () => setState(() {
+                    orderType = OrderType.TAKE_AWAY;
+                  }),
+                  child: Container(
+                    child: Text(
+                      "Takeaway",
+                      style: context.textTheme.bodyMedium!.copyWith(
+                          color: orderType == OrderType.TAKE_AWAY
+                              ? AppColors.white
+                              : AppColors.black),
+                    ),
+                    padding: EdgeInsets.all(2.w),
+                    decoration: BoxDecoration(
+                      color: orderType == OrderType.TAKE_AWAY
+                          ? AppColors.primaryLight
+                          : AppColors.searchBarLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
