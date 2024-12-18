@@ -135,7 +135,7 @@ class OrderOverview extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(2.w),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryDark.withOpacity(0.1),
+                    color: AppColors.primaryDark.withOpacity(0.2),
                   ),
                   child: Column(
                     children: [

@@ -96,18 +96,17 @@ class FoodOrderProvider {
     }
   }
 
+  // Stream to listen to orders
   Stream<List<FoodOrder>> listenToBookings(DateTime currentDate) {
     DateTime startOfDay =
         DateTime(currentDate.year, currentDate.month, currentDate.day);
-
     return ordersCollection
         .where('orderTime', isGreaterThanOrEqualTo: startOfDay)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
           .map((doc) => FoodOrder.fromJson(doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => a.orderTime.compareTo(b.orderTime));
+          .toList();
     });
   }
 
