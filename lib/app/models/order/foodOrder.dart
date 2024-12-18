@@ -225,7 +225,7 @@ enum FoodOrderStatus {
   PREPARING,
   CANCELLED,
   READY,
-  DELIVERED,
+  COMPLETED,
 }
 
 enum Gender {
