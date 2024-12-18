@@ -1,8 +1,11 @@
 import 'package:cho_nun_btk/app/components/common_tabbar.dart';
+import 'package:cho_nun_btk/app/components/empty_widget.dart';
+import 'package:cho_nun_btk/app/components/order_status_chip.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/views/new_order.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/controller/order_controller.dart';
+import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -34,24 +37,36 @@ class OrderOverview extends StatelessWidget {
             FocusManager.instance.primaryFocus?.unfocus();
           },
           titleAndWidget: {
-            'In-Progress': buildOrderList(status: FoodOrderStatus.PENDING),
-            'Ready': buildOrderList(status: FoodOrderStatus.READY),
-            'Completed': buildOrderList(status: FoodOrderStatus.DELIVERED),
+            'All': buildOrderList(statuses: [
+              FoodOrderStatus.PENDING,
+              FoodOrderStatus.PREPARING,
+              FoodOrderStatus.READY,
+              FoodOrderStatus.COMPLETED,
+              FoodOrderStatus.CANCELLED,
+            ]),
+            // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
+            'Completed': buildOrderList(statuses: [FoodOrderStatus.COMPLETED]),
           },
         ),
       ),
     );
   }
 
-  Widget buildOrderList({required FoodOrderStatus status}) {
+  Widget buildOrderList({required List<FoodOrderStatus> statuses}) {
     return Obx(() {
       final orders = orderController.allOrders
-          .where((order) => order.orderStatus == status)
+          .where((order) => statuses.contains(order.orderStatus))
           .toList();
 
       if (orders.isEmpty) {
-        return Center(
-          child: Text('No orders yet.'),
+        return EmptyIllustrations(
+          // placeInCenter: false,
+          imageHeight: 20.h,
+          // removeHeightValue: true,
+          width: 80.w,
+          title: "No Orders Today",
+          message: "You have not received any orders today",
+          imagePath: "assets/svg/empty.svg",
         );
       }
 
@@ -60,8 +75,8 @@ class OrderOverview extends StatelessWidget {
         itemBuilder: (context, index) {
           FoodOrder order = orders[index];
           return Card(
+            color: AppColors.white,
             elevation: 2,
-            color: AppColors.searchBarLight,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -71,37 +86,20 @@ class OrderOverview extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.primaryLight,
-                        ),
-                        padding: EdgeInsets.all(3.w),
-                        child: Center(
-                          child: Text(
-                            order.customerData.customerName.substring(0, 2),
-                            style: context.textTheme.bodySmall!.copyWith(
-                                color: AppColors.primaryDark,
-                                fontWeight: FontWeight.bold),
-                          ),
+                      Text(
+                        "Order No: ",
+                        style: context.textTheme.bodyLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 2.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            order.customerData.customerName,
-                            style: context.textTheme.bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            order.orderId,
-                            style: context.textTheme.bodySmall!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                      Text(
+                        "#" + parseOrderId(order.orderId)['counter'].toString(),
+                        style: context.textTheme.bodyLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      Spacer(),
+                      OrderStatusChip(status: order.orderStatus),
                     ],
                   )
                 ],
