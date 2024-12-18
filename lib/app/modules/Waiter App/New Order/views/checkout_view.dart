@@ -567,7 +567,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         EasyLoading.show(status: 'Placing Order...');
-                        String orderId = foodOrderProvider.getNewFoodOrderId();
+                        String orderId =
+                            await foodOrderProvider.getNewFoodOrderId();
                         CustomerData customerData = CustomerData(
                           customerName: customerNameController.text,
                           customerPhoneNumber:
