@@ -110,17 +110,6 @@ class FoodOrderProvider {
     });
   }
 
-  Future<QueryStatus> updateOrderStatus(
-      String orderId, FoodOrderStatus status) async {
-    try {
-      await ordersCollection.doc(orderId).update({'orderStatus': status.name});
-      return QueryStatus.SUCCESS;
-    } catch (e) {
-      print(e);
-      return QueryStatus.ERROR;
-    }
-  }
-
   Future<void> addDailyOrderAnalytics(FoodOrder order) async {
     String dailyAnalyticsId = getDailyAnalyticsId(order.orderTime);
 
@@ -214,6 +203,45 @@ class FoodOrderProvider {
           .set(updatedAnalytics.toJson());
     } catch (e) {
       print("Error updating daily analytics: $e");
+    }
+  }
+
+  Future<void> updateOrderStatus(String orderId, FoodOrderStatus status) async {
+    try {
+      await ordersCollection.doc(orderId).update({'orderStatus': status.name});
+    } catch (e) {
+      print("Error updating order status: $e");
+    }
+  }
+
+  Future<void> updateKitchenData(
+      String orderId, KitchenData kitchenData) async {
+    try {
+      await ordersCollection.doc(orderId).update({'kitchenData': kitchenData});
+    } catch (e) {
+      print("Error updating kitchen data: $e");
+    }
+  }
+
+  Future<void> updateCookingStartTime(
+      String orderId, DateTime cookingStartTime) async {
+    try {
+      await ordersCollection
+          .doc(orderId)
+          .update({'cookingStartTime': cookingStartTime});
+    } catch (e) {
+      print("Error updating cooking start time: $e");
+    }
+  }
+
+  Future<void> updateCookingEndTime(
+      String orderId, DateTime cookingEndTime) async {
+    try {
+      await ordersCollection
+          .doc(orderId)
+          .update({'cookingEndTime': cookingEndTime});
+    } catch (e) {
+      print("Error updating cooking end time: $e");
     }
   }
 }

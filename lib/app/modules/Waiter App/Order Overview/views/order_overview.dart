@@ -19,7 +19,7 @@ class OrderOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       initialIndex: 0,
       child: Scaffold(
         appBar: AppBar(
