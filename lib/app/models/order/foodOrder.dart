@@ -192,32 +192,20 @@ class CustomerData {
 class KitchenData {
   String kitchenStaffId;
   String kitchenStaffName;
-  DateTime? cookingStartTime;
-  DateTime? cookingEndTime;
 
   KitchenData({
     required this.kitchenStaffId,
     required this.kitchenStaffName,
-    this.cookingStartTime,
-    this.cookingEndTime,
   });
 
   Map<String, dynamic> toJson() => {
         'kitchenStaffId': kitchenStaffId,
         'kitchenStaffName': kitchenStaffName,
-        'cookingStartTime': cookingStartTime?.toIso8601String(),
-        'cookingEndTime': cookingEndTime?.toIso8601String(),
       };
 
   KitchenData.fromJson(Map<String, dynamic> json)
       : kitchenStaffId = json['kitchenStaffId'],
-        kitchenStaffName = json['kitchenStaffName'],
-        cookingStartTime = json['cookingStartTime'] != null
-            ? DateTime.parse(json['cookingStartTime'])
-            : null,
-        cookingEndTime = json['cookingEndTime'] != null
-            ? DateTime.parse(json['cookingEndTime'])
-            : null;
+        kitchenStaffName = json['kitchenStaffName'];
 }
 
 enum FoodOrderStatus {
