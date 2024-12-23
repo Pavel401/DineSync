@@ -1,10 +1,15 @@
+import 'package:cho_nun_btk/app/components/custom_buttons.dart';
+import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
+import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
+import 'package:cho_nun_btk/app/utils/date_utils.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +39,8 @@ class _ChefFlowState extends State<ChefFlow> {
 
   AuthController authController = Get.find<AuthController>();
 
+  bool isExpanded = false;
+
   @override
   void initState() {
     super.initState();
@@ -49,8 +56,7 @@ class _ChefFlowState extends State<ChefFlow> {
       ),
       body: Padding(
         padding: AppPading.containerPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +70,14 @@ class _ChefFlowState extends State<ChefFlow> {
                 ),
               ],
             ),
-            _buildItemList(),
+            SizedBox(height: 2.h),
+            DottedBorder(
+              borderType: BorderType.RRect,
+              radius: Radius.circular(12),
+              padding: EdgeInsets.all(6),
+              child: _buildItemList(),
+            ),
+            SizedBox(height: 2.h),
             Text(
               "Note:",
               style: context.textTheme.bodyMedium!.copyWith(
@@ -72,151 +85,216 @@ class _ChefFlowState extends State<ChefFlow> {
                 color: AppColors.errorLight,
               ),
             ),
+            SizedBox(height: 1.h),
             Text(
-              order.specialInstructions ?? "No special instructions",
+              order.specialInstructions!.isEmpty
+                  ? "No special instructions"
+                  : order.specialInstructions!,
               style: context.textTheme.bodyMedium!.copyWith(),
             ),
             SizedBox(height: 2.h),
-            DottedLine(
-              dashColor: AppColors.primaryLight,
+            Text(
+              "Order Type",
+              style: context.textTheme.bodyMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.errorLight,
+              ),
+            ),
+            SizedBox(height: 1.h),
+            Row(
+              children: [
+                Container(
+                  child: Text(
+                    order.orderType == OrderType.DINE_IN
+                        ? "Dine In"
+                        : "Take Away",
+                    style: context.textTheme.bodyMedium!
+                        .copyWith(color: AppColors.white),
+                  ),
+                  padding: EdgeInsets.all(2.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 2.h),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("More Details"),
+                  Icon(isExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down)
+                ],
+              ),
+            ),
+            Visibility(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    Text(
+                      "Customer Details",
+                      style: context.textTheme.bodyLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "${order.customerData.customerName}",
+                      style: context.textTheme.bodyMedium!.copyWith(),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text("Waiter Details",
+                        style: context.textTheme.bodyLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        )),
+                    Text(
+                      "${order.waiterData.waiterName}",
+                      style: context.textTheme.bodyMedium!.copyWith(),
+                    ),
+                  ],
+                ),
+                visible: isExpanded),
+            isExpanded
+                ? SizedBox(height: 5.h)
+                : SizedBox(
+                    height: 2.h,
+                  ),
             Text(
-              "Customer Details",
+              "TimeLine",
               style: context.textTheme.bodyLarge!.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.errorLight,
               ),
             ),
-            Text(
-              "${order.customerData.customerName}",
-              style: context.textTheme.bodyMedium!.copyWith(),
+            OrderTimeline(
+              order: order,
             ),
             SizedBox(height: 2.h),
-            DottedLine(
-              dashColor: AppColors.primaryLight,
-            ),
-            SizedBox(height: 2.h),
-            Text("Waiter Details",
-                style: context.textTheme.bodyLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                )),
-            Text(
-              "${order.waiterData.waiterName}",
-              style: context.textTheme.bodyMedium!.copyWith(),
-            ),
-            SizedBox(height: 2.h),
-            DottedLine(
-              dashColor: AppColors.primaryLight,
-            ),
-            SizedBox(height: 2.h),
-            Text("Order Type",
-                style: context.textTheme.bodyLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                )),
-            Container(
-              child: Text(
-                order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away",
-                style: context.textTheme.bodyMedium!
-                    .copyWith(color: AppColors.white),
-              ),
-              padding: EdgeInsets.all(2.w),
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            SizedBox(height: 2.h),
-            DottedLine(
-              dashColor: AppColors.primaryLight,
-            ),
-            SizedBox(height: 2.h),
-            SwipeButton(
-              thumbPadding: EdgeInsets.all(3),
-              thumb: Icon(
-                Icons.chevron_right,
-                color: Colors.white,
-              ),
-              elevationThumb: 2,
-              elevationTrack: 2,
-              child: Text(
-                order.orderStatus == FoodOrderStatus.PENDING
-                    ? "Start Cooking"
-                    : order.orderStatus == FoodOrderStatus.PREPARING
-                        ? "Mark as Ready"
-                        : "Mark as Completed",
-                style: context.textTheme.bodyMedium!.copyWith(),
-              ),
-              onSwipe: () {
-                EasyLoading.show(status: 'Updating Order Status...');
-                if (order.orderStatus == FoodOrderStatus.PENDING) {
-                  _foodOrderProvider!.updateOrderStatus(
-                    order.orderId,
-                    FoodOrderStatus.PREPARING,
-                  );
+            order.orderStatus == FoodOrderStatus.READY
+                ? CafePrimaryButton(
+                    buttonTitle: "Order is Ready", onPressed: () {})
+                : SwipeButton(
+                    thumbPadding: EdgeInsets.all(3),
+                    thumb: Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                    ),
+                    elevationThumb: 2,
+                    elevationTrack: 2,
+                    activeTrackColor: Colors.green,
+                    child: Text(
+                      order.orderStatus == FoodOrderStatus.PENDING
+                          ? "Swipe to Start Cooking"
+                          : order.orderStatus == FoodOrderStatus.PREPARING
+                              ? "Swipe to Mark Ready"
+                              : "Swipe to Mark Completed",
+                      style: context.textTheme.bodyMedium!.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onSwipe: () async {
+                      EasyLoading.show(status: 'Updating Order Status...');
+                      if (order.orderStatus == FoodOrderStatus.PENDING) {
+                        await _foodOrderProvider!.updateOrderStatus(
+                          order.orderId,
+                          FoodOrderStatus.PREPARING,
+                        );
+                        order.cookingStartTime = DateTime.now();
 
-                  KitchenData kitchenData = KitchenData(
-                    kitchenStaffId: authController.userModel!.uid ?? "",
-                    kitchenStaffName: authController.userModel!.name ?? "",
-                  );
-
-                  _foodOrderProvider!.updateKitchenData(
-                    order.orderId,
-                    kitchenData,
-                  );
-                  DateTime cookingStartTime = DateTime.now();
-                  _foodOrderProvider!.updateCookingStartTime(
-                    order.orderId,
-                    cookingStartTime,
-                  );
-                  _foodOrderProvider!.updateCookingStartTime(
-                    order.orderId,
-                    cookingStartTime,
-                  );
-
-                  Get.back();
-                }
-                if (order.orderStatus == FoodOrderStatus.PREPARING) {
-                  _foodOrderProvider!.updateOrderStatus(
-                    order.orderId,
-                    FoodOrderStatus.READY,
-                  );
-
-                  DateTime cookingEndTime = DateTime.now();
-                  _foodOrderProvider!.updateCookingEndTime(
-                    order.orderId,
-                    cookingEndTime,
-                  );
-                  Get.back();
-                }
-                EasyLoading.dismiss();
-              },
-            )
+                        _foodOrderProvider!.updateCookingStartTime(
+                          order.orderId,
+                          order.cookingStartTime!,
+                        );
+                        CustomSnackBar.showSuccess(
+                          "Order Status Updated",
+                          "The order is now in the 'Preparing' state.",
+                          context,
+                        );
+                      } else if (order.orderStatus ==
+                          FoodOrderStatus.PREPARING) {
+                        await _foodOrderProvider!.updateOrderStatus(
+                          order.orderId,
+                          FoodOrderStatus.READY,
+                        );
+                        order.cookingEndTime = DateTime.now();
+                        _foodOrderProvider!.updateCookingEndTime(
+                          order.orderId,
+                          order.cookingEndTime!,
+                        );
+                        CustomSnackBar.showSuccess(
+                          "Order Status Updated",
+                          "The order is now 'Ready'.",
+                          context,
+                        );
+                      }
+                      EasyLoading.dismiss();
+                      Get.back();
+                    },
+                  ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildOrderDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontWeight: FontWeight.bold),
+  int _getCurrentStep() {
+    if (order.orderStatus == FoodOrderStatus.READY) {
+      return 2;
+    } else if (order.orderStatus == FoodOrderStatus.PREPARING) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  Widget _buildStepper() {
+    return Stepper(
+      currentStep: _getCurrentStep(),
+      steps: [
+        Step(
+          title: const Text("Order Placed"),
+          subtitle: Text(
+            'Placed on ${DateUtilities.formatDateTime(order.orderTime)}',
+            style: TextStyle(fontSize: 12),
           ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.grey[700]),
-            ),
+          content: CircularProgressIndicator(),
+          isActive: true,
+        ),
+        Step(
+          title: const Text("Cooking Started"),
+          subtitle: Text(
+            order.cookingStartTime != null
+                ? 'Started at ${DateUtilities.formatDateTime(order.cookingStartTime!)}'
+                : "Not started yet",
+            style: TextStyle(fontSize: 12),
           ),
-        ],
-      ),
+          content: CircularProgressIndicator(),
+          isActive: order.orderStatus == FoodOrderStatus.PREPARING ||
+              order.orderStatus == FoodOrderStatus.READY,
+        ),
+        Step(
+          title: const Text("Order Ready"),
+          subtitle: Text(
+            order.cookingEndTime != null
+                ? 'Ready at ${DateUtilities.formatDateTime(order.cookingEndTime!)}'
+                : "Not ready yet",
+            style: TextStyle(fontSize: 12),
+          ),
+          content: CircularProgressIndicator(),
+          isActive: order.orderStatus == FoodOrderStatus.READY,
+        ),
+      ],
     );
   }
 
@@ -224,6 +302,7 @@ class _ChefFlowState extends State<ChefFlow> {
     return ListView.separated(
       separatorBuilder: (context, index) => DottedLine(
         dashColor: AppColors.primaryLight,
+        lineThickness: 0.6,
       ),
       shrinkWrap: true,
       itemCount: order.orderItems.length,
