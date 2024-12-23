@@ -180,7 +180,7 @@ class _ChefFlowState extends State<ChefFlow> {
             OrderTimeline(
               order: order,
             ),
-            SizedBox(height: 2.h),
+            SizedBox(height: 5.h),
             order.orderStatus == FoodOrderStatus.READY
                 ? CafePrimaryButton(
                     buttonTitle: "Order is Ready", onPressed: () {})
