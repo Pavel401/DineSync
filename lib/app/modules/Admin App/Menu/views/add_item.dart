@@ -617,7 +617,9 @@ class _AddMenuItemState extends State<AddMenuItem> {
           foodId: widget.item?.foodId ?? menuprovider.newId(),
           foodName: _nameController.text,
           foodDescription: _descriptionController.text,
-          foodPrice: double.parse(_priceController.text),
+          foodPrice: _priceController.text.isNotEmpty
+              ? double.parse(_priceController.text)
+              : 0,
           foodCategory: menuController.selectedCategory,
           foodImage: imageUrl,
           isVegan: _isVegan,
@@ -628,6 +630,9 @@ class _AddMenuItemState extends State<AddMenuItem> {
           spiceLevel: _spiceLevel,
           isAvailable: isAvailable,
           sides: sides,
+          nutritionalInfo: _nutritionController.text.isNotEmpty
+              ? double.parse(_nutritionController.text)
+              : 0,
         );
 
         if (widget.item == null) {
