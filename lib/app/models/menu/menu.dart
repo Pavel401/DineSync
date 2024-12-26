@@ -6,12 +6,14 @@ class FoodCategory extends Equatable {
   final String categoryImage;
   final String categoryId;
   final String? categoryDescription;
+  final bool noNeedToSendToKitchen;
 
   FoodCategory({
     required this.categoryName,
     required this.categoryImage,
     required this.categoryId,
     this.categoryDescription,
+    this.noNeedToSendToKitchen = false,
   });
 
   FoodCategory copyWith({
@@ -25,6 +27,8 @@ class FoodCategory extends Equatable {
       categoryImage: categoryImage ?? this.categoryImage,
       categoryId: categoryId ?? this.categoryId,
       categoryDescription: categoryDescription ?? this.categoryDescription,
+      noNeedToSendToKitchen:
+          noNeedToSendToKitchen ?? this.noNeedToSendToKitchen,
     );
   }
 
@@ -38,6 +42,7 @@ class FoodCategory extends Equatable {
       'categoryImage': categoryImage,
       'categoryId': categoryId,
       'categoryDescription': categoryDescription,
+      'noNeedToSendToKitchen': noNeedToSendToKitchen,
     };
   }
 
@@ -47,6 +52,7 @@ class FoodCategory extends Equatable {
       categoryImage: json['categoryImage'] ?? '',
       categoryId: json['categoryId'] ?? '',
       categoryDescription: json['categoryDescription'],
+      noNeedToSendToKitchen: json['noNeedToSendToKitchen'] ?? false,
     );
   }
 }

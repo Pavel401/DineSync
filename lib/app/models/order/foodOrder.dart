@@ -21,8 +21,6 @@ class FoodOrder {
   PaymentMode? paymentMode;
   PaymentStatus? paymentStatus;
 
-  List<String>? sendToKitchen;
-
   FoodOrder({
     required this.orderId,
     required this.orderItems,
@@ -39,7 +37,6 @@ class FoodOrder {
     this.customerFeedback,
     this.queuePosition,
     this.discountData,
-    this.sendToKitchen,
     this.orderType,
   });
 
@@ -70,7 +67,6 @@ class FoodOrder {
         'queuePosition': queuePosition,
         'discountData': discountData?.toJson(),
 
-        'sendToKitchen': sendToKitchen,
         'orderType': orderType?.name,
       };
 
@@ -104,9 +100,6 @@ class FoodOrder {
         queuePosition = json['queuePosition'] ?? 0,
         discountData = json['discountData'] != null
             ? DiscountData.fromJson(json['discountData'])
-            : null,
-        sendToKitchen = json['sendToKitchen'] != null
-            ? List<String>.from(json['sendToKitchen'])
             : null,
         orderType = json['orderType'] != null
             ? OrderType.values.firstWhere((e) => e.name == json['orderType'])

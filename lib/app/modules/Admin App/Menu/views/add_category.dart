@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sizer/sizer.dart';
 
 class AddCategory extends StatefulWidget {
   FoodCategory? category;
@@ -26,6 +27,8 @@ class _AddCategoryState extends State<AddCategory> {
   final _descriptionController = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+
+  bool noNeedToSendToKitchen = false;
 
   final FoodMenuController _controller = Get.find<FoodMenuController>();
 
@@ -69,6 +72,7 @@ class _AddCategoryState extends State<AddCategory> {
         categoryImage: imageUrl,
         categoryId: categoryId,
         categoryDescription: _descriptionController.text,
+        noNeedToSendToKitchen: noNeedToSendToKitchen,
       );
 
       if (widget.category != null) {
@@ -95,6 +99,8 @@ class _AddCategoryState extends State<AddCategory> {
     if (widget.category != null) {
       _nameController.text = widget.category!.categoryName;
       _descriptionController.text = widget.category!.categoryDescription!;
+
+      noNeedToSendToKitchen = widget.category!.noNeedToSendToKitchen;
     }
     super.initState();
   }
@@ -126,7 +132,7 @@ class _AddCategoryState extends State<AddCategory> {
               GestureDetector(
                 onTap: _pickImage,
                 child: Container(
-                  height: 200,
+                  height: 20.h,
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(10),
@@ -198,7 +204,7 @@ class _AddCategoryState extends State<AddCategory> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 2.h),
               TextFormField(
                 controller: _nameController,
                 maxLength: 50,
@@ -213,7 +219,7 @@ class _AddCategoryState extends State<AddCategory> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 2.h),
               TextFormField(
                 controller: _descriptionController,
                 maxLength: 400,
@@ -223,7 +229,35 @@ class _AddCategoryState extends State<AddCategory> {
                 ),
                 maxLines: 3,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 2.h),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 1.h),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Don't send to kitchen",
+                      style: context.textTheme.bodySmall!.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Checkbox(
+                      value: noNeedToSendToKitchen,
+                      onChanged: (value) {
+                        setState(() {
+                          noNeedToSendToKitchen = value!;
+                        });
+                      },
+                      activeColor: AppColors.primaryLight,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 2.h),
               ElevatedButton(
                 onPressed: _saveCategory,
                 child: widget.category != null
