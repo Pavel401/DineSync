@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
+import 'package:cho_nun_btk/app/models/FCM/fcm_model.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/views/home_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/fcm_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/views/auth_view_home.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/Home/views/chef_home.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Home/views/waiter_view.dart';
+import 'package:cho_nun_btk/app/provider/fcm_helper.dart';
+import 'package:cho_nun_btk/app/services/local_notification_service.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,8 +31,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await FirebaseMessaging.instance.setAutoInitEnabled(true);
+
+  await LocalNotificationService().init();
+
   AuthController authController = Get.put(AuthController());
   authController.loadUserModel();
+
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+
+  debugPrint('FirebaseMessaging: Token $fcmToken');
   await FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     debugPrint('FirebaseMessaging: Token refreshed');
     debugPrint('FirebaseMessaging: New Token: $newToken');
@@ -36,11 +50,36 @@ void main() async {
           .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, newToken);
     }
   });
-  // Future.delayed(const Duration(seconds: 1), () {});
 
-  // final fcmToken = await FirebaseMessaging.instance.getToken();
-  // await FirebaseMessaging.instance.setAutoInitEnabled(true);
-  // debugPrint('FirebaseMessaging: FCM Token: $fcmToken');
+  await FirebaseMessaging.onMessage
+      .listen(handleBackgroundMessageWhenAppIsOpen);
+
+  // When user taps on the notification
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    LocalNotificationService().handleNotificationClick(message.data);
+  });
+
+  // Check if the app was opened by tapping a notification while terminated
+  // This is only for notifcations from Firebase Cloud Messaging
+  // Notifications from Local Notification Service will not be handled here (need to test)
+  RemoteMessage? initialMessage =
+      await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    LocalNotificationService().handleNotificationClick(initialMessage
+        .data); // Handle notification click when app was terminated
+  }
+
+  print("Received the initial message: $initialMessage");
+
+  await FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    debugPrint('FirebaseMessaging: Token refreshed');
+    debugPrint('FirebaseMessaging: New Token: $newToken');
+    if (FirebaseAuth.instance.currentUser != null) {
+      FirebaseHelper()
+          .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, newToken);
+    }
+  });
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -148,4 +187,39 @@ class SplashScreen extends StatelessWidget {
       },
     );
   }
+}
+
+Future<void> handleBackgroundMessageWhenAppIsOpen(RemoteMessage message) async {
+  debugPrint('FirebaseMessaging: Message received when app is open');
+  debugPrint('FirebaseMessaging: Title: ${message.notification!.title}');
+  debugPrint('FirebaseMessaging: Body: ${message.notification!.body}');
+
+  FcmNotificationPayload payload =
+      FcmNotificationPayload.fromJson(message.data);
+
+  debugPrint('FirebaseMessaging: Type: ${payload.type}');
+  if (message.notification != null &&
+      message.notification!.title != null &&
+      message.notification!.body != null) {
+    String imageUrl = message.notification?.apple?.imageUrl ??
+        message.notification?.android?.imageUrl ??
+        '';
+
+    if (imageUrl.isNotEmpty) {
+      debugPrint('FirebaseMessaging: Image URL: $imageUrl');
+      LocalNotificationService().showBigPictureNotification(
+          id: message.messageId.hashCode,
+          title: message.notification!.title!,
+          imageUrl: imageUrl,
+          body: message.notification!.body!,
+          payload: jsonEncode(message.data));
+    } else {
+      LocalNotificationService().showBasicNotification(
+          id: message.messageId.hashCode,
+          title: message.notification!.title!,
+          body: message.notification!.body!,
+          payload: jsonEncode(message.data));
+    }
+  }
+  return;
 }
