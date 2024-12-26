@@ -565,7 +565,7 @@ class _AddMenuItemState extends State<AddMenuItem> {
                   CafePrimaryButton(
                       buttonTitle:
                           widget.item == null ? 'Add Item' : 'Update Item',
-                      width: 20.w,
+                      width: 25.w,
                       onPressed: () {
                         _submitForm();
                       }),
