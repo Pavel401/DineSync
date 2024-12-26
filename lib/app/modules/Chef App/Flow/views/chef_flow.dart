@@ -10,7 +10,6 @@ import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/date_utils.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -299,11 +298,7 @@ class _ChefFlowState extends State<ChefFlow> {
   }
 
   _buildItemList() {
-    return ListView.separated(
-      separatorBuilder: (context, index) => DottedLine(
-        dashColor: AppColors.primaryLight,
-        lineThickness: 0.6,
-      ),
+    return ListView.builder(
       shrinkWrap: true,
       itemCount: order.orderItems.length,
       physics: NeverScrollableScrollPhysics(),
