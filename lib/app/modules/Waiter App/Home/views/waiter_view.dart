@@ -68,15 +68,6 @@ class WaiterHomeView extends StatelessWidget {
           // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
 
           destinations: <Widget>[
-            // NavigationDestination(
-            //   icon: Icon(
-            //     Icons.history_outlined,
-            //     color: themeProvider.isDarkMode
-            //         ? AppColors.secondaryDark
-            //         : AppColors.secondaryLight,
-            //   ),
-            //   label: 'History',
-            // ),
             NavigationDestination(
               icon: Icon(
                 Icons.list_alt_outlined,
@@ -86,15 +77,6 @@ class WaiterHomeView extends StatelessWidget {
               ),
               label: 'Orders',
             ),
-            // NavigationDestination(
-            //   icon: Icon(
-            //     Icons.menu_book_outlined,
-            //     color: themeProvider.isDarkMode
-            //         ? AppColors.secondaryDark
-            //         : AppColors.secondaryLight,
-            //   ),
-            //   label: 'Menu',
-            // ),
             NavigationDestination(
               icon: Icon(
                 Icons.menu_outlined,

@@ -308,28 +308,26 @@ class _ChefFlowState extends State<ChefFlow> {
         final foodItem = entry.key; // The FoodItem
         final quantity = entry.value; // The quantity
 
-        return order.sendToKitchen!.contains(foodItem.foodId)
-            ? SizedBox()
-            : Padding(
-                padding: EdgeInsets.symmetric(vertical: 2.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 70.w,
-                      child: Text(
-                        foodItem.foodName,
-                        style: context.textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text('X$quantity'),
-                  ],
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 2.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 70.w,
+                child: Text(
+                  foodItem.foodName,
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              );
+              ),
+              Text('X$quantity'),
+            ],
+          ),
+        );
       },
     );
   }
