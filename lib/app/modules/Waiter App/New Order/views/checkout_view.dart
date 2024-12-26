@@ -227,14 +227,14 @@ class _CheckoutViewState extends State<CheckoutView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Send to kitchen",
+                        "Don't send to kitchen",
                         style: context.textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Obx(
                         () => Checkbox(
-                          value: controller.orderIdsToBeSendToKichen
+                          value: controller.orderIdsNotToBeSendToKichen
                               .contains(foodItem.foodId),
                           onChanged: (value) {
                             controller.saveOrderId(foodItem);
@@ -604,7 +604,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           discountData: discountData,
                           orderType: orderType,
                           sendToKitchen:
-                              waiterOrderController.orderIdsToBeSendToKichen,
+                              waiterOrderController.orderIdsNotToBeSendToKichen,
                         );
 
                         QueryStatus status =
