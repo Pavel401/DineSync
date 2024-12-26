@@ -217,34 +217,34 @@ class _CheckoutViewState extends State<CheckoutView> {
                   ],
                 ),
                 SizedBox(height: 1.h),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 1.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceLight.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Don't send to kitchen",
-                        style: context.textTheme.bodySmall!.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Obx(
-                        () => Checkbox(
-                          value: controller.orderIdsNotToBeSendToKichen
-                              .contains(foodItem.foodId),
-                          onChanged: (value) {
-                            controller.saveOrderId(foodItem);
-                          },
-                          activeColor: AppColors.primaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   padding: EdgeInsets.symmetric(vertical: 1.h),
+                //   decoration: BoxDecoration(
+                //     color: AppColors.surfaceLight.withOpacity(0.5),
+                //     borderRadius: BorderRadius.circular(8),
+                //   ),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       Text(
+                //         "Don't send to kitchen",
+                //         style: context.textTheme.bodySmall!.copyWith(
+                //           fontWeight: FontWeight.w600,
+                //         ),
+                //       ),
+                //       Obx(
+                //         () => Checkbox(
+                //           value: controller.orderIdsNotToBeSendToKichen
+                //               .contains(foodItem.foodId),
+                //           onChanged: (value) {
+                //             controller.saveOrderId(foodItem);
+                //           },
+                //           activeColor: AppColors.primaryLight,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             );
           },
@@ -603,8 +603,6 @@ class _CheckoutViewState extends State<CheckoutView> {
                           queuePosition: 0,
                           discountData: discountData,
                           orderType: orderType,
-                          sendToKitchen:
-                              waiterOrderController.orderIdsNotToBeSendToKichen,
                         );
 
                         QueryStatus status =
