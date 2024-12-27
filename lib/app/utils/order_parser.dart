@@ -1,3 +1,6 @@
+import 'package:cho_nun_btk/app/models/menu/menu.dart';
+import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+
 Map<String, dynamic> parseOrderId(String orderId) {
   // Define a regex to match the updated Order ID format
   final RegExp regex = RegExp(r'^##ORDER-(\d{8})-##(\d+)-##([A-Z0-9]+)$');
@@ -23,4 +26,18 @@ Map<String, dynamic> parseOrderId(String orderId) {
   } else {
     throw FormatException('Invalid Order ID format');
   }
+}
+
+bool isOrderNeededToKitchen(FoodOrder order) {
+  bool flag = false;
+  for (int i = 0; i < order.orderItems.length; i++) {
+    FoodItem item = order.orderItems.keys.elementAt(i);
+
+    if (item.foodCategory.noNeedToSendToKitchen == false) {
+      flag = true;
+      break;
+    }
+  }
+
+  return flag;
 }

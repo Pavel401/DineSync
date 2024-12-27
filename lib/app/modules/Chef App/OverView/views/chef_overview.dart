@@ -2,7 +2,6 @@ import 'package:cho_nun_btk/app/components/common_tabbar.dart';
 import 'package:cho_nun_btk/app/components/empty_widget.dart';
 import 'package:cho_nun_btk/app/components/order_status_chip.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
-import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/Flow/views/chef_flow.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/controller/order_controller.dart';
@@ -73,14 +72,7 @@ class KitchenOverView extends StatelessWidget {
 
           bool flag = true;
 
-          for (int i = 0; i < order.orderItems.length; i++) {
-            FoodItem item = order.orderItems.keys.elementAt(i);
-
-            if (item.foodCategory.noNeedToSendToKitchen == false) {
-              flag = false;
-              break;
-            }
-          }
+          flag = isOrderNeededToKitchen(order);
           return GestureDetector(
             onTap: () {
               Get.to(
