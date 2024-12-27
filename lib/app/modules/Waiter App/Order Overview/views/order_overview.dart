@@ -5,6 +5,7 @@ import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/views/new_order.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/controller/order_controller.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/views/order_summary.dart';
 import 'package:cho_nun_btk/app/utils/date_utils.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -76,101 +77,106 @@ class OrderOverview extends StatelessWidget {
         itemCount: orders.length,
         itemBuilder: (context, index) {
           FoodOrder order = orders[index];
-          return Card(
-            color: AppColors.white,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(2.w),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Order No: ",
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
+          return GestureDetector(
+            onTap: () {
+              Get.to(() => WaiterFlow(order: order));
+            },
+            child: Card(
+              color: AppColors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "Order No: ",
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "#" +
-                                parseOrderId(order.orderId)['counter']
-                                    .toString(),
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              "#" +
+                                  parseOrderId(order.orderId)['counter']
+                                      .toString(),
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Spacer(),
-                          OrderStatusChip(status: order.orderStatus),
-                        ],
-                      ),
-                      SizedBox(height: 2.h),
-                      Row(
-                        children: [
-                          Text(
-                            "Name:",
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
+                            Spacer(),
+                            OrderStatusChip(status: order.orderStatus),
+                          ],
+                        ),
+                        SizedBox(height: 2.h),
+                        Row(
+                          children: [
+                            Text(
+                              "Name:",
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            order.customerData.customerName ?? "",
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              order.customerData.customerName ?? "",
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 1.h),
-                DottedLine(
-                  dashColor: AppColors.primaryDark,
-                ),
-                Container(
-                  padding: EdgeInsets.all(2.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryDark.withOpacity(0.2),
+                  SizedBox(height: 1.h),
+                  DottedLine(
+                    dashColor: AppColors.primaryDark,
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "X" + order.orderItems.length.toString(),
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
+                  Container(
+                    padding: EdgeInsets.all(2.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark.withOpacity(0.2),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "X" + order.orderItems.length.toString(),
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Spacer(),
-                          Icon(Icons.schedule),
-                          Text(
-                            DateUtilities.formatDateTime(order.orderTime),
-                            style: context.textTheme.bodySmall!.copyWith(
-                              fontWeight: FontWeight.bold,
+                            Spacer(),
+                            Icon(Icons.schedule),
+                            Text(
+                              DateUtilities.formatDateTime(order.orderTime),
+                              style: context.textTheme.bodySmall!.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Spacer(),
-                          Text(
-                            order.orderType!.name == OrderType.DINE_IN.name
-                                ? "Dine In"
-                                : "Take Away",
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryLight,
+                            Spacer(),
+                            Text(
+                              order.orderType!.name == OrderType.DINE_IN.name
+                                  ? "Dine In"
+                                  : "Take Away",
+                              style: context.textTheme.bodyLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryLight,
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                )
-              ],
+                          ],
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           );
         },

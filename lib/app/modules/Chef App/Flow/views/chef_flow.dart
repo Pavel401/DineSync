@@ -73,7 +73,7 @@ class _ChefFlowState extends State<ChefFlow> {
             DottedBorder(
               borderType: BorderType.RRect,
               radius: Radius.circular(12),
-              padding: EdgeInsets.all(6),
+              // padding: EdgeInsets.all(2.w),
               child: _buildItemList(),
             ),
             SizedBox(height: 2.h),
@@ -308,26 +308,28 @@ class _ChefFlowState extends State<ChefFlow> {
         final foodItem = entry.key; // The FoodItem
         final quantity = entry.value; // The quantity
 
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 2.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 70.w,
-                child: Text(
-                  foodItem.foodName,
-                  style: context.textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+        return foodItem.foodCategory.noNeedToSendToKitchen
+            ? SizedBox()
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 70.w,
+                      child: Text(
+                        foodItem.foodName,
+                        style: context.textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text('X$quantity'),
+                  ],
                 ),
-              ),
-              Text('X$quantity'),
-            ],
-          ),
-        );
+              );
       },
     );
   }

@@ -2,6 +2,7 @@ import 'package:cho_nun_btk/app/components/common_tabbar.dart';
 import 'package:cho_nun_btk/app/components/empty_widget.dart';
 import 'package:cho_nun_btk/app/components/order_status_chip.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
+import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/Flow/views/chef_flow.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/controller/order_controller.dart';
@@ -69,6 +70,17 @@ class KitchenOverView extends StatelessWidget {
         itemCount: orders.length,
         itemBuilder: (context, index) {
           FoodOrder order = orders[index];
+
+          bool flag = true;
+
+          for (int i = 0; i < order.orderItems.length; i++) {
+            FoodItem item = order.orderItems.keys.elementAt(i);
+
+            if (item.foodCategory.noNeedToSendToKitchen == false) {
+              flag = false;
+              break;
+            }
+          }
           return GestureDetector(
             onTap: () {
               Get.to(
@@ -77,103 +89,114 @@ class KitchenOverView extends StatelessWidget {
                 ),
               );
             },
-            child: Card(
-              color: AppColors.white,
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(2.w),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Order No: ",
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              "#" +
-                                  parseOrderId(order.orderId)['counter']
-                                      .toString(),
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Spacer(),
-                            OrderStatusChip(status: order.orderStatus),
-                          ],
-                        ),
-                        SizedBox(height: 2.h),
-                        Row(
-                          children: [
-                            Text(
-                              "Name:",
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              order.customerData.customerName ?? "",
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 1.h),
-                  DottedLine(
-                    dashColor: AppColors.primaryDark,
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(2.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryDark.withOpacity(0.2),
+            child: flag
+                ? Card(
+                    color: AppColors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "X" + order.orderItems.length.toString(),
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: EdgeInsets.all(2.w),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Order No: ",
+                                    style:
+                                        context.textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "#" +
+                                        parseOrderId(order.orderId)['counter']
+                                            .toString(),
+                                    style:
+                                        context.textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  OrderStatusChip(status: order.orderStatus),
+                                ],
                               ),
-                            ),
-                            Spacer(),
-                            Icon(Icons.schedule),
-                            Text(
-                              DateUtilities.formatDateTime(order.orderTime),
-                              style: context.textTheme.bodySmall!.copyWith(
-                                fontWeight: FontWeight.bold,
+                              SizedBox(height: 2.h),
+                              Row(
+                                children: [
+                                  Text(
+                                    "Name:",
+                                    style:
+                                        context.textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    order.customerData.customerName ?? "",
+                                    style:
+                                        context.textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Spacer(),
-                            Text(
-                              order.orderType!.name == OrderType.DINE_IN.name
-                                  ? "Dine In"
-                                  : "Take Away",
-                              style: context.textTheme.bodyLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryLight,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 1.h),
+                        DottedLine(
+                          dashColor: AppColors.primaryDark,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(2.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryDark.withOpacity(0.2),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "X" + order.orderItems.length.toString(),
+                                    style:
+                                        context.textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Icon(Icons.schedule),
+                                  Text(
+                                    DateUtilities.formatDateTime(
+                                        order.orderTime),
+                                    style:
+                                        context.textTheme.bodySmall!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    order.orderType!.name ==
+                                            OrderType.DINE_IN.name
+                                        ? "Dine In"
+                                        : "Take Away",
+                                    style:
+                                        context.textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryLight,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
                         )
                       ],
                     ),
                   )
-                ],
-              ),
-            ),
+                : SizedBox(),
           );
         },
       );
