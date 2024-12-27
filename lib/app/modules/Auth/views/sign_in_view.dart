@@ -119,7 +119,7 @@ class _SignInViewState extends State<SignInView> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         CafePrimaryButton(
-                          width: isLargeScreen ? 25.w : 20.w,
+                          width: isLargeScreen ? 20.w : 20.w,
                           buttonTitle: "Login",
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
@@ -187,7 +187,7 @@ class _SignInViewState extends State<SignInView> {
                         ),
                         CafePrimaryButton(
                           buttonTitle: "SignUp",
-                          width: isLargeScreen ? 25.w : 20.w,
+                          width: isLargeScreen ? 20.w : 20.w,
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               ScaffoldMessenger.of(context).showSnackBar(

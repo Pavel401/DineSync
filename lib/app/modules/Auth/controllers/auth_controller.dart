@@ -1,6 +1,7 @@
 import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
 import 'package:cho_nun_btk/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -262,6 +263,9 @@ class AuthController extends GetxController {
       passwordController.clear();
       nameController.clear();
       phoneController.clear();
+
+      Get.delete<HomeController>();
+
       selectedUserType = UserType.NONE;
 
       Get.offAll(() => SplashScreen());
