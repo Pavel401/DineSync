@@ -198,3 +198,45 @@ class TurfPaymentButton extends StatelessWidget {
     );
   }
 }
+
+class CafeCancelButton extends StatelessWidget {
+  final double? width;
+  final double? height;
+  final String buttonTitle;
+  final Function()? onPressed;
+  final bool isEnabled;
+
+  bool? isCancelButton;
+
+  CafeCancelButton({
+    required this.buttonTitle,
+    required this.onPressed,
+    this.width,
+    this.height,
+    this.isEnabled = true,
+    this.isCancelButton,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: isEnabled ? onPressed : null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
+      ),
+      child: Container(
+        width: width ?? 80.w,
+        height: height ?? 5.h,
+        child: Center(
+          child: Text(
+            buttonTitle,
+            style: TextStyle(
+              color: isEnabled ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
