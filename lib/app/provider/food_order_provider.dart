@@ -147,17 +147,4 @@ class FoodOrderProvider {
       print("Error updating cooking end time: $e");
     }
   }
-
-  String getAnalyticsId(DateTime date, String type) {
-    switch (type) {
-      case "daily":
-        return "${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}";
-      case "monthly":
-        return "${date.year}${date.month.toString().padLeft(2, '0')}";
-      case "yearly":
-        return "${date.year}";
-      default:
-        throw ArgumentError("Invalid analytics type: $type");
-    }
-  }
 }
