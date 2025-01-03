@@ -1,5 +1,6 @@
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Analytics/views/admin_analytics_view.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/menu_view.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/More/view/more_view.dart';
@@ -27,7 +28,7 @@ class AdminHomeView extends StatelessWidget {
               Container(),
               // Placeholder(),
               Container(),
-              Container(),
+              AdminAnalyticsView(),
               MenuView(),
 
               AdminMoreView(),
@@ -42,8 +43,6 @@ class AdminHomeView extends StatelessWidget {
       BuildContext context, ThemeProvider themeProvider) {
     return NavigationBarTheme(
       data: NavigationBarThemeData(
-        // indicatorColor: Colors.red,
-
         labelTextStyle: WidgetStateProperty.all(
           context.textTheme.bodySmall!.copyWith(
             fontWeight: FontWeight.bold,
@@ -58,7 +57,6 @@ class AdminHomeView extends StatelessWidget {
           onDestinationSelected: (int index) {
             homeController.changeIndex(index);
           },
-
           elevation: 0.4,
           backgroundColor: themeProvider.isDarkMode
               ? AppColors.surfaceDark
@@ -67,8 +65,6 @@ class AdminHomeView extends StatelessWidget {
               ? AppColors.tertiaryDark
               : AppColors.tertiaryLight,
           selectedIndex: homeController.currentIndex.value,
-          // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-
           destinations: <Widget>[
             NavigationDestination(
               icon: Icon(
@@ -79,28 +75,6 @@ class AdminHomeView extends StatelessWidget {
               ),
               label: 'Home',
             ),
-            // NavigationDestination(
-            //   icon: Badge(
-            //     label: Text('2'),
-            //     child: Icon(
-            //       Icons.stadium_outlined,
-            //       color: themeProvider.isDarkMode
-            //           ? AppColors.primaryDark
-            //           : AppColors.primaryLight,
-            //     ),
-            //   ),
-            //   label: 'Book',
-            // ),
-            // NavigationDestination(
-            //   icon: Icon(
-            //     Icons.sports_soccer_outlined,
-            //     color: themeProvider.isDarkMode
-            //         ? AppColors.secondaryDark
-            //         : AppColors.secondaryLight,
-            //   ),
-            //   label: 'Games',
-            // ),
-
             NavigationDestination(
               icon: Icon(
                 Icons.list_alt_outlined,
@@ -110,7 +84,6 @@ class AdminHomeView extends StatelessWidget {
               ),
               label: 'Orders',
             ),
-
             NavigationDestination(
               icon: Icon(
                 Icons.analytics_outlined,
@@ -129,7 +102,6 @@ class AdminHomeView extends StatelessWidget {
               ),
               label: 'Menu',
             ),
-
             NavigationDestination(
               icon: Icon(
                 Icons.menu_outlined,
