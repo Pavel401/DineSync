@@ -4,7 +4,6 @@ class FoodAnalytics {
 
   // Basic Metrics
   int totalOrders; // Total number of orders
-  double totalRevenue; // Total revenue for the day
   int totalCustomers; // Total unique customers for the day
 
   // Discount Metrics
@@ -19,7 +18,6 @@ class FoodAnalytics {
 
   // Cancellation Metrics
   int cancelledOrders; // Total number of cancelled orders
-  List<String> cancelledReasons; // Reasons for cancellations (optional)
 
   double averageOrderValue; // Average revenue per order
 
@@ -27,13 +25,11 @@ class FoodAnalytics {
     required this.aid,
     required this.date,
     required this.totalOrders,
-    required this.totalRevenue,
     required this.totalCustomers,
     this.totalDiscountedOrders = 0,
     this.categorySales = const {},
     this.itemSalesCount = const {},
     this.cancelledOrders = 0,
-    this.cancelledReasons = const [],
     this.averageOrderValue = 0.0,
   });
 
@@ -42,29 +38,27 @@ class FoodAnalytics {
         'aid': aid,
         'date': date.toIso8601String(),
         'totalOrders': totalOrders,
-        'totalRevenue': totalRevenue,
         'totalCustomers': totalCustomers,
         'totalDiscountedOrders': totalDiscountedOrders,
         'categorySales': categorySales,
         'itemSalesCount': itemSalesCount,
         'cancelledOrders': cancelledOrders,
-        'cancelledReasons': cancelledReasons,
         'averageOrderValue': averageOrderValue,
       };
-
-  // JSON deserialization
   factory FoodAnalytics.fromJson(Map<String, dynamic> json) {
     return FoodAnalytics(
       aid: json['aid'],
       date: DateTime.parse(json['date']),
       totalOrders: json['totalOrders'],
-      totalRevenue: json['totalRevenue'],
       totalCustomers: json['totalCustomers'],
       totalDiscountedOrders: json['totalDiscountedOrders'],
-      categorySales: json['categorySales'],
-      itemSalesCount: json['itemSalesCount'],
+      categorySales: (json['categorySales'] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(key, value as int),
+      ),
+      itemSalesCount: (json['itemSalesCount'] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(key, value as int),
+      ),
       cancelledOrders: json['cancelledOrders'],
-      cancelledReasons: json['cancelledReasons'],
       averageOrderValue: json['averageOrderValue'],
     );
   }
