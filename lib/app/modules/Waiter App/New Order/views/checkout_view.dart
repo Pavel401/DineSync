@@ -7,6 +7,7 @@ import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
+import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:flutter/material.dart';
@@ -607,6 +608,12 @@ class _CheckoutViewState extends State<CheckoutView> {
 
                         QueryStatus status =
                             await foodOrderProvider.createOrder(foodOrder);
+
+                        AnalyticsProvider analyticsProvider =
+                            serviceLocator<AnalyticsProvider>();
+
+                        QueryStatus astatus =
+                            await analyticsProvider.recordAnalytics(foodOrder);
 
                         if (status == QueryStatus.SUCCESS) {
                           EasyLoading.dismiss();
