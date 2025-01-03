@@ -184,12 +184,26 @@ class _WaiterFlowState extends State<WaiterFlow> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 CafePrimaryButton(
-                    isEnabled: order.orderStatus == FoodOrderStatus.READY,
+                    isEnabled: flag == false
+                        ? true
+                        : order.orderStatus == FoodOrderStatus.READY,
                     width: 30.w,
                     buttonTitle: "Mark as Served",
                     onPressed: () {
-                      _foodOrderProvider!.updateOrderStatus(
-                          order.orderId, FoodOrderStatus.COMPLETED);
+                      if (flag == false) {
+                        _foodOrderProvider!.updateOrderStatus(
+                            order.orderId, FoodOrderStatus.COMPLETED);
+
+                        _foodOrderProvider!.updateCookingStartTime(
+                            order.orderId, DateTime.now());
+
+                        _foodOrderProvider!.updateCookingEndTime(
+                            order.orderId, DateTime.now());
+                      } else {
+                        _foodOrderProvider!.updateOrderStatus(
+                            order.orderId, FoodOrderStatus.COMPLETED);
+                      }
+
                       Get.back();
                     }),
                 CafeCancelButton(
