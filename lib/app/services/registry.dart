@@ -1,4 +1,5 @@
 import 'package:cho_nun_btk/app/modules/Auth/controllers/fcm_controller.dart';
+import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/firebase_imageProvider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/provider/menuProvider.dart';
@@ -16,4 +17,7 @@ Future<void> setupRegistry() async {
 
   serviceLocator
       .registerLazySingleton<FoodOrderProvider>(() => FoodOrderProvider());
+
+  serviceLocator
+      .registerLazySingleton<AnalyticsProvider>(() => AnalyticsProvider());
 }
