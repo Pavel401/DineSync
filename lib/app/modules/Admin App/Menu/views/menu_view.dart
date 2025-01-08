@@ -1,5 +1,6 @@
 import 'package:cho_nun_btk/app/components/food_card.dart';
 import 'package:cho_nun_btk/app/components/network_image.dart';
+import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
@@ -246,10 +247,17 @@ class _MenuViewState extends State<MenuView> {
                           Expanded(child: SizedBox()),
                           GestureDetector(
                             onTap: () {
-                              Get.to(() => AddMenuItem())!.then((value) {
-                                menuController.getItemsForCategory(
-                                    menuController.selectedCategory!);
-                              });
+                              if (menuController.selectedCategory.isAvailable ==
+                                  true) {
+                                Get.to(() => AddMenuItem())!.then((value) {
+                                  menuController.getItemsForCategory(
+                                      menuController.selectedCategory!);
+                                });
+                              } else {
+                                CustomSnackBar.showError("Error",
+                                    "Please select a category first", context);
+                                return;
+                              }
                             },
                             child: DottedBorder(
                               borderType: BorderType.RRect,

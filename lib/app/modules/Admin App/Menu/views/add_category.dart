@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/components/network_image.dart';
 import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
+import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
 import 'package:cho_nun_btk/app/provider/firebase_imageProvider.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class AddCategory extends StatefulWidget {
@@ -73,6 +76,7 @@ class _AddCategoryState extends State<AddCategory> {
         categoryId: categoryId,
         categoryDescription: _descriptionController.text,
         noNeedToSendToKitchen: noNeedToSendToKitchen,
+        isAvailable: true,
       );
 
       if (widget.category != null) {
@@ -258,16 +262,109 @@ class _AddCategoryState extends State<AddCategory> {
                 ),
               ),
               SizedBox(height: 2.h),
-              ElevatedButton(
-                onPressed: _saveCategory,
-                child: widget.category != null
-                    ? const Text('Update Category')
-                    : const Text('Add Category'),
+              Row(
+                mainAxisAlignment: widget.category != null
+                    ? MainAxisAlignment.spaceEvenly
+                    : MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _saveCategory,
+                    child: widget.category != null
+                        ? const Text('Update Category')
+                        : const Text('Add Category'),
+                  ),
+                  widget.category != null
+                      ? ElevatedButton(
+                          onPressed: () async {
+                            bool shouldLogout =
+                                await deleteCategoryConfirmationDialog(
+                                        context) ??
+                                    false;
+                            if (shouldLogout) {
+                              _controller.removeCategory(widget.category!);
+                              Get.back();
+                            } else {
+                              // Get.back();
+                            }
+                          },
+                          child: widget.category != null
+                              ? const Text('Remove Category')
+                              : const Text('Cancel'),
+                        )
+                      : SizedBox(),
+                ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future deleteCategoryConfirmationDialog(BuildContext context) {
+    bool isDarkMode =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.all(16.0),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.delete_forever_outlined,
+                    size: MediaQuery.of(context).size.width * 0.2,
+                    color: isDarkMode
+                        ? AppColors.primaryDark
+                        : AppColors.primaryLight,
+                  ),
+                  SizedBox(height: 16.0),
+                  Text(
+                    'Are you sure you want to delete this category?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Warning: All food items under this category will be permanently deleted.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.red[700],
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  CafePrimaryButton(
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                    buttonTitle: 'Cancel',
+                    width: MediaQuery.of(context).size.width * 0.4,
+                  ),
+                  SizedBox(height: 8.0),
+                  CafeSecondaryButton(
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
+                    buttonTitle: 'Yes, Delete Category',
+                    width: MediaQuery.of(context).size.width * 0.4,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

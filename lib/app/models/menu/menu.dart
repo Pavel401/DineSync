@@ -7,6 +7,7 @@ class FoodCategory extends Equatable {
   final String categoryId;
   final String? categoryDescription;
   final bool noNeedToSendToKitchen;
+  final bool isAvailable;
 
   FoodCategory({
     required this.categoryName,
@@ -14,6 +15,7 @@ class FoodCategory extends Equatable {
     required this.categoryId,
     this.categoryDescription,
     this.noNeedToSendToKitchen = false,
+    this.isAvailable = true,
   });
 
   FoodCategory copyWith({
@@ -29,6 +31,7 @@ class FoodCategory extends Equatable {
       categoryDescription: categoryDescription ?? this.categoryDescription,
       noNeedToSendToKitchen:
           noNeedToSendToKitchen ?? this.noNeedToSendToKitchen,
+      isAvailable: isAvailable ?? this.isAvailable,
     );
   }
 
@@ -43,6 +46,7 @@ class FoodCategory extends Equatable {
       'categoryId': categoryId,
       'categoryDescription': categoryDescription,
       'noNeedToSendToKitchen': noNeedToSendToKitchen,
+      'isAvailable': isAvailable,
     };
   }
 
@@ -53,6 +57,7 @@ class FoodCategory extends Equatable {
       categoryId: json['categoryId'] ?? '',
       categoryDescription: json['categoryDescription'],
       noNeedToSendToKitchen: json['noNeedToSendToKitchen'] ?? false,
+      isAvailable: json['isAvailable'] ?? true,
     );
   }
 }

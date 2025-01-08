@@ -27,7 +27,8 @@ class Menuprovider {
   ///Get all categories from the menu
   Future<List<FoodCategory>> getAllCategories() async {
     try {
-      QuerySnapshot snapshot = await menuCollection.get();
+      QuerySnapshot snapshot =
+          await menuCollection.where('isAvailable', isEqualTo: true).get();
       return snapshot.docs
           .map((doc) =>
               FoodCategory.fromJson(doc.data() as Map<String, dynamic>))
@@ -39,7 +40,9 @@ class Menuprovider {
 
   Future<QueryStatus> removeCategory(FoodCategory category) async {
     try {
-      await menuCollection.doc(category.categoryId).delete();
+      await menuCollection.doc(category.categoryId).set({
+        'isAvailable': false,
+      }, SetOptions(merge: true));
       return QueryStatus.SUCCESS;
     } catch (e) {
       return QueryStatus.ERROR;
