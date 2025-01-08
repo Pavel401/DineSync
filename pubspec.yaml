@@ -55,6 +55,7 @@ dependencies:
   provider: ^6.1.2
   readmore: ^3.0.0
   shared_preferences: ^2.3.3
+  shimmer: ^3.0.0
   sizer: ^3.0.5
   toastification: ^2.3.0
   wolt_modal_sheet: ^0.9.4
