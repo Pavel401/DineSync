@@ -645,6 +645,8 @@ class _AddMenuItemState extends State<AddMenuItem> {
               newMenuItem, menuController.selectedCategory);
         }
 
+        await menuprovider.storeFoodItemInGlobalMenu(newMenuItem);
+
         Get.back();
       } else {
         EasyLoading.dismiss();
