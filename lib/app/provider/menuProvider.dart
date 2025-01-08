@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 class Menuprovider {
   final menuCollection = FirebaseFirestore.instance.collection('menu');
+  final globalMenuCollection =
+      FirebaseFirestore.instance.collection('globalmenu');
 
   String newId() {
     return menuCollection.doc().id;
@@ -184,6 +186,35 @@ class Menuprovider {
       return QueryStatus.SUCCESS;
     } catch (e) {
       return QueryStatus.ERROR;
+    }
+  }
+
+  Future<void> storeFoodItemInGlobalMenu(FoodItem item) async {
+    try {
+      await globalMenuCollection.doc("allitems").update({
+        'foodItems': FieldValue.arrayUnion([item.toJson()]),
+      });
+    } catch (e) {
+      if (e is FirebaseException && e.code == 'not-found') {
+        // If the document doesn't exist, create it with an array containing the first item
+        await globalMenuCollection.doc("allitems").set({
+          'foodItems': [item.toJson()],
+        });
+      } else {
+        debugPrint('Error storing item in global menu: $e');
+      }
+    }
+  }
+
+  Future<List<FoodItem>> getAllItemsFromGlobalMenu() async {
+    try {
+      DocumentSnapshot snapshot =
+          await globalMenuCollection.doc("allitems").get();
+      return (snapshot.data() as Map<String, dynamic>)['foodItems']
+          .map<FoodItem>((item) => FoodItem.fromJson(item))
+          .toList();
+    } catch (e) {
+      return [];
     }
   }
 }
