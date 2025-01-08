@@ -225,8 +225,4 @@ class FoodMenuController extends GetxController {
   Future<String> generateFoodId() async {
     return await menuprovider.newId();
   }
-
-  // Future<Map<FoodItem, int>> getSalesData(Map<String, int> itemsData) async {
-  //   return await menuprovider.getSalesData();
-  // }
 }
