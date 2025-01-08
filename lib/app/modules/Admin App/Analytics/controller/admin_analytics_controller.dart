@@ -1,10 +1,12 @@
 import 'package:cho_nun_btk/app/models/analytics/analytics.dart';
+import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
+import 'package:cho_nun_btk/app/provider/menuProvider.dart';
 import 'package:get/get.dart';
 
 class AdminAnalyticsController extends GetxController {
   final AnalyticsProvider _analyticsProvider = AnalyticsProvider();
-
+  Menuprovider menuprovider = Menuprovider();
   final selectedFilter = 'Today'.obs;
   final selectedMonth = DateTime.now().month.obs;
   final selectedYear = DateTime.now().year.obs;
@@ -14,8 +16,12 @@ class AdminAnalyticsController extends GetxController {
   final cancelledOrders = 0.obs;
   final totalDiscountedOrders = 0.obs;
 
+  RxBool isLoading = false.obs;
+
   Map<String, int> itemSalesData = <String, int>{}.obs;
   Map<String, int> categorySalesData = <String, int>{}.obs;
+
+  Map<FoodItem, int> salesData = <FoodItem, int>{}.obs;
 
   @override
   void onInit() {
@@ -24,6 +30,7 @@ class AdminAnalyticsController extends GetxController {
   }
 
   Future<void> loadAnalytics() async {
+    isLoading.value = true;
     DateTime date;
     FoodAnalytics analytics = FoodAnalytics(
       aid: '',
@@ -70,12 +77,32 @@ class AdminAnalyticsController extends GetxController {
     updateAnalyticsData(analytics);
   }
 
-  void updateAnalyticsData(FoodAnalytics analytics) {
+  void updateAnalyticsData(FoodAnalytics analytics) async {
     totalOrders.value = analytics.totalOrders;
     totalCustomers.value = analytics.totalCustomers;
     cancelledOrders.value = analytics.cancelledOrders;
     totalDiscountedOrders.value = analytics.totalDiscountedOrders;
     itemSalesData = analytics.itemSalesCount;
     categorySalesData = analytics.categorySales;
+
+    salesData = await getSalesData(itemSalesData);
+    isLoading.value = false;
+
+    update();
+  }
+
+  Future<Map<FoodItem, int>> getSalesData(Map<String, int> itemsData) async {
+    List<FoodItem> allitems = await menuprovider.getAllItemsFromGlobalMenu();
+
+    Map<FoodItem, int> salesData = {};
+
+    for (int i = 0; i < allitems.length; i++) {
+      if (itemsData.containsKey(allitems[i].foodId)) {
+        salesData[allitems[i]] = itemsData[allitems[i].foodId]!;
+      }
+    }
+    salesData.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+
+    return salesData;
   }
 }
