@@ -1,11 +1,12 @@
 import 'package:cho_nun_btk/app/modules/Admin%20App/Analytics/controller/admin_analytics_controller.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class AdminAnalyticsView extends StatelessWidget {
   final controller = Get.put(AdminAnalyticsController());
-
+  FoodMenuController foodMenuController = Get.put(FoodMenuController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,11 +36,6 @@ class AdminAnalyticsView extends StatelessWidget {
                     ),
                   ),
                   Obx(() => _buildFilterDropdown(context)),
-
-                  ///Add a Filter for Today , YesterDay , Weekly , Monthly , Yearly
-                  ///If monthly is selected then show a dropdown for selecting month
-                  ///If yearly is selected then show a dropdown for selecting year
-                  ///Do we need to show the year picker for the month picker too ?
                 ],
               ),
               SizedBox(height: 2.h),
@@ -85,6 +81,74 @@ class AdminAnalyticsView extends StatelessWidget {
                         color: Colors.orange,
                       )),
                 ],
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                'Trending Items',
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(4.w),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Top Selling Items',
+                            style: context.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Icon(
+                            Icons.trending_up,
+                            color: Colors.green,
+                            size: 24,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
+                      // Obx(
+                      //   () => FutureBuilder(
+                      //     future: foodMenuController
+                      //         .getItemsForCategory(controller.itemSalesData),
+                      //     builder: (context, snapshot) {
+                      //       if (snapshot.connectionState ==
+                      //           ConnectionState.waiting) {
+                      //         return Center(
+                      //           child: CircularProgressIndicator(),
+                      //         );
+                      //       }
+                      //       if (snapshot.hasData) {
+                      //         Map<FoodItem, int> items =
+                      //             snapshot.data as Map<FoodItem, int>;
+                      //         return Column(
+                      //           children: items.entries
+                      //               .map(
+                      //                 (e) => ListTile(
+                      //                   title: Text(e.key.foodName),
+                      //                   subtitle: Text(
+                      //                       'Quantity: ${e.value} | Revenue: \$${e.key.foodPrice * e.value}'),
+                      //                 ),
+                      //               )
+                      //               .toList(),
+                      //         );
+                      //       }
+                      //       return Container();
+                      //     },
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
