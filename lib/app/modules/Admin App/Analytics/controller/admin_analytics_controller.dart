@@ -14,6 +14,9 @@ class AdminAnalyticsController extends GetxController {
   final cancelledOrders = 0.obs;
   final totalDiscountedOrders = 0.obs;
 
+  Map<String, int> itemSalesData = <String, int>{}.obs;
+  Map<String, int> categorySalesData = <String, int>{}.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -45,6 +48,9 @@ class AdminAnalyticsController extends GetxController {
         break;
       case 'Weekly':
         // Implementation for weekly analytics
+
+        date = DateTime.now();
+        analytics = await _analyticsProvider.weeklyAnalytics(date);
         break;
       case 'Monthly':
         date = DateTime(selectedYear.value, selectedMonth.value);
@@ -69,5 +75,7 @@ class AdminAnalyticsController extends GetxController {
     totalCustomers.value = analytics.totalCustomers;
     cancelledOrders.value = analytics.cancelledOrders;
     totalDiscountedOrders.value = analytics.totalDiscountedOrders;
+    itemSalesData = analytics.itemSalesCount;
+    categorySalesData = analytics.categorySales;
   }
 }
