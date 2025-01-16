@@ -6,7 +6,6 @@ import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
-import 'package:cho_nun_btk/app/utils/date_utils.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,7 +43,9 @@ class _WaiterFlowState extends State<WaiterFlow> {
     order = widget.order;
     _foodOrderProvider = serviceLocator<FoodOrderProvider>();
 
-    flag = isOrderNeededToKitchen(order);
+    flag = order.orderStatus == FoodOrderStatus.COMPLETED
+        ? true
+        : isOrderNeededToKitchen(order);
   }
 
   @override
@@ -200,6 +201,18 @@ class _WaiterFlowState extends State<WaiterFlow> {
                         _foodOrderProvider!.updateCookingEndTime(
                             order.orderId, DateTime.now());
                       } else {
+                        order.cookingStartTime = DateTime.now();
+
+                        _foodOrderProvider!.updateCookingStartTime(
+                          order.orderId,
+                          order.cookingStartTime!,
+                        );
+                        order.cookingEndTime = DateTime.now();
+                        _foodOrderProvider!.updateCookingEndTime(
+                          order.orderId,
+                          order.cookingEndTime!,
+                        );
+
                         _foodOrderProvider!.updateOrderStatus(
                             order.orderId, FoodOrderStatus.COMPLETED);
                       }
@@ -208,6 +221,10 @@ class _WaiterFlowState extends State<WaiterFlow> {
                     }),
                 CafeCancelButton(
                     width: 30.w,
+                    isEnabled: (order.orderStatus == FoodOrderStatus.READY ||
+                            order.orderStatus == FoodOrderStatus.COMPLETED)
+                        ? false
+                        : true,
                     buttonTitle: "Cancel Order",
                     onPressed: () {
                       _foodOrderProvider!.updateOrderStatus(
@@ -220,60 +237,6 @@ class _WaiterFlowState extends State<WaiterFlow> {
           ],
         ),
       ),
-    );
-  }
-
-  int _getCurrentStep() {
-    if (order.orderStatus == FoodOrderStatus.READY) {
-      return 2;
-    } else if (order.orderStatus == FoodOrderStatus.PREPARING) {
-      return 1;
-    } else if (order.orderStatus == FoodOrderStatus.COMPLETED) {
-      return 3;
-    } else if (order.orderStatus == FoodOrderStatus.CANCELLED) {
-      return 4;
-    } else {
-      return 0;
-    }
-  }
-
-  Widget _buildStepper() {
-    return Stepper(
-      currentStep: _getCurrentStep(),
-      steps: [
-        Step(
-          title: const Text("Order Placed"),
-          subtitle: Text(
-            'Placed on ${DateUtilities.formatDateTime(order.orderTime)}',
-            style: TextStyle(fontSize: 12),
-          ),
-          content: CircularProgressIndicator(),
-          isActive: true,
-        ),
-        Step(
-          title: const Text("Cooking Started"),
-          subtitle: Text(
-            order.cookingStartTime != null
-                ? 'Started at ${DateUtilities.formatDateTime(order.cookingStartTime!)}'
-                : "Not started yet",
-            style: TextStyle(fontSize: 12),
-          ),
-          content: CircularProgressIndicator(),
-          isActive: order.orderStatus == FoodOrderStatus.PREPARING ||
-              order.orderStatus == FoodOrderStatus.READY,
-        ),
-        Step(
-          title: const Text("Order Ready"),
-          subtitle: Text(
-            order.cookingEndTime != null
-                ? 'Ready at ${DateUtilities.formatDateTime(order.cookingEndTime!)}'
-                : "Not ready yet",
-            style: TextStyle(fontSize: 12),
-          ),
-          content: CircularProgressIndicator(),
-          isActive: order.orderStatus == FoodOrderStatus.READY,
-        ),
-      ],
     );
   }
 
