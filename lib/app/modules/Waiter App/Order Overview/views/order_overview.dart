@@ -40,15 +40,16 @@ class OrderOverview extends StatelessWidget {
             FocusManager.instance.primaryFocus?.unfocus();
           },
           titleAndWidget: {
-            'All': buildOrderList(statuses: [
+            'Ongoing': buildOrderList(statuses: [
               FoodOrderStatus.PENDING,
               FoodOrderStatus.PREPARING,
               FoodOrderStatus.READY,
+            ]),
+            // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
+            'Completed': buildOrderList(statuses: [
               FoodOrderStatus.COMPLETED,
               FoodOrderStatus.CANCELLED,
             ]),
-            // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
-            'Completed': buildOrderList(statuses: [FoodOrderStatus.COMPLETED]),
           },
         ),
       ),
