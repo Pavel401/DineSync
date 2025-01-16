@@ -42,14 +42,14 @@ class _AdminMoreViewState extends State<AdminMoreView> {
             ),
             SizedBox(height: 2.h),
 
-            CafeMoreTileWidget(
-              icon: Icons.settings_outlined,
-              title: 'Settings',
-              subtitle: 'View and manage your settings',
-              onTap: () {},
-            ),
+            // CafeMoreTileWidget(
+            //   icon: Icons.settings_outlined,
+            //   title: 'Settings',
+            //   subtitle: 'View and manage your settings',
+            //   onTap: () {},
+            // ),
 
-            SizedBox(height: 2.h),
+            // SizedBox(height: 2.h),
 
             // // Switch Theme
             // CafeMoreTileWidget(
