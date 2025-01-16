@@ -51,21 +51,21 @@ class _ChefMoreViewState extends State<ChefMoreView> {
 
             SizedBox(height: 2.h),
 
-            // Switch Theme
-            CafeMoreTileWidget(
-              showRightArrow: false,
-              icon: Get.isDarkMode
-                  ? Icons.light_mode_outlined
-                  : Icons.dark_mode_outlined,
-              title: Get.isDarkMode ? 'Light Mode' : 'Dark Mode',
-              subtitle: Get.isDarkMode
-                  ? 'Switch to light mode'
-                  : 'Switch to dark mode',
-              onTap: () {
-                themeProvider.toggleTheme();
-              },
-            ),
-            SizedBox(height: 2.h),
+            // // Switch Theme
+            // CafeMoreTileWidget(
+            //   showRightArrow: false,
+            //   icon: Get.isDarkMode
+            //       ? Icons.light_mode_outlined
+            //       : Icons.dark_mode_outlined,
+            //   title: Get.isDarkMode ? 'Light Mode' : 'Dark Mode',
+            //   subtitle: Get.isDarkMode
+            //       ? 'Switch to light mode'
+            //       : 'Switch to dark mode',
+            //   onTap: () {
+            //     themeProvider.toggleTheme();
+            //   },
+            // ),
+            // SizedBox(height: 2.h),
 
             CafeMoreTileWidget(
               icon: Icons.logout_outlined,
