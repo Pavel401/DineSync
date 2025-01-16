@@ -12,6 +12,10 @@ class OrderTimeline extends StatelessWidget {
       return 2;
     } else if (order.orderStatus == FoodOrderStatus.PREPARING) {
       return 1;
+    } else if (order.orderStatus == FoodOrderStatus.COMPLETED) {
+      return 3;
+    } else if (order.orderStatus == FoodOrderStatus.CANCELLED) {
+      return 4;
     } else {
       return 0;
     }
