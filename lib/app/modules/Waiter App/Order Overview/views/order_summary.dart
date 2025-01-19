@@ -4,6 +4,7 @@ import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
+import 'package:cho_nun_btk/app/modules/Common/order_label_printer.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
@@ -53,6 +54,16 @@ class _WaiterFlowState extends State<WaiterFlow> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Order: # ${parseOrderId(order.orderId)["counter"]}'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Get.to(() => FoodLabelPrinter(
+                    order: order,
+                  ));
+            },
+            icon: Icon(Icons.print),
+          ),
+        ],
       ),
       body: Padding(
         padding: AppPading.containerPadding,
@@ -185,9 +196,11 @@ class _WaiterFlowState extends State<WaiterFlow> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 CafePrimaryButton(
-                    isEnabled: flag == false
-                        ? true
-                        : order.orderStatus == FoodOrderStatus.READY,
+                    isEnabled: order.orderStatus == FoodOrderStatus.CANCELLED
+                        ? false
+                        : flag == false
+                            ? true
+                            : order.orderStatus == FoodOrderStatus.READY,
                     width: 30.w,
                     buttonTitle: "Mark as Served",
                     onPressed: () {
@@ -222,13 +235,14 @@ class _WaiterFlowState extends State<WaiterFlow> {
                 CafeCancelButton(
                     width: 30.w,
                     isEnabled: (order.orderStatus == FoodOrderStatus.READY ||
-                            order.orderStatus == FoodOrderStatus.COMPLETED)
+                            order.orderStatus == FoodOrderStatus.COMPLETED ||
+                            order.orderStatus == FoodOrderStatus.CANCELLED)
                         ? false
                         : true,
                     buttonTitle: "Cancel Order",
                     onPressed: () {
                       _foodOrderProvider!.updateOrderStatus(
-                          order.orderId, FoodOrderStatus.COMPLETED);
+                          order.orderId, FoodOrderStatus.CANCELLED);
                       Get.back();
                     })
               ],
