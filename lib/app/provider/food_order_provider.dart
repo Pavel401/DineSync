@@ -109,6 +109,16 @@ class FoodOrderProvider {
     });
   }
 
+  Stream<FoodOrder> listenToOrder(String orderId) {
+    return ordersCollection.doc(orderId).snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        return FoodOrder.fromJson(snapshot.data() as Map<String, dynamic>);
+      } else {
+        throw Exception("Order not found");
+      }
+    });
+  }
+
   Future<void> updateOrderStatus(String orderId, FoodOrderStatus status) async {
     try {
       await ordersCollection.doc(orderId).update({'orderStatus': status.name});

@@ -4,7 +4,6 @@ import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
-import 'package:cho_nun_btk/app/modules/Common/order_label_printer.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
@@ -37,12 +36,17 @@ class _WaiterFlowState extends State<WaiterFlow> {
 
   bool isExpanded = false;
   bool flag = true;
-
   @override
   void initState() {
     super.initState();
     order = widget.order;
     _foodOrderProvider = serviceLocator<FoodOrderProvider>();
+
+    _foodOrderProvider!.listenToOrder(order.orderId).listen((updatedOrder) {
+      setState(() {
+        order = updatedOrder; // Update the order object
+      });
+    });
 
     flag = order.orderStatus == FoodOrderStatus.COMPLETED
         ? true
@@ -55,14 +59,14 @@ class _WaiterFlowState extends State<WaiterFlow> {
       appBar: AppBar(
         title: Text('Order: # ${parseOrderId(order.orderId)["counter"]}'),
         actions: [
-          IconButton(
-            onPressed: () {
-              Get.to(() => FoodLabelPrinter(
-                    order: order,
-                  ));
-            },
-            icon: Icon(Icons.print),
-          ),
+          // IconButton(
+          //   onPressed: () {
+          //     Get.to(() => FoodLabelPrinter(
+          //           order: order,
+          //         ));
+          //   },
+          //   icon: Icon(Icons.print),
+          // ),
         ],
       ),
       body: Padding(
@@ -85,7 +89,6 @@ class _WaiterFlowState extends State<WaiterFlow> {
             DottedBorder(
               borderType: BorderType.RRect,
               radius: Radius.circular(12),
-              // padding: EdgeInsets.all(2.w),
               child: _buildItemList(),
             ),
             SizedBox(height: 2.h),
