@@ -72,7 +72,7 @@ void main() async {
         .data); // Handle notification click when app was terminated
   }
 
-  print("Received the initial message: $initialMessage");
+  debugPrint("Received the initial message: $initialMessage");
 
   await FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     debugPrint('FirebaseMessaging: Token refreshed');
@@ -91,6 +91,22 @@ void main() async {
       child: const MyApp(),
     ),
   );
+}
+
+Future<void> getAndSaveFCMToken() async {
+  String? FCMToken = await FirebaseMessaging.instance.getToken();
+
+  AuthController authController = Get.find<AuthController>();
+  String savedFCMToken = authController.userModel?.fcmToken ?? '';
+  if (FCMToken != null && FCMToken != savedFCMToken) {
+    debugPrint('FirebaseMessaging: FCM Tokens are different');
+    debugPrint('FirebaseMessaging: New Token: $FCMToken');
+    FirebaseHelper()
+        .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, FCMToken);
+  } else {
+    debugPrint('FirebaseMessaging: FCM Tokens are same');
+    debugPrint('FirebaseMessaging: Token: $FCMToken');
+  }
 }
 
 // Define an async function to initialize FlutterFire
@@ -163,8 +179,44 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
   final AuthController auth = Get.find<AuthController>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    bool isLoggedIn = false;
+
+    isLoggedIn = FirebaseAuth.instance.currentUser != null;
+    requestNotificationPermission();
+    if (FirebaseAuth.instance.currentUser != null) {
+      getAndSaveFCMToken();
+    } else {}
+    super.initState();
+  }
+
+  void requestNotificationPermission() async {
+    NotificationSettings notificationPermission =
+        await FirebaseMessaging.instance.getNotificationSettings();
+    if (notificationPermission.authorizationStatus !=
+        AuthorizationStatus.authorized) {
+      debugPrint('FirebaseMessaging: Requesting permission');
+      await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        announcement: false,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
