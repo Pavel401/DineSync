@@ -9,6 +9,7 @@ import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
 import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
+import 'package:cho_nun_btk/app/services/analytics.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -616,6 +617,18 @@ class _CheckoutViewState extends State<CheckoutView> {
                             await analyticsProvider.recordAnalytics(foodOrder);
 
                         if (status == QueryStatus.SUCCESS) {
+                          AnalyticsService _analyticsService =
+                              AnalyticsService();
+                          try {
+                            await _analyticsService.logEvent(
+                              eventName: 'add_achievement',
+                              parameters: <String, Object>{
+                                Analytics.TAP_SKILL_CARD: 'created_new_order',
+                              },
+                            );
+                          } catch (error) {
+                            print('Error in logging event: $error');
+                          }
                           EasyLoading.dismiss();
                           Get.until((route) => route.isFirst);
                           CustomSnackBar.showSuccess(

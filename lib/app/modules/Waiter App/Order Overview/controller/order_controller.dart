@@ -25,4 +25,17 @@ class OrderController extends GetxController {
     debugPrint('Listening to orders');
     debugPrint('All orders: $allOrders');
   }
+
+  void listenToOrder(String orderId) {
+    orderProvider.listenToOrder(orderId).listen((FoodOrder updatedOrder) {
+      int index = allOrders
+          .indexWhere((order) => order.orderId == updatedOrder.orderId);
+      if (index != -1) {
+        // Update the specific order in the list
+        allOrders[index] = updatedOrder;
+        allOrders.refresh(); // Notify listeners
+      }
+      debugPrint('Updated order: $updatedOrder');
+    });
+  }
 }

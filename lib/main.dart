@@ -11,12 +11,15 @@ import 'package:cho_nun_btk/app/modules/Auth/views/auth_view_home.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/Home/views/chef_home.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Home/views/waiter_view.dart';
 import 'package:cho_nun_btk/app/provider/fcm_helper.dart';
+import 'package:cho_nun_btk/app/services/analytics.dart';
 import 'package:cho_nun_btk/app/services/local_notification_service.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -80,12 +83,33 @@ void main() async {
     }
   });
 
+  initializeCrashAnalytics();
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
       child: const MyApp(),
     ),
   );
+}
+
+// Define an async function to initialize FlutterFire
+void initializeCrashAnalytics() async {
+  try {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  } catch (e) {
+    // Set `_error` state to true if Firebase initialization fails
+    debugPrint('Error: $e');
+  }
 }
 
 void setEasyLoading(bool isDarkMode) {
@@ -127,6 +151,9 @@ class _MyAppState extends State<MyApp> {
           transitionDuration: const Duration(milliseconds: 300),
           debugShowCheckedModeBanner: true,
           theme: themeProvider.lightTheme,
+          navigatorObservers: <NavigatorObserver>[
+            AnalyticsService().getAnalyticsObserver()
+          ],
           darkTheme: themeProvider.darkTheme,
           themeMode:
               themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
