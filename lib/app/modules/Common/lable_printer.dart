@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:ui';
 
-import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Common/custom_canvas_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:niimbot_label_printer/niimbot_label_printer.dart';
 
 class LablePrinterView extends StatefulWidget {
-  FoodOrder order;
-  LablePrinterView({super.key, required this.order});
+  LablePrinterView({
+    super.key,
+  });
 
   @override
   State<LablePrinterView> createState() => _LablePrinterViewState();
@@ -147,6 +147,7 @@ class _LablePrinterViewState extends State<LablePrinterView> {
                   TextButton(
                     onPressed: () async {
                       _image = await loadImage("assets/2.png");
+
                       setState(() {});
                     },
                     child: const Text('Toggle image assets'),
