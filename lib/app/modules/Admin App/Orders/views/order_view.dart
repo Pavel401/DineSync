@@ -79,32 +79,37 @@ class _OrderViewState extends State<OrderView> {
           //   label: Text(DateFormat('MMM dd, yyyy').format(selectedDate)),
           //   onPressed: () => _selectDate(context),
           // ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-            margin: EdgeInsets.only(right: 2.w),
-            decoration: BoxDecoration(
-                color: AppColors.primaryDark.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border(
-                  bottom: BorderSide(color: AppColors.primaryDark, width: 2),
-                  top: BorderSide(color: AppColors.primaryDark, width: 2),
-                  left: BorderSide(color: AppColors.primaryDark, width: 2),
-                  right: BorderSide(color: AppColors.primaryDark, width: 2),
-                )),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 20,
-                ),
-                SizedBox(width: 1.w),
-                Text(
-                  DateFormat('MMM dd, yyyy').format(selectedDate),
-                  style: context.textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
+          GestureDetector(
+            onTap: () {
+              _selectDate(context);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+              margin: EdgeInsets.only(right: 2.w),
+              decoration: BoxDecoration(
+                  color: AppColors.primaryDark.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border(
+                    bottom: BorderSide(color: AppColors.primaryDark, width: 2),
+                    top: BorderSide(color: AppColors.primaryDark, width: 2),
+                    left: BorderSide(color: AppColors.primaryDark, width: 2),
+                    right: BorderSide(color: AppColors.primaryDark, width: 2),
+                  )),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 20,
                   ),
-                ),
-              ],
+                  SizedBox(width: 1.w),
+                  Text(
+                    DateFormat('MMM dd, yyyy').format(selectedDate),
+                    style: context.textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         ],
