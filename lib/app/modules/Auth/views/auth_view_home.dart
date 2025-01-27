@@ -141,23 +141,29 @@ class _AuthViewState extends State<AuthView> {
         ElevatedButton(
           onPressed: () {
             authController.setUserType(UserType.CHEF);
-            Get.to(() => SignInView());
+            Get.to(() => SignInView(
+                  userType: UserType.CHEF,
+                ));
           },
-          child: Text("Chef"),
+          child: Text("Kitchen"),
         ),
         SizedBox(height: 2.h),
         ElevatedButton(
           onPressed: () {
             authController.setUserType(UserType.WAITER);
-            Get.to(() => SignInView());
+            Get.to(() => SignInView(
+                  userType: UserType.WAITER,
+                ));
           },
-          child: Text("Waiter"),
+          child: Text("Bar"),
         ),
         SizedBox(height: 2.h),
         ElevatedButton(
           onPressed: () {
             authController.setUserType(UserType.ADMIN);
-            Get.to(() => SignInView());
+            Get.to(() => SignInView(
+                  userType: UserType.ADMIN,
+                ));
           },
           child: Text("Admin"),
         ),
