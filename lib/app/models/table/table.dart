@@ -46,6 +46,27 @@ class TableModel {
           : null,
     );
   }
+
+  // CopyWith method
+  TableModel copyWith({
+    String? id,
+    String? tableName,
+    TableStatus? tableStatus,
+    int? capacity,
+    String? currentOrderId,
+    String? location,
+    Timestamp? reservedUntil,
+  }) {
+    return TableModel(
+      id: id ?? this.id,
+      tableName: tableName ?? this.tableName,
+      tableStatus: tableStatus ?? this.tableStatus,
+      capacity: capacity ?? this.capacity,
+      currentOrderId: currentOrderId ?? this.currentOrderId,
+      location: location ?? this.location,
+      reservedUntil: reservedUntil ?? this.reservedUntil,
+    );
+  }
 }
 
 // TableStatus Enum
