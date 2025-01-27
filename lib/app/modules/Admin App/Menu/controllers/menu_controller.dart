@@ -127,6 +127,10 @@ class FoodMenuController extends GetxController {
     update();
   }
 
+  Future<void> changeMassKitchenStatusForOrders(FoodCategory) {
+    return menuprovider.massChangeKitchenCategoryForItems(FoodCategory);
+  }
+
   Future<List<FoodCategory>> getAllCategories() async {
     categories.value = await menuprovider.getAllCategories();
 

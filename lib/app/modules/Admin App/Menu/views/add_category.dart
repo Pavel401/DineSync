@@ -81,6 +81,7 @@ class _AddCategoryState extends State<AddCategory> {
 
       if (widget.category != null) {
         await _controller.updateCategory(category, context);
+        await _controller.changeMassKitchenStatusForOrders(category);
       } else {
         await _controller.addCategory(
             category, context); // Wait for addCategory
