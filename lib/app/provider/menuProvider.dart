@@ -38,6 +38,44 @@ class Menuprovider {
     }
   }
 
+  Future<QueryStatus> massChangeKitchenCategoryForItems(
+      FoodCategory category) async {
+    try {
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+
+      // Get the snapshot of food items
+      QuerySnapshot snapshot = await menuCollection
+          .doc(category.categoryId)
+          .collection('fooditems')
+          .get();
+
+      int totalDocs = snapshot.docs.length;
+      if (totalDocs == 0) {
+        return QueryStatus.SUCCESS;
+      }
+
+      int processedDocs = 0;
+
+      // Update each document in the batch and track progress
+      for (var doc in snapshot.docs) {
+        batch.update(doc.reference, {'foodCategory': category.toJson()});
+        processedDocs++;
+
+        // Update progress after processing each document
+      }
+
+      // Commit the batch
+      await batch.commit();
+
+      // Ensure progress shows 100% after commit
+
+      return QueryStatus.SUCCESS;
+    } catch (e) {
+      // Handle errors
+      return QueryStatus.ERROR;
+    }
+  }
+
   Future<QueryStatus> removeCategory(FoodCategory category) async {
     try {
       await menuCollection.doc(category.categoryId).set({

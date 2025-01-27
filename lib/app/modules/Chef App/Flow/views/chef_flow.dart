@@ -161,6 +161,7 @@ class _ChefFlowState extends State<ChefFlow> {
                       "${order.waiterData.waiterName}",
                       style: context.textTheme.bodyMedium!.copyWith(),
                     ),
+                    SizedBox(height: 2.h),
                     widget.order.tableData != null
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

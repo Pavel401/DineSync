@@ -178,6 +178,7 @@ class _WaiterFlowState extends State<WaiterFlow> {
                       "${order.waiterData.waiterName}",
                       style: context.textTheme.bodyMedium!.copyWith(),
                     ),
+                    SizedBox(height: 2.h),
                     widget.order.tableData != null
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
