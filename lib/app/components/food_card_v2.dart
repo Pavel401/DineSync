@@ -133,32 +133,50 @@ class _FoodCardReadWidgetState extends State<FoodCardReadWidget> {
                         ),
 
                         // Add/Remove Buttons
-                        Row(
-                          children: [
-                            // Remove Button
-                            IconButton(
-                              onPressed: widget.onRemove,
-                              icon: Icon(Icons.remove_circle_outline),
-                              color: _quantity > 0 ? Colors.red : Colors.grey,
-                            ),
+                        widget.foodItem.isAvailable
+                            ? Row(
+                                children: [
+                                  // Remove Button
+                                  IconButton(
+                                    onPressed: widget.onRemove,
+                                    icon: Icon(Icons.remove_circle_outline),
+                                    color: _quantity > 0
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
 
-                            // Quantity
-                            Text(
-                              widget.itemCount.toString(),
-                              style: context.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
+                                  // Quantity
+                                  Text(
+                                    widget.itemCount.toString(),
+                                    style:
+                                        context.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12.sp,
+                                    ),
+                                  ),
+
+                                  // Add Button
+                                  IconButton(
+                                    onPressed: widget.onAdd,
+                                    icon: Icon(Icons.add_circle_outline),
+                                    color: Colors.green,
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  Icon(Icons.block),
+                                  SizedBox(width: 1.w),
+                                  Text(
+                                    'Not Available',
+                                    style:
+                                        context.textTheme.bodySmall?.copyWith(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-
-                            // Add Button
-                            IconButton(
-                              onPressed: widget.onAdd,
-                              icon: Icon(Icons.add_circle_outline),
-                              color: Colors.green,
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ],
