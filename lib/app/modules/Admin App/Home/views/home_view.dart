@@ -4,6 +4,7 @@ import 'package:cho_nun_btk/app/modules/Admin%20App/Analytics/views/admin_analyt
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/menu_view.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/More/view/more_view.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Orders/views/order_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,10 +26,12 @@ class AdminHomeView extends StatelessWidget {
           () => IndexedStack(
             index: homeController.currentIndex.value,
             children: [
-              Container(),
+              // Container(),
               // Placeholder(),
-              Container(),
+              OrderView(),
               AdminAnalyticsView(),
+              Container(),
+
               MenuView(),
 
               AdminMoreView(),
@@ -68,15 +71,6 @@ class AdminHomeView extends StatelessWidget {
           destinations: <Widget>[
             NavigationDestination(
               icon: Icon(
-                Icons.home_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
-              ),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(
                 Icons.list_alt_outlined,
                 color: themeProvider.isDarkMode
                     ? AppColors.secondaryDark
@@ -92,6 +86,15 @@ class AdminHomeView extends StatelessWidget {
                     : AppColors.secondaryLight,
               ),
               label: 'Analytics',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.table_bar,
+                color: themeProvider.isDarkMode
+                    ? AppColors.secondaryDark
+                    : AppColors.secondaryLight,
+              ),
+              label: 'Table',
             ),
             NavigationDestination(
               icon: Icon(
