@@ -74,7 +74,10 @@ class _AdminProfileViewState extends State<AdminProfileView> {
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.chevron_left, color: AppColors.onPrimaryLight),
+          icon: Icon(
+            Icons.chevron_left,
+            color: AppColors.onPrimaryLight,
+          ),
           iconSize: 30,
         ),
       ),
