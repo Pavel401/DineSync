@@ -4,6 +4,7 @@ import 'package:cho_nun_btk/app/components/photo_view.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -23,6 +24,8 @@ class _ViewOrderReadViewState extends State<ViewOrderReadView>
   Color? _dominantColor;
   final PageController _imageController = PageController();
 
+  WaiterOrderController waiterOrderController =
+      Get.find<WaiterOrderController>();
   @override
   void initState() {
     super.initState();
@@ -30,45 +33,7 @@ class _ViewOrderReadViewState extends State<ViewOrderReadView>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     )..forward();
-
-    // // Safely generate palette color
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _generatePaletteColor();
-    // });
   }
-
-  // Future<void> _generatePaletteColor() async {
-  //   // Prevent multiple color generation attempts
-  //   if (_isColorGenerating || !mounted) return;
-
-  //   setState(() {
-  //     _isColorGenerating = true;
-  //   });
-
-  //   try {
-  //     // final imageProvider = NetworkImage(widget.foodItem.foodImage);
-  //     // final paletteGenerator = await PaletteGenerator.fromImageProvider(
-  //     //   imageProvider,
-  //     //   size: const Size(100, 100),
-  //     // );
-
-  //     // Check if widget is still mounted before updating state
-  //     // if (mounted) {
-  //     //   setState(() {
-  //     //     _dominantColor =
-  //     //         paletteGenerator.dominantColor?.color ?? Colors.white;
-  //     //   });
-  //     // }
-  //   } catch (e) {
-  //     debugPrint('Error generating palette color: $e');
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() {
-  //         _isColorGenerating = false;
-  //       });
-  //     }
-  //   }
-  // }
 
   @override
   void dispose() {
@@ -146,11 +111,99 @@ class _ViewOrderReadViewState extends State<ViewOrderReadView>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 2.h),
-                            Text(
-                              food.foodName,
-                              style: context.textTheme.titleLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                            GetBuilder(
+                              init: waiterOrderController,
+                              builder: (_) {
+                                return Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 3.w, vertical: 1.5.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceLight,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                    border: Border.all(
+                                        color: AppColors.primaryLight
+                                            .withOpacity(0.5)),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // Food item name
+                                      Expanded(
+                                        child: Text(
+                                          widget.foodItem.foodName,
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      SizedBox(width: 2.w),
+                                      // Decrease button
+                                      GestureDetector(
+                                        onTap: () {
+                                          waiterOrderController
+                                              .removeOrderItem(widget.foodItem);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryLight
+                                                .withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.remove,
+                                            color: AppColors.primaryLight,
+                                            size: 18.sp,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 3.w),
+                                      // Quantity display
+                                      Text(
+                                        '${waiterOrderController.orderItems[widget.foodItem] ?? 0}',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      SizedBox(width: 3.w),
+                                      // Increase button
+                                      GestureDetector(
+                                        onTap: () {
+                                          waiterOrderController
+                                              .addOrderItem(widget.foodItem);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryLight
+                                                .withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.add,
+                                            color: AppColors.primaryLight,
+                                            size: 18.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                             SizedBox(height: 2.h),
 

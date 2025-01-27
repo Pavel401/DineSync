@@ -1,4 +1,5 @@
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
+import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FoodOrder {
@@ -20,6 +21,7 @@ class FoodOrder {
   OrderType? orderType;
   PaymentMode? paymentMode;
   PaymentStatus? paymentStatus;
+  TableModel? tableData;
 
   FoodOrder({
     required this.orderId,
@@ -38,6 +40,7 @@ class FoodOrder {
     this.queuePosition,
     this.discountData,
     this.orderType,
+    this.tableData,
   });
 
   // JSON serialization
@@ -68,6 +71,7 @@ class FoodOrder {
         'discountData': discountData?.toJson(),
 
         'orderType': orderType?.name,
+        'tableData': tableData?.toJson(),
       };
 
   // JSON deserialization
@@ -103,6 +107,9 @@ class FoodOrder {
             : null,
         orderType = json['orderType'] != null
             ? OrderType.values.firstWhere((e) => e.name == json['orderType'])
+            : null,
+        tableData = json['tableData'] != null
+            ? TableModel.fromJson(json['tableData'])
             : null,
         customerFeedback = json['customerFeedback'] ?? "";
 }
