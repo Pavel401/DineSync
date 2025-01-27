@@ -5,6 +5,7 @@ import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_control
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/views/menu_view.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/More/view/more_view.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Orders/views/order_view.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Table/views/table_view.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +31,7 @@ class AdminHomeView extends StatelessWidget {
               // Placeholder(),
               OrderView(),
               AdminAnalyticsView(),
-              Container(),
+              TableBuilderView(),
 
               MenuView(),
 
