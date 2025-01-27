@@ -86,6 +86,8 @@ class KitchenOverView extends StatelessWidget {
 
           flag = isOrderNeededToKitchen(order);
 
+          print("Flag: $flag");
+
           return GestureDetector(
             onTap: () {
               Get.to(

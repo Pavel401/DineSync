@@ -1,12 +1,14 @@
+import 'package:cho_nun_btk/app/components/empty_widget.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/More/view/more_view.dart';
-import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/views/order_overview.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/views/waiter_overview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
 class WaiterHomeView extends StatelessWidget {
   WaiterHomeView({super.key});
@@ -17,6 +19,8 @@ class WaiterHomeView extends StatelessWidget {
 
     AuthController authController = Get.put(AuthController());
 
+    bool isBlocked = authController.userModel!.blocked ?? false;
+
     return SafeArea(
       child: Scaffold(
         bottomNavigationBar: buildBottomNavBar(context, themeProvider),
@@ -26,7 +30,14 @@ class WaiterHomeView extends StatelessWidget {
             children: [
               // Container(),
               // Placeholder(),
-              OrderOverview(),
+              isBlocked
+                  ? EmptyIllustrations(
+                      title: "Blocked",
+                      message:
+                          "You have been blocked by the admin\nContact the admin for more information",
+                      width: 60.w,
+                    )
+                  : OrderOverview(),
 
               WaiterMoreView(),
             ],

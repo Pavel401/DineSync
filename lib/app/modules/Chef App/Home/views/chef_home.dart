@@ -1,3 +1,4 @@
+import 'package:cho_nun_btk/app/components/empty_widget.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
@@ -7,6 +8,7 @@ import 'package:cho_nun_btk/app/modules/Chef%20App/OverView/views/chef_overview.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
 class ChefHomeView extends StatelessWidget {
   ChefHomeView({super.key});
@@ -16,6 +18,7 @@ class ChefHomeView extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     AuthController authController = Get.put(AuthController());
+    bool isBlocked = authController.userModel!.blocked ?? false;
 
     return SafeArea(
       child: Scaffold(
@@ -26,7 +29,14 @@ class ChefHomeView extends StatelessWidget {
             children: [
               // Container(),
               // Placeholder(),
-              KitchenOverView(),
+              isBlocked
+                  ? EmptyIllustrations(
+                      title: "Blocked",
+                      message:
+                          "You have been blocked by the admin\nContact the admin for more information",
+                      width: 60.w,
+                    )
+                  : KitchenOverView(),
 
               ChefMoreView(),
             ],
