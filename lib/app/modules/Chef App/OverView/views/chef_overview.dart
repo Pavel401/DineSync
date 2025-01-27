@@ -31,16 +31,28 @@ class KitchenOverView extends StatelessWidget {
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
           },
+          // titleAndWidget: {
+          //   'All': buildOrderList(statuses: [
+          //     FoodOrderStatus.PENDING,
+          //     FoodOrderStatus.PREPARING,
+          //     FoodOrderStatus.READY,
+          //     FoodOrderStatus.COMPLETED,
+          //     FoodOrderStatus.CANCELLED,
+          //   ]),
+          //   // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
+          //   'Completed': buildOrderList(statuses: [FoodOrderStatus.COMPLETED]),
+          // },
           titleAndWidget: {
-            'All': buildOrderList(statuses: [
+            'Ongoing': buildOrderList(statuses: [
               FoodOrderStatus.PENDING,
               FoodOrderStatus.PREPARING,
               FoodOrderStatus.READY,
+            ]),
+            // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
+            'Completed': buildOrderList(statuses: [
               FoodOrderStatus.COMPLETED,
               FoodOrderStatus.CANCELLED,
             ]),
-            // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
-            'Completed': buildOrderList(statuses: [FoodOrderStatus.COMPLETED]),
           },
         ),
       ),
@@ -73,6 +85,7 @@ class KitchenOverView extends StatelessWidget {
           bool flag = true;
 
           flag = isOrderNeededToKitchen(order);
+
           return GestureDetector(
             onTap: () {
               Get.to(

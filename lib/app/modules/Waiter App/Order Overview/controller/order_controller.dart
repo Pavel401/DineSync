@@ -1,4 +1,6 @@
+import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/app_to_app_notification.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
@@ -9,6 +11,8 @@ class OrderController extends GetxController {
   final RxList<FoodOrder> allOrders = <FoodOrder>[].obs;
 
   late FoodOrderProvider orderProvider;
+
+  AuthController authController = Get.find<AuthController>();
 
   @override
   void onInit() {
@@ -21,7 +25,13 @@ class OrderController extends GetxController {
     orderProvider
         .listenToBookings(DateTime.now())
         .listen((List<FoodOrder> orders) {
-      // triggerNotification(orders[0], Get.context!);
+      if (orders.length > allOrders.length &&
+          authController.userModel!.userType == UserType.CHEF &&
+          orders.isNotEmpty &&
+          orders.last.orderStatus == FoodOrderStatus.PENDING) {
+        triggerNewOrderCreatedNotification(orders.last);
+      }
+
       allOrders.assignAll(orders);
     });
     debugPrint('Listening to orders');
@@ -35,65 +45,54 @@ class OrderController extends GetxController {
       if (index != -1) {
         // Update the specific order in the list
         allOrders[index] = updatedOrder;
-        // triggerNotification(updatedOrder, Get.context!);
-
         allOrders.refresh(); // Notify listeners
+        triggerNotification(updatedOrder);
       }
+
       debugPrint('Updated order: $updatedOrder');
     });
   }
 
-  void triggerNotification(FoodOrder foodOrder, BuildContext context) {
-    String title = "";
-    String message = "";
-    Function() onTapOk = () {
-      Navigator.of(context).pop(); // Dismiss the dialog
-    };
-    Function() onTapNo = () {
-      Navigator.of(context).pop(); // Dismiss the dialog
-    };
+  void triggerNotification(FoodOrder foodOrder) {
+    if (foodOrder.orderStatus == FoodOrderStatus.READY) {
+      AppToAppNotification.showNotificationDialog(foodOrder, 'Order Ready',
+          'Order ${foodOrder.orderId} is ready for delivery', () {
+        orderProvider.updateOrderStatus(
+            foodOrder.orderId, FoodOrderStatus.COMPLETED);
+        Get.back();
+      }, () {
+        Get.back();
+      }, Get.context!);
+    } else if (foodOrder.orderStatus == FoodOrderStatus.PREPARING) {
+      AppToAppNotification.showNotificationDialog(foodOrder, 'Order Preparing',
+          'Order ${foodOrder.orderId} is being prepared', () {
+        Get.back();
+      }, () {
+        Get.back();
+      }, Get.context!);
+    } else if (foodOrder.orderStatus == FoodOrderStatus.COMPLETED) {
+      AppToAppNotification.showNotificationDialog(foodOrder, 'Order Completed',
+          'Order ${foodOrder.orderId} has been completed', () {
+        Get.back();
+      }, () {
+        Get.back();
+      }, Get.context!);
+    } else if (foodOrder.orderStatus == FoodOrderStatus.CANCELLED) {
+      AppToAppNotification.showNotificationDialog(foodOrder, 'Order Cancelled',
+          'Order ${foodOrder.orderId} has been cancelled', () {
+        Get.back();
+      }, () {
+        Get.back();
+      }, Get.context!);
+    } else {}
+  }
 
-    bool flag = false;
-
-    switch (foodOrder.orderStatus) {
-      case FoodOrderStatus.READY:
-        title = "Order Ready";
-        message =
-            "Your order (ID: ${foodOrder.orderId}) is ready to be served.";
-        break;
-
-      case FoodOrderStatus.PREPARING:
-        title = "Order Preparing";
-        message =
-            "Your order (ID: ${foodOrder.orderId}) is currently being prepared. Please wait a moment.";
-        break;
-
-      case FoodOrderStatus.COMPLETED:
-        title = "Order Completed";
-        message =
-            "Your order (ID: ${foodOrder.orderId}) has been completed. Thank you!";
-        break;
-
-      case FoodOrderStatus.CANCELLED:
-        title = "Order Cancelled";
-        message = "Your order (ID: ${foodOrder.orderId}) has been cancelled.";
-        break;
-
-      default:
-        flag = true;
-        break;
-    }
-
-    if (flag) {
-      return;
-    }
+  void triggerNewOrderCreatedNotification(FoodOrder foodOrder) {
     AppToAppNotification.showNotificationDialog(
-      foodOrder,
-      title,
-      message,
-      onTapOk,
-      onTapNo,
-      context,
-    );
+        foodOrder, 'New Order', 'A new order has been created', () {
+      Get.back();
+    }, () {
+      Get.back();
+    }, Get.context!);
   }
 }

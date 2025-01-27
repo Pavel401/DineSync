@@ -1,4 +1,5 @@
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:flutter/material.dart';
 
 class AppToAppNotification {
@@ -11,7 +12,7 @@ class AppToAppNotification {
       BuildContext context) async {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -82,7 +83,8 @@ class AppToAppNotification {
                             ),
                           ),
                           Text(
-                            foodOrder.orderId,
+                            parseOrderId(foodOrder.orderId)['counter']
+                                .toString(),
                             style: TextStyle(
                               color: Colors.black87,
                             ),

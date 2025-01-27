@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCj5i16FE-xUmavs185US1dS5dFt1nLkFM',
-    appId: '1:439501539620:android:a9851185aeaefffe488bb1',
-    messagingSenderId: '439501539620',
-    projectId: 'cho-nun-btk',
-    storageBucket: 'cho-nun-btk.firebasestorage.app',
+    apiKey: 'AIzaSyCSelyg4EMOfWBjTYlYaCbzhAOSmQUerIg',
+    appId: '1:878427818416:android:222fb81acf645e0faa6e75',
+    messagingSenderId: '878427818416',
+    projectId: 'cho-nun-bar-to-kitchen',
+    storageBucket: 'cho-nun-bar-to-kitchen.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD2twCrVsYnRO90nXmlv_BAhZpNCbq7MSE',
-    appId: '1:439501539620:ios:67732472229ad53f488bb1',
-    messagingSenderId: '439501539620',
-    projectId: 'cho-nun-btk',
-    storageBucket: 'cho-nun-btk.firebasestorage.app',
+    apiKey: 'AIzaSyA3yTXA8xkR4jcbV-MNsbzNphrS6FH98Ww',
+    appId: '1:878427818416:ios:cf9b80a777ff0a11aa6e75',
+    messagingSenderId: '878427818416',
+    projectId: 'cho-nun-bar-to-kitchen',
+    storageBucket: 'cho-nun-bar-to-kitchen.firebasestorage.app',
     iosBundleId: 'com.ChonunBTK.app',
   );
 

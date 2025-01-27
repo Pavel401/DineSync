@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyD2twCrVsYnRO90nXmlv_BAhZpNCbq7MSE</string>
+	<string>AIzaSyA3yTXA8xkR4jcbV-MNsbzNphrS6FH98Ww</string>
 	<key>GCM_SENDER_ID</key>
-	<string>439501539620</string>
+	<string>878427818416</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.ChonunBTK.app</string>
 	<key>PROJECT_ID</key>
-	<string>cho-nun-btk</string>
+	<string>cho-nun-bar-to-kitchen</string>
 	<key>STORAGE_BUCKET</key>
-	<string>cho-nun-btk.firebasestorage.app</string>
+	<string>cho-nun-bar-to-kitchen.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:439501539620:ios:67732472229ad53f488bb1</string>
+	<string>1:878427818416:ios:cf9b80a777ff0a11aa6e75</string>
 </dict>
 </plist>

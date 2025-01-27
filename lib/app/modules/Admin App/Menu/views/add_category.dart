@@ -112,6 +112,7 @@ class _AddCategoryState extends State<AddCategory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           widget.category != null ? 'Edit Category' : 'Add Category',
