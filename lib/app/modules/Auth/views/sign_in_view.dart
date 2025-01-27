@@ -1,4 +1,5 @@
 import 'package:cho_nun_btk/app/components/custom_buttons.dart';
+import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
@@ -13,7 +14,8 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class SignInView extends StatefulWidget {
-  const SignInView({super.key});
+  final UserType userType;
+  const SignInView({super.key, required this.userType});
 
   @override
   State<SignInView> createState() => _SignInViewState();
@@ -57,7 +59,6 @@ class _SignInViewState extends State<SignInView> {
                   children: [
                     SizedBox(height: isLargeScreen ? 8.h : 5.h),
 
-                    // User Type Icon
                     Center(
                       child: SvgPicture.asset(
                         authController.selectedUserType == UserType.CHEF
@@ -69,9 +70,33 @@ class _SignInViewState extends State<SignInView> {
                         height: isLargeScreen ? 15.h : 20.h,
                       ),
                     ),
+
                     SizedBox(height: isLargeScreen ? 8.h : 5.h),
 
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryDark,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.shade400),
+                      ),
+                      child: Text(
+                        widget.userType == UserType.WAITER
+                            ? 'Bar'
+                            : widget.userType == UserType.CHEF
+                                ? 'Kitchen'
+                                : 'Admin',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: Colors.green.shade800,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 4.h : 2.h),
+
                     // Email Field
+
                     TextFormField(
                       controller: authController.emailController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -84,6 +109,7 @@ class _SignInViewState extends State<SignInView> {
                         border: const OutlineInputBorder(),
                       ),
                     ),
+
                     SizedBox(height: isLargeScreen ? 3.h : 2.h),
 
                     // Password Field
@@ -116,7 +142,9 @@ class _SignInViewState extends State<SignInView> {
 
                     // Login Button
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: widget.userType == UserType.ADMIN
+                          ? MainAxisAlignment.center
+                          : MainAxisAlignment.spaceEvenly,
                       children: [
                         CafePrimaryButton(
                           width: isLargeScreen ? 20.w : 20.w,
@@ -185,76 +213,81 @@ class _SignInViewState extends State<SignInView> {
                             }
                           },
                         ),
-                        CafePrimaryButton(
-                          buttonTitle: "SignUp",
-                          width: isLargeScreen ? 20.w : 20.w,
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Signing up...'),
-                                ),
-                              );
+                        widget.userType == UserType.ADMIN
+                            ? SizedBox()
+                            : CafePrimaryButton(
+                                buttonTitle: "SignUp",
+                                width: isLargeScreen ? 20.w : 20.w,
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Signing up...'),
+                                      ),
+                                    );
 
-                              UserModel user = UserModel(
-                                uid: '',
-                                email: authController.emailController.text,
-                                name: '',
-                                photoUrl: '',
-                                phone: '',
-                                address: '',
-                                userType: authController.selectedUserType,
-                                password:
-                                    authController.passwordController.text,
-                                blocked: false,
-                                joinedOn: DateTime.now(),
-                                lastLogin: DateTime.now(),
-                                fcmToken: '',
-                              );
+                                    UserModel user = UserModel(
+                                      uid: '',
+                                      email:
+                                          authController.emailController.text,
+                                      name: '',
+                                      photoUrl: '',
+                                      phone: '',
+                                      address: '',
+                                      userType: authController.selectedUserType,
+                                      password: authController
+                                          .passwordController.text,
+                                      blocked: false,
+                                      joinedOn: DateTime.now(),
+                                      lastLogin: DateTime.now(),
+                                      fcmToken: '',
+                                    );
 
-                              QueryStatus status = await authController.signUp(
-                                context: context,
-                                email: user.email,
-                                password: user.password,
-                                name: user.name,
-                                phone: user.phone,
-                                address: user.address,
-                              );
+                                    QueryStatus status =
+                                        await authController.signUp(
+                                      context: context,
+                                      email: user.email,
+                                      password: user.password,
+                                      name: user.name,
+                                      phone: user.phone,
+                                      address: user.address,
+                                    );
 
-                              if (status == QueryStatus.SUCCESS) {
-                                Widget view = Container();
-                                debugPrint('User Signed Up');
+                                    if (status == QueryStatus.SUCCESS) {
+                                      Widget view = Container();
+                                      debugPrint('User Signed Up');
 
-                                await authController.loadUserModel();
+                                      await authController.loadUserModel();
 
-                                if (authController.firebaseUser != null &&
-                                    authController.userModel != null) {
-                                  if (authController.userModel!.userType ==
-                                      UserType.ADMIN) {
-                                    view = AdminHomeView();
-                                  } else if (authController
-                                          .userModel!.userType ==
-                                      UserType.CHEF) {
-                                    view = ChefHomeView();
-                                  } else if (authController
-                                          .userModel!.userType ==
-                                      UserType.WAITER) {
-                                    view = WaiterHomeView();
+                                      if (authController.firebaseUser != null &&
+                                          authController.userModel != null) {
+                                        if (authController
+                                                .userModel!.userType ==
+                                            UserType.ADMIN) {
+                                          view = AdminHomeView();
+                                        } else if (authController
+                                                .userModel!.userType ==
+                                            UserType.CHEF) {
+                                          view = ChefHomeView();
+                                        } else if (authController
+                                                .userModel!.userType ==
+                                            UserType.WAITER) {
+                                          view = WaiterHomeView();
+                                        }
+                                      }
+
+                                      Get.offAll(view);
+                                    }
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please fix the errors'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
                                   }
-                                }
-
-                                Get.offAll(view);
-                              }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please fix the errors'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          },
-                        ),
+                                },
+                              ),
                       ],
                     ),
                     SizedBox(height: isLargeScreen ? 3.h : 2.h),
