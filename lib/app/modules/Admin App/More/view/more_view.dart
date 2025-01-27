@@ -2,6 +2,7 @@ import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/components/settings_tile.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/More/view/staff_management.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Profile/view/profile_view.dart';
 import 'package:flutter/material.dart';
@@ -42,14 +43,16 @@ class _AdminMoreViewState extends State<AdminMoreView> {
             ),
             SizedBox(height: 2.h),
 
-            // CafeMoreTileWidget(
-            //   icon: Icons.settings_outlined,
-            //   title: 'Settings',
-            //   subtitle: 'View and manage your settings',
-            //   onTap: () {},
-            // ),
+            CafeMoreTileWidget(
+              icon: Icons.settings_outlined,
+              title: 'Staff Management',
+              subtitle: 'View and manage your settings',
+              onTap: () {
+                Get.to(() => StaffManagementView());
+              },
+            ),
 
-            // SizedBox(height: 2.h),
+            SizedBox(height: 2.h),
 
             // // Switch Theme
             // CafeMoreTileWidget(
