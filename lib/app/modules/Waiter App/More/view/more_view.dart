@@ -3,10 +3,7 @@ import 'package:cho_nun_btk/app/components/settings_tile.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
-import 'package:cho_nun_btk/app/modules/Common/lable_printer.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Profile/view/profile_view.dart';
-import 'package:cho_nun_btk/app/services/analytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -43,43 +40,43 @@ class _WaiterMoreViewState extends State<WaiterMoreView> {
                 );
               },
             ),
-            SizedBox(height: 2.h),
+            // SizedBox(height: 2.h),
 
-            kDebugMode
-                ? CafeMoreTileWidget(
-                    icon: Icons.settings_outlined,
-                    title: 'Test RAW Label Printer',
-                    subtitle: 'THis is the test for the nimboo label printer',
-                    onTap: () {
-                      Get.to(
-                        () => LablePrinterView(),
-                      );
-                    },
-                  )
-                : SizedBox(),
+            // kDebugMode
+            //     ? CafeMoreTileWidget(
+            //         icon: Icons.settings_outlined,
+            //         title: 'Test RAW Label Printer',
+            //         subtitle: 'THis is the test for the nimboo label printer',
+            //         onTap: () {
+            //           Get.to(
+            //             () => LablePrinterView(),
+            //           );
+            //         },
+            //       )
+            //     : SizedBox(),
 
-            SizedBox(height: 2.h),
+            // SizedBox(height: 2.h),
 
-            CafeMoreTileWidget(
-              icon: Icons.settings_outlined,
-              title: 'Test Firebase Analytics',
-              subtitle: 'THis is the test firebase analytics',
-              onTap: () async {
-                print('Tapped on Firebase Analytics');
-                AnalyticsService analyticsService = AnalyticsService();
+            // CafeMoreTileWidget(
+            //   icon: Icons.settings_outlined,
+            //   title: 'Test Firebase Analytics',
+            //   subtitle: 'THis is the test firebase analytics',
+            //   onTap: () async {
+            //     print('Tapped on Firebase Analytics');
+            //     AnalyticsService analyticsService = AnalyticsService();
 
-                try {
-                  await analyticsService.logEvent(
-                    eventName: 'created_new_order',
-                    parameters: <String, Object>{
-                      Analytics.TAP_SKILL_CARD: 'created_new_order',
-                    },
-                  );
-                } catch (error) {
-                  print('Error in logging event: $error');
-                }
-              },
-            ),
+            //     try {
+            //       await analyticsService.logEvent(
+            //         eventName: 'created_new_order',
+            //         parameters: <String, Object>{
+            //           Analytics.TAP_SKILL_CARD: 'created_new_order',
+            //         },
+            //       );
+            //     } catch (error) {
+            //       print('Error in logging event: $error');
+            //     }
+            //   },
+            // ),
 
             SizedBox(height: 2.h),
 
