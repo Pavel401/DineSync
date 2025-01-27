@@ -334,6 +334,8 @@ class _AddNewOrderViewState extends State<AddNewOrderView> {
                                               physics:
                                                   NeverScrollableScrollPhysics(),
                                               itemBuilder: (context, index) {
+                                                FoodItem item =
+                                                    controller.items[index];
                                                 return FoodCardReadWidget(
                                                   onTap: () {
                                                     Get.to(

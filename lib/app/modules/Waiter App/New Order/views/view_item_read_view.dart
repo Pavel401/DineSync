@@ -150,56 +150,82 @@ class _ViewOrderReadViewState extends State<ViewOrderReadView>
                                       ),
                                       SizedBox(width: 2.w),
                                       // Decrease button
-                                      GestureDetector(
-                                        onTap: () {
-                                          waiterOrderController
-                                              .removeOrderItem(widget.foodItem);
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryLight
-                                                .withOpacity(0.1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.remove,
-                                            color: AppColors.primaryLight,
-                                            size: 18.sp,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 3.w),
-                                      // Quantity display
-                                      Text(
-                                        '${waiterOrderController.orderItems[widget.foodItem] ?? 0}',
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      SizedBox(width: 3.w),
-                                      // Increase button
-                                      GestureDetector(
-                                        onTap: () {
-                                          waiterOrderController
-                                              .addOrderItem(widget.foodItem);
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryLight
-                                                .withOpacity(0.1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.add,
-                                            color: AppColors.primaryLight,
-                                            size: 18.sp,
-                                          ),
-                                        ),
-                                      ),
+                                      widget.foodItem.isAvailable
+                                          ? Row(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    waiterOrderController
+                                                        .removeOrderItem(
+                                                            widget.foodItem);
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors
+                                                          .primaryLight
+                                                          .withOpacity(0.1),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.remove,
+                                                      color: AppColors
+                                                          .primaryLight,
+                                                      size: 18.sp,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 3.w),
+                                                // Quantity display
+                                                Text(
+                                                  '${waiterOrderController.orderItems[widget.foodItem] ?? 0}',
+                                                  style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black87,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 3.w),
+                                                // Increase button
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    waiterOrderController
+                                                        .addOrderItem(
+                                                            widget.foodItem);
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors
+                                                          .primaryLight
+                                                          .withOpacity(0.1),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.add,
+                                                      color: AppColors
+                                                          .primaryLight,
+                                                      size: 18.sp,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Row(
+                                              children: [
+                                                Icon(Icons.block),
+                                                SizedBox(width: 1.w),
+                                                Text(
+                                                  'Not Available',
+                                                  style: context
+                                                      .textTheme.bodySmall
+                                                      ?.copyWith(
+                                                    color: Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                     ],
                                   ),
                                 );
@@ -351,27 +377,6 @@ class _ViewOrderReadViewState extends State<ViewOrderReadView>
             ],
           ),
         SizedBox(height: 1.5.h),
-
-        // Availability UI
-        Row(
-          children: [
-            Icon(
-              food.isAvailable ? Icons.check_circle : Icons.cancel,
-              color: food.isAvailable ? Colors.green : Colors.redAccent,
-              size: 20.sp,
-            ),
-            SizedBox(width: 1.w),
-            Text(
-              food.isAvailable ? 'Available' : 'Not Available',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: food.isAvailable ? Colors.green : Colors.redAccent,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 2.h),
       ],
     );
   }

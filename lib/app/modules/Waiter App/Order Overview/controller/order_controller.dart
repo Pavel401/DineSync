@@ -1,4 +1,3 @@
-import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
@@ -25,12 +24,12 @@ class OrderController extends GetxController {
     orderProvider
         .listenToBookings(DateTime.now())
         .listen((List<FoodOrder> orders) {
-      if (orders.length > allOrders.length &&
-          authController.userModel!.userType == UserType.CHEF &&
-          orders.isNotEmpty &&
-          orders.last.orderStatus == FoodOrderStatus.PENDING) {
-        triggerNewOrderCreatedNotification(orders.last);
-      }
+      // if (orders.length > allOrders.length &&
+      //     authController.userModel!.userType == UserType.CHEF &&
+      //     orders.isNotEmpty &&
+      //     orders.last.orderStatus == FoodOrderStatus.PENDING) {
+      //   triggerNewOrderCreatedNotification(orders.last);
+      // }
 
       allOrders.assignAll(orders);
     });

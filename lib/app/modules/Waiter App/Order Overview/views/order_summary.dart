@@ -2,9 +2,11 @@ import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
+import 'package:cho_nun_btk/app/provider/table_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -176,6 +178,21 @@ class _WaiterFlowState extends State<WaiterFlow> {
                       "${order.waiterData.waiterName}",
                       style: context.textTheme.bodyMedium!.copyWith(),
                     ),
+                    widget.order.tableData != null
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Table Details",
+                                  style: context.textTheme.bodyLarge!.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              Text(
+                                "${order.tableData!.tableName}",
+                                style: context.textTheme.bodyMedium!.copyWith(),
+                              ),
+                            ],
+                          )
+                        : SizedBox()
                   ],
                 ),
                 visible: isExpanded),
@@ -231,6 +248,15 @@ class _WaiterFlowState extends State<WaiterFlow> {
 
                         _foodOrderProvider!.updateOrderStatus(
                             order.orderId, FoodOrderStatus.COMPLETED);
+
+                        if (order.tableData != null) {
+                          TableProvider tableProvider = TableProvider();
+
+                          TableModel table = order.tableData!
+                              .copyWith(tableStatus: TableStatus.AVAILABLE)!;
+
+                          tableProvider.saveTable(table);
+                        }
                       }
 
                       Get.back();
@@ -246,6 +272,15 @@ class _WaiterFlowState extends State<WaiterFlow> {
                     onPressed: () {
                       _foodOrderProvider!.updateOrderStatus(
                           order.orderId, FoodOrderStatus.CANCELLED);
+
+                      if (order.tableData != null) {
+                        TableProvider tableProvider = TableProvider();
+
+                        TableModel table = order.tableData!
+                            .copyWith(tableStatus: TableStatus.AVAILABLE)!;
+
+                        tableProvider.saveTable(table);
+                      }
                       Get.back();
                     })
               ],

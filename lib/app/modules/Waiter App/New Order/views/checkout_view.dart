@@ -5,10 +5,13 @@ import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/views/table_selection_view.dart';
 import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
+import 'package:cho_nun_btk/app/provider/table_provider.dart';
 import 'package:cho_nun_btk/app/services/analytics.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +37,8 @@ class _CheckoutViewState extends State<CheckoutView> {
       TextEditingController();
   final TextEditingController specialInstructionsController =
       TextEditingController();
+
+  TableModel? selectedTable;
 
   Gender? selectedGender;
   bool isDiscountApplied = false;
@@ -99,6 +104,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                     _buildOrderType(context),
                     SizedBox(height: 2.h),
                     _buildCustomerDetailsCard(context),
+                    SizedBox(height: 2.h),
+                    _buildTableSelectionView(context),
                     SizedBox(height: 2.h),
                     _buildWaiterCard(context),
                     SizedBox(height: 2.h),
@@ -395,6 +402,55 @@ class _CheckoutViewState extends State<CheckoutView> {
     );
   }
 
+  Card _buildTableSelectionView(BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Select Table',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            selectedTable == null
+                ? const Text("No Table Selected")
+                : Text(
+                    selectedTable!.tableName,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                // Navigate to TableSelectionView and wait for the selected table.
+                final table = await Navigator.push<TableModel>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TableSelectionView(),
+                  ),
+                );
+
+                if (table != null) {
+                  setState(() {
+                    selectedTable = table; // Update the selected table.
+                  });
+                }
+              },
+              child: const Text('Choose Table'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Card _buildDiscountDetailsCard(BuildContext context) {
     return Card(
       elevation: 3,
@@ -587,6 +643,12 @@ class _CheckoutViewState extends State<CheckoutView> {
                           ),
                         );
 
+                        if (selectedTable != null) {
+                          TableProvider tableProvider = TableProvider();
+
+                          tableProvider.saveTable(selectedTable!);
+                        }
+
                         FoodOrder foodOrder = FoodOrder(
                           orderStatus: FoodOrderStatus.PENDING,
                           orderItems: controller.orderItems,
@@ -605,6 +667,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           queuePosition: 0,
                           discountData: discountData,
                           orderType: orderType,
+                          tableData: selectedTable,
                         );
 
                         QueryStatus status =
