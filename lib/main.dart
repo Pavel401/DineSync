@@ -23,6 +23,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -193,29 +194,60 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isLoggedIn = false;
 
     isLoggedIn = FirebaseAuth.instance.currentUser != null;
-    requestNotificationPermission();
+    requestPermissions();
     if (FirebaseAuth.instance.currentUser != null) {
       getAndSaveFCMToken();
     } else {}
     super.initState();
   }
 
-  void requestNotificationPermission() async {
-    NotificationSettings notificationPermission =
-        await FirebaseMessaging.instance.getNotificationSettings();
-    if (notificationPermission.authorizationStatus !=
-        AuthorizationStatus.authorized) {
-      debugPrint('FirebaseMessaging: Requesting permission');
-      await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        announcement: false,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-      );
-    }
+  // void requestNotificationPermission() async {
+  //   NotificationSettings notificationPermission =
+  //       await FirebaseMessaging.instance.getNotificationSettings();
+  //   if (notificationPermission.authorizationStatus !=
+  //       AuthorizationStatus.authorized) {
+  //     debugPrint('FirebaseMessaging: Requesting permission');
+  //     await FirebaseMessaging.instance.requestPermission(
+  //       alert: true,
+  //       badge: true,
+  //       sound: true,
+  //       announcement: false,
+  //       carPlay: false,
+  //       criticalAlert: false,
+  //       provisional: false,
+  //     );
+  //   }
+  // }
+
+  Future<void> requestPermissions() async {
+    // 1. Request Bluetooth permissions first
+    Map<Permission, PermissionStatus> bluetoothStatuses = await [
+      Permission.bluetooth,
+      Permission.bluetoothScan, // Required for Android 12+
+      Permission.bluetoothConnect, // Required for Android 12+
+      Permission.bluetoothAdvertise // Required for Android 12+
+    ].request();
+
+    debugPrint('Bluetooth Permission Status: $bluetoothStatuses');
+
+    // 2. Request Location permissions (often required for BLE)
+    PermissionStatus locationStatus = await Permission.location.request();
+    debugPrint('Location Permission Status: $locationStatus');
+
+    // 3. Request Firebase Messaging permissions
+    NotificationSettings notificationSettings =
+        await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      announcement: false,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+    );
+
+    debugPrint(
+        'Notification Permission Status: ${notificationSettings.authorizationStatus}');
   }
 
   @override

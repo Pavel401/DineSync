@@ -112,3 +112,19 @@ class UserModel extends Equatable {
         fcmToken,
       ];
 }
+
+class UserTypeToString {
+  static String convert(UserType userType) {
+    switch (userType) {
+      case UserType.ADMIN:
+        return 'Admin';
+
+      case UserType.WAITER:
+        return 'Waiter/Bartender';
+      case UserType.CHEF:
+        return 'Chef/Kitchen Staff';
+      default:
+        return 'None';
+    }
+  }
+}

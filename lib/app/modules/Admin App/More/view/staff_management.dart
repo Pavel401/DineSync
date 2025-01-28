@@ -131,7 +131,8 @@ class _StaffManagementViewState extends State<StaffManagementView> {
                         const SizedBox(height: 16),
                         _buildDetailRow('Phone', user.phone),
                         _buildDetailRow('Address', user.address),
-                        _buildDetailRow('User Type', user.userType.toString()),
+                        _buildDetailRow('User Type',
+                            UserTypeToString.convert(user.userType)),
                         _buildDetailRow(
                             'Joined On', user.joinedOn.toLocal().toString()),
                         _buildDetailRow(

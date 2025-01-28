@@ -5,6 +5,7 @@ import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
+import 'package:cho_nun_btk/app/modules/Common/invoice_printer.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/provider/table_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
@@ -61,14 +62,16 @@ class _WaiterFlowState extends State<WaiterFlow> {
       appBar: AppBar(
         title: Text('Order: # ${parseOrderId(order.orderId)["counter"]}'),
         actions: [
-          // IconButton(
-          //   onPressed: () {
-          //     Get.to(() => FoodLabelPrinter(
-          //           order: order,
-          //         ));
-          //   },
-          //   icon: Icon(Icons.print),
-          // ),
+          IconButton(
+            onPressed: () {
+              Get.to(
+                () => InvoicePrinter(
+                  order: order,
+                ),
+              );
+            },
+            icon: Icon(Icons.print),
+          ),
         ],
       ),
       body: Padding(
@@ -234,7 +237,17 @@ class _WaiterFlowState extends State<WaiterFlow> {
 
                         _foodOrderProvider!.updateCookingEndTime(
                             order.orderId, DateTime.now());
+
+                        if (order.tableData != null) {
+                          TableProvider tableProvider = TableProvider();
+
+                          TableModel table = order.tableData!
+                              .copyWith(tableStatus: TableStatus.AVAILABLE)!;
+
+                          tableProvider.saveTable(table);
+                        }
                       } else {
+                        print("Else is clicked");
                         order.cookingStartTime = DateTime.now();
 
                         _foodOrderProvider!.updateCookingStartTime(
