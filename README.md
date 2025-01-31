@@ -1,61 +1,102 @@
+# DineSync - All-in-One Restaurant Order Management System
 
-# DineSync 🍽️
+DineSync is a Flutter-based restaurant management system that integrates the **Waiter App**, **Admin Dashboard**, and **Kitchen App** into a single seamless platform. It ensures smooth communication between waiters, chefs, and restaurant administrators while providing real-time order tracking, analytics, and invoice printing support.
 
-**DineSync** is a Flutter-based restaurant order management app that combines waiter, admin, and kitchen functionalities into a single platform. It allows seamless real-time synchronization across all parts of the restaurant, improving service efficiency and user experience.
+## Features Overview
 
-## Features
-- **Waiter App**: Enables waiters to take and manage orders efficiently.
-- **Admin App**: Allows admins to manage the restaurant's operations, such as user roles, settings, and business tracking.
-- **Kitchen App**: Helps the kitchen team view and manage orders for timely preparation.
-- **Real-Time Sync**: Instantly syncs orders and updates across all devices.
+### 🏢 Admin Features
+- **Real-Time Order Management**
+  - Track daily live orders categorized as **Ongoing, Served, Cancelled, or Completed**
+- **Advanced Analytics & Reports**
+  - View **Daily, Weekly, Monthly, and Yearly** sales reports
+  - Identify **Most Sold Items**
+- **Table Management**
+  - Assign and manage table reservations
+  - Optimize seating arrangements
+- **Menu & Category Management**
+  - Add, edit, and remove items from the menu
+  - Categorize menu items for efficient browsing
+- **Staff Management**
+  - Add and manage waiter, chef, and admin roles
+  - Assign staff responsibilities
+- **Order & Invoice Management**
+  - Generate invoices with **Bluetooth Printer Support**
+  - Maintain transaction records
 
-## Screenshots
-Here are some screenshots of the DineSync app in action:
+### 👨‍🍽️ Waiter Features
+- **Effortless Order Placement**
+  - Browse the menu and select items for customers
+  - Add special **instructions or notes** for the kitchen
+  - Record coupon details & customer data
+- **Live Order Tracking**
+  - Receive real-time updates from the kitchen on order status
+- **Mark Orders as Served**
+  - Notify the system when an order is completed and served
 
-| Waiter App | Admin App | Kitchen App |
-|------------|-----------|-------------|
-| ![Screenshot 1](https://github.com/user-attachments/assets/f87496db-d66b-40e1-a8ac-b4ad6e552f81) | ![Screenshot 2](https://github.com/user-attachments/assets/2fd38dc8-ab94-4ed2-8dd1-ee8a09fb1383) | ![Screenshot 3](https://github.com/user-attachments/assets/bb7f1b8d-6938-4031-b23b-83c25cf487c9) |
-| ![Screenshot 4](https://github.com/user-attachments/assets/4dc316e4-4399-4f2b-8391-d5aaa7cf3fa5) | ![Screenshot 5](https://github.com/user-attachments/assets/1cc9d784-6b66-4813-bcb9-7dc61a686e34) | ![Screenshot 6](https://github.com/user-attachments/assets/f3881536-89e6-414c-bb08-b3a8938d5ecd) |
-| ![Screenshot 7](https://github.com/user-attachments/assets/c7d527ae-58fe-47dc-8875-f0aa4b27fcf9) | ![Screenshot 8](https://github.com/user-attachments/assets/2e29118e-6751-4dd7-8700-c39c17278fd6) | ![Screenshot 9](https://github.com/user-attachments/assets/31d1e0d5-235e-4aff-bf57-28cc3dcd98f4) |
-| ![Screenshot 10](https://github.com/user-attachments/assets/84560650-f956-43f9-adcc-f9b7d5349bf1) | ![Screenshot 11](https://github.com/user-attachments/assets/b53f1134-5d30-46b3-96fb-0751a784be6e) | ![Screenshot 12](https://github.com/user-attachments/assets/d17c8c4b-ab08-419d-9bd4-03ac477da463) |
+### 👨‍🍳 Kitchen Features
+- **Order Management**
+  - Receive new orders in real-time
+  - Start preparing dishes as orders come in
+  - Update order status when cooking is completed
+- **Cooking Time Tracking**
+  - Record the time taken to prepare each dish
+  - Enhance efficiency by analyzing cooking trends
 
-## Installation
+### 🔄 Sync & Notifications
+- **Instant Synchronization**
+  - Keep waiters, chefs, and admins updated in real time
+  - No delays in order processing
+- **Push Notifications**
+  - Notify waiters when food is ready to be served
+  - Notify admins of new orders and changes
 
-To run **DineSync** locally, follow these steps:
+## 📸 Screenshots
 
-### Prerequisites
-- Flutter SDK (v3.0 or higher)
-- Dart SDK (v2.0 or higher)
-- Android Studio / Visual Studio Code
+| Waiter/Bartender App | Admin App | Chef/Kitchen App |
+|----------------------|-----------|------------------|
+| ![Screenshot 1](https://github.com/user-attachments/assets/f87496db-d66b-40e1-a8ac-b4ad6e552f81) | ![Screenshot 1](https://github.com/user-attachments/assets/3370cf19-eadb-4ea6-b0df-546a87d57022) | ![Screenshot 1](https://github.com/user-attachments/assets/094af6af-93c0-470e-809a-55566ec658c7) |
+| ![Screenshot 2](https://github.com/user-attachments/assets/dfed9771-be8d-4e17-8482-5f6459aec656) | ![Screenshot 2](https://github.com/user-attachments/assets/dd2b783d-b939-45c6-b5ba-436880a48536) | ![Screenshot 2](https://github.com/user-attachments/assets/6c261c4f-74e0-43db-b8de-e43b98ac160b) |
+| ![Screenshot 3](https://github.com/user-attachments/assets/fa6b874f-754c-45fd-88f5-6c2878dd1f82) | ![Screenshot 3](https://github.com/user-attachments/assets/71b4563f-93f4-4173-8cc1-1eb2495794de) | ![Screenshot 3](https://github.com/user-attachments/assets/27310802-c01d-405c-9b5c-5efd92948ee5) |
+| ![Screenshot 4](https://github.com/user-attachments/assets/87cadaf5-a27d-48a3-a76a-170a0ad56c24) | ![Screenshot 4](https://github.com/user-attachments/assets/730f1f8e-b9c4-468e-996a-f6d0a301ca03) | ![Screenshot 4](https://github.com/user-attachments/assets/3bb5b1d9-192c-491f-a0d7-8896479bfae5) |
+| ![Screenshot 5](https://github.com/user-attachments/assets/be811c94-0767-4fc5-9a50-1ff6b931bd69) | ![Screenshot 5](https://github.com/user-attachments/assets/a119b712-0d31-4130-a69c-f4cf0a0fa477) | ![Screenshot 5](https://github.com/user-attachments/assets/2f20e2f0-8503-476b-a5b4-0e5b987f8143) |
+| ![Screenshot 6](https://github.com/user-attachments/assets/920ed1d5-ec3c-4edf-9709-d46592fc1d69) | ![Screenshot 6](https://github.com/user-attachments/assets/7a2b25e0-4db5-4c82-b04d-c9dcf78d6f17) | |
+| ![Screenshot 7](https://github.com/user-attachments/assets/219d9bad-46d8-4200-a622-d89ecfc3d651) | ![Screenshot 7](https://github.com/user-attachments/assets/eb96b1b5-cf25-42ba-8291-c52e5159969f) | |
+| | ![Screenshot 8](https://github.com/user-attachments/assets/740f7d6c-3c5d-495f-8aa6-9e9ee4566641) | |
+| | ![Screenshot 9](https://github.com/user-attachments/assets/1051536c-a5e0-463d-8484-55b49d62955f) | |
+| | ![Screenshot 10](https://github.com/user-attachments/assets/e7c59910-7ad5-46e1-b02a-1fcf107516f5) | |
+| | ![Screenshot 11](https://github.com/user-attachments/assets/115307b4-2b73-4f24-b0f2-24ff0346514f) | |
 
-### Steps
+## 🛠️ Technologies Used
+- **Flutter** (Dart)
+- **Firebase** for real-time synchronization
+- **SQLite** for local data storage
+- **Bluetooth Printing** for invoice generation
 
+## 📌 Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/DineSync.git
+   git clone https://github.com/your-repo/dinesync.git
+   cd dinesync
    ```
-
-2. Navigate to the project directory:
-   ```bash
-   cd DineSync
-   ```
-
-3. Install dependencies:
+2. Install dependencies:
    ```bash
    flutter pub get
    ```
-
-4. Run the app:
+3. Run the app:
    ```bash
    flutter run
    ```
 
-5. Open your browser or mobile emulator to view the app.
+## 🚀 Future Enhancements
+- AI-powered **demand forecasting**
+- QR code-based **self-ordering system**
+- Multi-language support
 
-## Contributing
+---
 
-Feel free to submit any pull requests or issues! Contributions are always welcome.
 
-## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
+
+DineSync – Making Restaurant Management Seamless! 🍽️
+
