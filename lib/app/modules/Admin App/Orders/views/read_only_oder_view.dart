@@ -1,15 +1,12 @@
-import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/paddings.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
-import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
 import 'package:cho_nun_btk/app/modules/Common/invoice_printer.dart';
-import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
-import 'package:cho_nun_btk/app/provider/table_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
+import 'package:cho_nun_btk/app/utils/date_utils.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,19 +14,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-class WaiterFlow extends StatefulWidget {
+class AdminOrderFlow extends StatefulWidget {
   final FoodOrder order;
 
-  WaiterFlow({
+  AdminOrderFlow({
     Key? key,
     required this.order,
   }) : super(key: key);
 
   @override
-  State<WaiterFlow> createState() => _WaiterFlowState();
+  State<AdminOrderFlow> createState() => _AdminOrderFlowState();
 }
 
-class _WaiterFlowState extends State<WaiterFlow> {
+class _AdminOrderFlowState extends State<AdminOrderFlow> {
   late FoodOrder order;
 
   FoodOrderProvider? _foodOrderProvider;
@@ -39,22 +36,12 @@ class _WaiterFlowState extends State<WaiterFlow> {
   AuthController authController = Get.find<AuthController>();
 
   bool isExpanded = false;
-  bool flag = true;
+
   @override
   void initState() {
     super.initState();
     order = widget.order;
     _foodOrderProvider = serviceLocator<FoodOrderProvider>();
-
-    _foodOrderProvider!.listenToOrder(order.orderId).listen((updatedOrder) {
-      setState(() {
-        order = updatedOrder; // Update the order object
-      });
-    });
-
-    flag = order.orderStatus == FoodOrderStatus.COMPLETED
-        ? true
-        : isOrderNeededToKitchen(order);
   }
 
   @override
@@ -95,6 +82,7 @@ class _WaiterFlowState extends State<WaiterFlow> {
             DottedBorder(
               borderType: BorderType.RRect,
               radius: Radius.circular(12),
+              // padding: EdgeInsets.all(2.w),
               child: _buildItemList(),
             ),
             SizedBox(height: 2.h),
@@ -217,99 +205,59 @@ class _WaiterFlowState extends State<WaiterFlow> {
               order: order,
             ),
             SizedBox(height: 5.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CafePrimaryButton(
-                    isEnabled: order.orderStatus == FoodOrderStatus.CANCELLED
-                        ? false
-                        : flag == false
-                            ? true
-                            : order.orderStatus == FoodOrderStatus.READY,
-                    width: 30.w,
-                    buttonTitle: "Mark as Served",
-                    onPressed: () {
-                      if (flag == false) {
-                        _foodOrderProvider!.updateOrderStatus(
-                            order.orderId, FoodOrderStatus.COMPLETED);
-
-                        _foodOrderProvider!.updateCookingStartTime(
-                            order.orderId, DateTime.now());
-
-                        _foodOrderProvider!.updateCookingEndTime(
-                            order.orderId, DateTime.now());
-
-                        if (order.tableData != null) {
-                          TableProvider tableProvider = TableProvider();
-
-                          TableModel table = order.tableData!
-                              .copyWith(tableStatus: TableStatus.AVAILABLE)!;
-
-                          tableProvider.saveTable(table);
-                        }
-                      } else {
-                        print("Else is clicked");
-                        order.cookingStartTime = DateTime.now();
-
-                        _foodOrderProvider!.updateCookingStartTime(
-                          order.orderId,
-                          order.cookingStartTime!,
-                        );
-                        order.cookingEndTime = DateTime.now();
-                        _foodOrderProvider!.updateCookingEndTime(
-                          order.orderId,
-                          order.cookingEndTime!,
-                        );
-
-                        _foodOrderProvider!.updateOrderStatus(
-                            order.orderId, FoodOrderStatus.COMPLETED);
-
-                        if (order.tableData != null) {
-                          TableProvider tableProvider = TableProvider();
-
-                          TableModel table = order.tableData!
-                              .copyWith(tableStatus: TableStatus.AVAILABLE)!;
-
-                          tableProvider.saveTable(table);
-                        }
-                      }
-
-                      Get.back();
-                    }),
-                CafeCancelButton(
-                    width: 30.w,
-                    isEnabled: (order.orderStatus == FoodOrderStatus.READY ||
-                            order.orderStatus == FoodOrderStatus.COMPLETED ||
-                            order.orderStatus == FoodOrderStatus.CANCELLED)
-                        ? false
-                        : true,
-                    buttonTitle: "Cancel Order",
-                    onPressed: () {
-                      _foodOrderProvider!.updateOrderStatus(
-                          order.orderId, FoodOrderStatus.CANCELLED);
-
-                      AnalyticsProvider analyticsProvider = AnalyticsProvider();
-
-                      analyticsProvider.updateCancelledOrderAnalytics(
-                        widget.order,
-                      );
-
-                      if (order.tableData != null) {
-                        TableProvider tableProvider = TableProvider();
-
-                        TableModel table = order.tableData!
-                            .copyWith(tableStatus: TableStatus.AVAILABLE)!;
-
-                        tableProvider.saveTable(table);
-                      }
-                      Get.back();
-                    })
-              ],
-            ),
-            SizedBox(height: 5.h),
           ],
         ),
       ),
+    );
+  }
+
+  int _getCurrentStep() {
+    if (order.orderStatus == FoodOrderStatus.READY) {
+      return 2;
+    } else if (order.orderStatus == FoodOrderStatus.PREPARING) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  Widget _buildStepper() {
+    return Stepper(
+      currentStep: _getCurrentStep(),
+      steps: [
+        Step(
+          title: const Text("Order Placed"),
+          subtitle: Text(
+            'Placed on ${DateUtilities.formatDateTime(order.orderTime)}',
+            style: TextStyle(fontSize: 12),
+          ),
+          content: CircularProgressIndicator(),
+          isActive: true,
+        ),
+        Step(
+          title: const Text("Cooking Started"),
+          subtitle: Text(
+            order.cookingStartTime != null
+                ? 'Started at ${DateUtilities.formatDateTime(order.cookingStartTime!)}'
+                : "Not started yet",
+            style: TextStyle(fontSize: 12),
+          ),
+          content: CircularProgressIndicator(),
+          isActive: order.orderStatus == FoodOrderStatus.PREPARING ||
+              order.orderStatus == FoodOrderStatus.READY,
+        ),
+        Step(
+          title: const Text("Order Ready"),
+          subtitle: Text(
+            order.cookingEndTime != null
+                ? 'Ready at ${DateUtilities.formatDateTime(order.cookingEndTime!)}'
+                : "Not ready yet",
+            style: TextStyle(fontSize: 12),
+          ),
+          content: CircularProgressIndicator(),
+          isActive: order.orderStatus == FoodOrderStatus.READY,
+        ),
+      ],
     );
   }
 
@@ -324,26 +272,28 @@ class _WaiterFlowState extends State<WaiterFlow> {
         final foodItem = entry.key; // The FoodItem
         final quantity = entry.value; // The quantity
 
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 70.w,
-                child: Text(
-                  foodItem.foodName,
-                  style: context.textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+        return foodItem.foodCategory.noNeedToSendToKitchen
+            ? SizedBox()
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 70.w,
+                      child: Text(
+                        foodItem.foodName,
+                        style: context.textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text('X$quantity'),
+                  ],
                 ),
-              ),
-              Text('X$quantity'),
-            ],
-          ),
-        );
+              );
       },
     );
   }

@@ -2,6 +2,7 @@ import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/models/analytics/analytics.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class AnalyticsProvider {
   final ordersCollection = FirebaseFirestore.instance.collection('orders');
@@ -303,6 +304,40 @@ class AnalyticsProvider {
 
       // Update yearly analytics
       await updateYearlyAnalytics(order);
+
+      return QueryStatus.SUCCESS;
+    } catch (e) {
+      print("Error recording analytics for order: $e");
+      return QueryStatus.ERROR;
+    }
+  }
+
+  Future<QueryStatus> updateCancelledOrderAnalytics(FoodOrder order) async {
+    try {
+      String dailyAnalyticsId = getAnalyticsId(order.orderTime, "daily");
+      String monthlyAnalyticsId = getAnalyticsId(order.orderTime, "monthly");
+      String yearlyAnalyticsId = getAnalyticsId(order.orderTime, "yearly");
+
+      debugPrint("Daily: $dailyAnalyticsId");
+      debugPrint("Monthly: $monthlyAnalyticsId");
+      debugPrint("Yearly: $yearlyAnalyticsId");
+      await analyticsCollection
+          .doc("daily")
+          .collection("dates")
+          .doc(dailyAnalyticsId)
+          .update({"cancelledOrders": FieldValue.increment(1)});
+
+      await analyticsCollection
+          .doc("monthly")
+          .collection("months")
+          .doc(monthlyAnalyticsId)
+          .update({"cancelledOrders": FieldValue.increment(1)});
+
+      await analyticsCollection
+          .doc("yearly")
+          .collection("years")
+          .doc(yearlyAnalyticsId)
+          .update({"cancelledOrders": FieldValue.increment(1)});
 
       return QueryStatus.SUCCESS;
     } catch (e) {
