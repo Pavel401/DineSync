@@ -1,16 +1,18 @@
 import 'dart:async';
 
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
-import 'package:print_bluetooth_thermal/post_code.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
 
 class InvoicePrinter extends StatefulWidget {
   final FoodOrder order;
-
   InvoicePrinter({required this.order});
+
   @override
   _InvoicePrinterState createState() => _InvoicePrinterState();
 }
@@ -20,17 +22,7 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
   String _msj = '';
   bool connected = false;
   List<BluetoothInfo> items = [];
-  List<String> _options = [
-    "permission bluetooth granted",
-    "bluetooth enabled",
-    "connection status",
-    "update info"
-  ];
-
-  String _selectSize = "2";
-  final _txtText = TextEditingController(text: "Hello developer");
-  bool _progress = false;
-  String _msjprogress = "";
+  BluetoothInfo? selectedPrinter;
 
   String optionprinttype = "58 mm";
   List<String> options = ["58 mm", "80 mm"];
@@ -39,125 +31,90 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
   void initState() {
     super.initState();
     initPlatformState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: const Text(' Invoice Printer'),
-        ),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('info: $_info\n '),
-                Text(_msj),
-                Row(
-                  children: [
-                    Text("Type print"),
-                    SizedBox(width: 10),
-                    DropdownButton<String>(
-                      value: optionprinttype,
-                      items: options.map((String option) {
-                        return DropdownMenuItem<String>(
-                          value: option,
-                          child: Text(option),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          optionprinttype = newValue!;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                // Displaying order items
-                Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Colors.grey.withOpacity(0.3),
-                  ),
-                  child: Column(
-                    children: [
-                      Text("Order Items:"),
-                      SizedBox(height: 10),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: widget.order.orderItems.length,
-                        itemBuilder: (context, index) {
-                          var item =
-                              widget.order.orderItems.keys.elementAt(index);
-                          var quantity = widget.order.orderItems[item];
-                          return ListTile(
-                            title: Text('${item.foodName}'),
-                            subtitle: Text('Quantity: $quantity'),
-                          );
-                        },
-                      ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: connected ? this.printInvoice : null,
-                        child: Text("Print Invoice"),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    loadSavedPrinter();
   }
 
   Future<void> initPlatformState() async {
-    String platformVersion;
-    int porcentbatery = 0;
     try {
-      platformVersion = await PrintBluetoothThermal.platformVersion;
-      porcentbatery = await PrintBluetoothThermal.batteryLevel;
+      String platformVersion = await PrintBluetoothThermal.platformVersion;
+      int batteryLevel = await PrintBluetoothThermal.batteryLevel;
+      bool bluetoothEnabled = await PrintBluetoothThermal.bluetoothEnabled;
+
+      setState(() {
+        _info = "$platformVersion ($batteryLevel% battery)";
+        _msj = bluetoothEnabled
+            ? "Bluetooth enabled, search and connect"
+            : "Bluetooth not enabled";
+      });
     } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      setState(() => _info = 'Failed to get platform version.');
     }
+  }
 
-    if (!mounted) return;
+  Future<void> loadSavedPrinter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedPrinterName = prefs.getString("printer_name");
+    String? savedPrinterAddress = prefs.getString("printer_mac");
 
-    final bool result = await PrintBluetoothThermal.bluetoothEnabled;
-    if (result) {
-      _msj = "Bluetooth enabled, please search and connect";
+    if (savedPrinterName != null && savedPrinterAddress != null) {
+      setState(() {
+        selectedPrinter = BluetoothInfo(
+            name: savedPrinterName, macAdress: savedPrinterAddress);
+        connected = true;
+      });
+    }
+  }
+
+  Future<void> searchPrinters() async {
+    setState(() {
+      _msj = "Searching for printers...";
+    });
+    List<BluetoothInfo> printers = await PrintBluetoothThermal.pairedBluetooths;
+    setState(() {
+      items = printers;
+      _msj = printers.isEmpty
+          ? "No printers found"
+          : "Select a printer from the list";
+    });
+  }
+
+  Future<void> connectPrinter(BluetoothInfo printer) async {
+    bool success = await PrintBluetoothThermal.connect(
+        macPrinterAddress: printer.macAdress);
+    if (success) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("printer_name", printer.name);
+      await prefs.setString("printer_mac", printer.macAdress);
+
+      setState(() {
+        selectedPrinter = printer;
+        connected = true;
+        _msj = "Connected to ${printer.name}";
+      });
     } else {
-      _msj = "Bluetooth not enabled";
+      setState(() => _msj = "Failed to connect");
     }
+  }
+
+  Future<void> resetPrinter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove("printer_name");
+    await prefs.remove("printer_mac");
 
     setState(() {
-      _info = platformVersion + " ($porcentbatery% battery)";
+      selectedPrinter = null;
+      connected = false;
+      _msj = "Printer reset. Please select a new printer.";
     });
   }
 
   Future<void> printInvoice() async {
-    bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
-    if (conexionStatus) {
+    if (connected) {
       List<int> ticket = await generateInvoiceTicket();
       bool result = await PrintBluetoothThermal.writeBytes(ticket);
       print("Invoice print result:  $result");
     } else {
-      setState(() {
-        _msj = "No connected device";
-      });
-      print("No connected");
+      setState(() => _msj = "No connected device");
     }
   }
 
@@ -168,11 +125,21 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
         optionprinttype == "58 mm" ? PaperSize.mm58 : PaperSize.mm80, profile);
 
     bytes += generator.reset();
+    bytes += generator.text('Invoice:', styles: PosStyles(bold: true));
+    bytes += generator.text(
+        "Order: # ${parseOrderId(widget.order.orderId)["counter"]}",
+        styles: PosStyles(bold: true));
+    bytes += generator
+        .text("Customer Name: ${widget.order.customerData.customerName}");
 
-    // Adding order details to the ticket
-    bytes += generator.text('Invoice:');
-    bytes += generator.text('Order ID: ${widget.order.orderId}');
-    bytes += generator.text('Time: ${widget.order.orderTime.toLocal()}');
+    if (widget.order.tableData != null) {
+      bytes += generator.text("Table No: ${widget.order.tableData?.tableName}");
+    }
+
+    bytes += generator.text(
+        "Order Type: ${widget.order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away"}");
+
+    bytes += generator.text("Items:", styles: PosStyles(underline: true));
 
     widget.order.orderItems.forEach((foodItem, quantity) {
       bytes += generator.row([
@@ -181,10 +148,98 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
       ]);
     });
 
-    bytes += PostCode.line();
-    bytes += generator.text('Total: ${widget.order.totalAmount}');
+    bytes += generator.text("Total: ${widget.order.totalAmount}",
+        styles: PosStyles(bold: true));
     bytes += generator.cut();
-
     return bytes;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Invoice Printer')),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('Info: $_info'),
+            Text(_msj),
+            DropdownButton<String>(
+              value: optionprinttype,
+              items: options.map((String option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(option, style: TextStyle(color: Colors.black)),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  optionprinttype = newValue!;
+                });
+              },
+            ),
+            ElevatedButton(
+              onPressed: searchPrinters,
+              child: Text("Search Printers"),
+            ),
+            selectedPrinter != null
+                ? Text("Selected Printer: ${selectedPrinter!.name}")
+                : SizedBox(),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(items[index].name),
+                  subtitle: Text(items[index].macAdress),
+                  onTap: () => connectPrinter(items[index]),
+                );
+              },
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: resetPrinter,
+              child: Text("Reset Printer"),
+            ),
+            SizedBox(height: 20),
+            Text("Invoice Preview:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 2.h),
+            Container(
+              width: 100.w,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      "Order: # ${parseOrderId(widget.order.orderId)["counter"]}",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                      "Customer Name: ${widget.order.customerData.customerName}"),
+                  widget.order.tableData != null
+                      ? Text("Table No: ${widget.order.tableData?.tableName}")
+                      : SizedBox(),
+                  Text(
+                      "Order Type: ${widget.order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away"}"),
+                  Text("Items:"),
+                  ...widget.order.orderItems.entries.map(
+                      (entry) => Text("${entry.key.foodName} x${entry.value}")),
+                ],
+              ),
+            ),
+            SizedBox(height: 2.h),
+            ElevatedButton(
+              onPressed: connected ? printInvoice : null,
+              child: Text("Print Invoice"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
