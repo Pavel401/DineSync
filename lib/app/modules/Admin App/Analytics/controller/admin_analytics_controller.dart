@@ -83,7 +83,8 @@ class AdminAnalyticsController extends GetxController {
     cancelledOrders.value = analytics.cancelledOrders;
     totalDiscountedOrders.value = analytics.totalDiscountedOrders;
     itemSalesData = analytics.itemSalesCount;
-    categorySalesData = analytics.categorySales;
+
+    categorySalesData = await sortTredningCategoryData(analytics.categorySales);
 
     salesData = await getSalesData(itemSalesData);
     isLoading.value = false;
@@ -92,7 +93,8 @@ class AdminAnalyticsController extends GetxController {
   }
 
   Future<Map<FoodItem, int>> getSalesData(Map<String, int> itemsData) async {
-    List<FoodItem> allitems = await menuprovider.getAllItemsFromGlobalMenu();
+    List<FoodItem> allitems =
+        await menuprovider.getAllFoodItemsFromGlobalMenu();
 
     Map<FoodItem, int> salesData = {};
 
@@ -101,8 +103,39 @@ class AdminAnalyticsController extends GetxController {
         salesData[allitems[i]] = itemsData[allitems[i].foodId]!;
       }
     }
-    salesData.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
-    return salesData;
+    // Convert to list of entries, sort, and convert back to map
+    var sortedEntries = salesData.entries.toList()
+      ..sort(
+          (a, b) => b.value.compareTo(a.value)); // Sort by value (descending)
+
+    // Create a new LinkedHashMap to maintain the sorted order
+    Map<FoodItem, int> sortedSalesData = Map.fromEntries(sortedEntries);
+
+    // Debug print (optional)
+    sortedSalesData.forEach((item, quantity) {
+      print('${item.foodName}: $quantity');
+    });
+
+    // salesData.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+
+    return sortedSalesData;
+  }
+
+  Future<Map<String, int>> sortTredningCategoryData(
+      Map<String, int> categoryData) async {
+    var sortedEntries = categoryData.entries.toList()
+      ..sort(
+          (a, b) => b.value.compareTo(a.value)); // Sort by value (descending)
+
+    // Create a new LinkedHashMap to maintain the sorted order
+    Map<String, int> sortedCategoryData = Map.fromEntries(sortedEntries);
+
+    // Debug print (optional)
+    sortedCategoryData.forEach((category, quantity) {
+      print('$category: $quantity');
+    });
+
+    return sortedCategoryData;
   }
 }

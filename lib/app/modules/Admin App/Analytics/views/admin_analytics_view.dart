@@ -4,7 +4,9 @@ import 'package:cho_nun_btk/app/components/shimmers.dart';
 import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Analytics/controller/admin_analytics_controller.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
@@ -246,6 +248,30 @@ class AdminAnalyticsView extends StatelessWidget {
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
+                                            kDebugMode
+                                                ? GestureDetector(
+                                                    onTap: () {
+                                                      Clipboard.setData(
+                                                          ClipboardData(
+                                                              text:
+                                                                  item.foodId));
+                                                      Get.snackbar("Copied",
+                                                          "Item ID copied to clipboard");
+                                                    },
+                                                    child: Text(
+                                                      item.foodId,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: context
+                                                          .textTheme.titleSmall
+                                                          ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  )
+                                                : SizedBox(),
                                           ],
                                         ),
                                       ),

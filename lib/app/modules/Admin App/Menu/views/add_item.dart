@@ -597,6 +597,8 @@ class _AddMenuItemState extends State<AddMenuItem> {
       String? imageUrl =
           widget.item?.foodImage; // Default to existing image URL
 
+      debugPrint('Image URL: $imageUrl');
+
       // If there's a new image, upload it
       if (_selectedImage != null &&
           _selectedImage!.path != widget.item?.foodImage) {
