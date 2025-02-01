@@ -232,30 +232,66 @@ class Menuprovider {
 
   Future<void> storeFoodItemInGlobalMenu(FoodItem item) async {
     try {
-      await globalMenuCollection.doc("allitems").update({
-        'foodItems': FieldValue.arrayUnion([item.toJson()]),
-      });
-    } catch (e) {
-      if (e is FirebaseException && e.code == 'not-found') {
-        // If the document doesn't exist, create it with an array containing the first item
-        await globalMenuCollection.doc("allitems").set({
-          'foodItems': [item.toJson()],
+      DocumentSnapshot doc = await globalMenuCollection.doc("allitems").get();
+
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        // Convert the item to JSON and store it with foodId as the key
+        await globalMenuCollection.doc("allitems").update({
+          item.foodId.toString(): item.toJson(),
         });
       } else {
-        debugPrint('Error storing item in global menu: $e');
+        // If the document doesn't exist, create it with the first item
+        await globalMenuCollection.doc("allitems").set({
+          item.foodId.toString(): item.toJson(),
+        });
       }
+    } catch (e) {
+      debugPrint('Error storing/updating item in global menu: $e');
+      throw e;
     }
   }
 
-  Future<List<FoodItem>> getAllItemsFromGlobalMenu() async {
+  Future<void> syncMenuWithGlobalMenu() async {
     try {
-      DocumentSnapshot snapshot =
-          await globalMenuCollection.doc("allitems").get();
-      return (snapshot.data() as Map<String, dynamic>)['foodItems']
-          .map<FoodItem>((item) => FoodItem.fromJson(item))
-          .toList();
+      List<FoodCategory> categories = await getAllCategories();
+      for (var category in categories) {
+        List<FoodItem> items = await getAllItems(category);
+        for (var item in items) {
+          await storeFoodItemInGlobalMenu(item);
+        }
+      }
     } catch (e) {
-      return [];
+      debugPrint('Error syncing menu with global menu: $e');
+      throw e;
+    }
+  }
+
+  // Get all food items
+  Future<List<FoodItem>> getAllFoodItemsFromGlobalMenu() async {
+    try {
+      DocumentSnapshot doc = await globalMenuCollection.doc("allitems").get();
+
+      if (!doc.exists) {
+        return [];
+      }
+
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      List<FoodItem> items = [];
+
+      data.forEach((key, value) {
+        try {
+          items.add(FoodItem.fromJson(value as Map<String, dynamic>));
+        } catch (e) {
+          debugPrint('Error parsing food item with ID $key: $e');
+          // Continue processing other items even if one fails
+        }
+      });
+
+      return items;
+    } catch (e) {
+      debugPrint('Error retrieving all food items from global menu: $e');
+      throw e;
     }
   }
 }

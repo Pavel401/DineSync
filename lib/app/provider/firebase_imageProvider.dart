@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,9 +11,12 @@ class FirebaseImageprovider {
       String categoryId, File? _selectedImage, BuildContext context) async {
     if (_selectedImage == null) return null;
 
+    Random random = Random();
+    String imageId = random.nextInt(100000).toString();
+
     try {
       final storageRef =
-          FirebaseStorage.instance.ref().child('categories/$categoryId.jpg');
+          FirebaseStorage.instance.ref().child('categories/$imageId.jpg');
       final uploadTask = await storageRef.putFile(_selectedImage!);
       EasyLoading.dismiss();
       return await uploadTask.ref.getDownloadURL();
