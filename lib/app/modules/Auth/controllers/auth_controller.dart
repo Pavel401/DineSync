@@ -320,7 +320,7 @@ class AuthController extends GetxController {
 
       QuerySnapshot snapshot = await _firestore
           .collection('users')
-          .where('userType', isEqualTo: userTypeString)
+          .where('userType', isEqualTo: "UserType.CHEF")
           .get();
 
       users = snapshot.docs
