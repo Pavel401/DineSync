@@ -60,7 +60,7 @@ class FcmNotificationProvider {
 
       // Send the POST request to the notification service
       final response = await http.post(
-        Uri.parse(BASE_URL),
+        Uri.parse("https://dine-sync-api-production.up.railway.app/send"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
