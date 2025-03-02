@@ -79,20 +79,22 @@ class UserModel extends Equatable {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      uid: json['uid'] as String,
-      email: json['email'] as String,
-      name: json['name'] as String,
-      photoUrl: json['photoUrl'] as String,
-      phone: json['phone'] as String,
-      address: json['address'] as String,
+      uid: json['uid'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      photoUrl: json['photoUrl'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      address: json['address'] as String? ?? '',
       userType: UserType.values.firstWhere(
           (e) => e.toString() == json['userType'],
           orElse: () => UserType.NONE), // Handle default UserType
-      password: json['password'] as String,
-      blocked: json['blocked'] as bool,
-      joinedOn: DateTime.parse(json['joinedOn'] as String),
-      lastLogin: DateTime.parse(json['lastLogin'] as String),
-      fcmToken: json['fcmToken'] as String,
+      password: json['password'] as String? ?? '',
+      blocked: json['blocked'] as bool? ?? false,
+      joinedOn: DateTime.parse(
+          json['joinedOn'] as String? ?? DateTime.now().toIso8601String()),
+      lastLogin: DateTime.parse(
+          json['lastLogin'] as String? ?? DateTime.now().toIso8601String()),
+      fcmToken: json['fcmToken'] as String? ?? '',
     );
   }
 
