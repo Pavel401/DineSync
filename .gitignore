@@ -47,3 +47,5 @@ firebase.json
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 android/build/ios/XCBuildData/PIFCache/target/TARGET@v11_hash=ea838d8e663890f6025c22ae5c49e138-json
+# android/
+# android/app/

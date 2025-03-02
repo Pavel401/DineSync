@@ -1,0 +1,2 @@
+/Users/mabud/Desktop/WorkSpace/cho_nun_btk/android/app/.cxx/RelWithDebInfo/5b4p2c4q/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/mabud/Desktop/WorkSpace/cho_nun_btk/android/app/.cxx/RelWithDebInfo/5b4p2c4q/arm64-v8a/CMakeFiles/rebuild_cache.dir

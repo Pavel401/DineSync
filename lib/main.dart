@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cho_nun_btk/app/components/no_internet_widget.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
@@ -22,7 +23,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_no_internet_widget/flutter_no_internet_widget.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -144,19 +147,42 @@ class _MyAppState extends State<MyApp> {
 
     return Sizer(builder: (context, orientation, deviceType) {
       setEasyLoading(themeProvider.isDarkMode);
-      return GetMaterialApp(
-          defaultTransition: Transition.rightToLeftWithFade,
-          transitionDuration: const Duration(milliseconds: 300),
-          debugShowCheckedModeBanner: true,
-          theme: themeProvider.lightTheme,
-          navigatorObservers: <NavigatorObserver>[
-            AnalyticsService().getAnalyticsObserver()
-          ],
-          darkTheme: themeProvider.darkTheme,
-          themeMode:
-              themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: SplashScreen(),
-          builder: EasyLoading.init());
+      return InternetWidget(
+        offline: FullScreenWidget(
+          child: CustomNoInternetWidget(
+            color: AppColors.primaryDark,
+            imageWidget: Lottie.asset('assets/nointernet.json'),
+            textWidget: Text(
+              "Connect to Internet Service",
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        // ignore: avoid_print
+        whenOffline: () => print('No Internet'),
+        // ignore: avoid_print
+        whenOnline: () => print('Connected to internet'),
+        loadingWidget: CustomNoInternetWidget(
+          color: AppColors.primaryDark,
+          imageWidget: Lottie.asset('assets/wallpaper.json'),
+          textWidget: Text(
+            "Wallpapers are loading",
+            textAlign: TextAlign.center,
+          ),
+        ),
+        online: GetMaterialApp(
+            defaultTransition: Transition.rightToLeftWithFade,
+            transitionDuration: const Duration(milliseconds: 300),
+            debugShowCheckedModeBanner: true,
+            theme: themeProvider.lightTheme,
+            navigatorObservers: <NavigatorObserver>[
+              AnalyticsService().getAnalyticsObserver()
+            ],
+            darkTheme: themeProvider.darkTheme,
+            themeMode: ThemeMode.light,
+            home: SplashScreen(),
+            builder: EasyLoading.init()),
+      );
     });
   }
 }
