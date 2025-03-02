@@ -253,15 +253,21 @@ class _OrderViewState extends State<OrderView> {
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              Text(
-                                                "#" +
-                                                    parseOrderId(order.orderId)[
-                                                            'counter']
-                                                        .toString(),
-                                                style: context
-                                                    .textTheme.bodyLarge!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.bold,
+                                              Expanded(
+                                                child: Text(
+                                                  "#" +
+                                                      parseOrderId(order
+                                                                  .orderId)[
+                                                              'counter']
+                                                          .toString(),
+                                                  style: context
+                                                      .textTheme.bodyLarge!
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  softWrap: false,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                               Spacer(),
@@ -280,14 +286,20 @@ class _OrderViewState extends State<OrderView> {
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              Text(
-                                                order.customerData
-                                                        .customerName ??
-                                                    "",
-                                                style: context
-                                                    .textTheme.bodyLarge!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.bold,
+                                              Expanded(
+                                                child: Text(
+                                                  order.customerData
+                                                          .customerName ??
+                                                      "",
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  softWrap: false,
+                                                  style: context
+                                                      .textTheme.bodyLarge!
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -323,6 +335,8 @@ class _OrderViewState extends State<OrderView> {
                                                 .copyWith(
                                               fontWeight: FontWeight.bold,
                                             ),
+                                            // overflow: TextOverflow.ellipsis,
+                                            softWrap: false,
                                           ),
                                           Spacer(),
                                           Text(

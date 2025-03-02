@@ -6,6 +6,7 @@ import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
 import 'package:cho_nun_btk/app/modules/Common/invoice_printer.dart';
+import 'package:cho_nun_btk/app/modules/Common/order_printer.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:cho_nun_btk/app/utils/date_utils.dart';
@@ -58,6 +59,16 @@ class _ChefFlowState extends State<ChefFlow> {
             onPressed: () {
               Get.to(
                 () => InvoicePrinter(
+                  order: order,
+                ),
+              );
+            },
+            icon: Icon(Icons.print),
+          ),
+          IconButton(
+            onPressed: () {
+              Get.to(
+                () => OldPrinter(
                   order: order,
                 ),
               );

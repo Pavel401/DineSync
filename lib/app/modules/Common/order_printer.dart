@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
@@ -9,16 +10,17 @@ import 'package:image/image.dart' as img;
 import 'package:print_bluetooth_thermal/post_code.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal_windows.dart';
+import 'package:sizer/sizer.dart';
 
-class InvoicePrinter extends StatefulWidget {
+class OldPrinter extends StatefulWidget {
   final FoodOrder order;
 
-  InvoicePrinter({required this.order});
+  OldPrinter({required this.order});
   @override
-  _InvoicePrinterState createState() => _InvoicePrinterState();
+  _OldPrinterState createState() => _OldPrinterState();
 }
 
-class _InvoicePrinterState extends State<InvoicePrinter> {
+class _OldPrinterState extends State<OldPrinter> {
   String _info = "";
   String _msj = '';
   bool connected = false;
@@ -31,7 +33,7 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
   ];
 
   String _selectSize = "2";
-  final _txtText = TextEditingController(text: "Hello developer");
+  final _txtText = TextEditingController(text: "");
   bool _progress = false;
   String _msjprogress = "";
 
@@ -41,7 +43,53 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
   @override
   void initState() {
     super.initState();
+    _txtText.text = getOrderData();
     initPlatformState();
+  }
+
+  String getOrderData() {
+    String orderData = "";
+    orderData += "Order: # ${parseOrderId(widget.order.orderId)["counter"]}\n";
+    orderData += "Customer Name: ${widget.order.customerData.customerName}\n";
+    orderData += widget.order.tableData != null
+        ? "Table No: ${widget.order.tableData?.tableName}\n"
+        : "";
+    orderData +=
+        "Order Type: ${widget.order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away"}\n";
+    orderData += "Items:\n";
+    orderData += widget.order.orderItems.entries
+        .map((entry) => "${entry.key.foodName} x${entry.value}\n")
+        .join();
+
+    print(orderData);
+    return orderData;
+  }
+
+  Widget orderWidget() {
+    return Container(
+      width: 100.w,
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Order: # ${parseOrderId(widget.order.orderId)["counter"]}",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          Text("Customer Name: ${widget.order.customerData.customerName}"),
+          widget.order.tableData != null
+              ? Text("Table No: ${widget.order.tableData?.tableName}")
+              : SizedBox(),
+          Text(
+              "Order Type: ${widget.order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away"}"),
+          Text("Items:"),
+          ...widget.order.orderItems.entries
+              .map((entry) => Text("${entry.key.foodName} x${entry.value}")),
+        ],
+      ),
+    );
   }
 
   @override
@@ -50,6 +98,12 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Plugin example app'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           actions: [
             PopupMenuButton(
               elevation: 3.2,
@@ -193,6 +247,7 @@ class _InvoicePrinterState extends State<InvoicePrinter> {
                         Expanded(
                           child: TextField(
                             controller: _txtText,
+                            maxLines: 10,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Text",

@@ -13,6 +13,7 @@ import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
 import 'package:cho_nun_btk/app/provider/table_provider.dart';
 import 'package:cho_nun_btk/app/services/analytics.dart';
+import 'package:cho_nun_btk/app/services/fcm_notification.dart';
 import 'package:cho_nun_btk/app/services/registry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -55,6 +56,8 @@ class _CheckoutViewState extends State<CheckoutView> {
     // TODO: implement initState
     super.initState();
     foodOrderProvider = serviceLocator<FoodOrderProvider>();
+    FcmNotificationProvider fcmNotificationProvider =
+        serviceLocator<FcmNotificationProvider>();
   }
 
   @override
@@ -623,87 +626,110 @@ class _CheckoutViewState extends State<CheckoutView> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      if (formKey.currentState!.validate()) {
-                        EasyLoading.show(status: 'Placing Order...');
-                        String orderId =
-                            await foodOrderProvider.getNewFoodOrderId();
-                        CustomerData customerData = CustomerData(
-                          customerName: customerNameController.text,
-                          customerPhoneNumber:
-                              customerPhoneNumberController.text,
-                          customerGender: selectedGender,
-                        );
+                      // Validate the form
+                      if (formKey.currentState?.validate() ?? false) {
+                        try {
+                          EasyLoading.show(status: 'Placing Order...');
 
-                        DiscountData discountData = DiscountData(
-                          isDiscountApplied: isDiscountApplied,
-                          discountName: discountNameController.text,
-                          discountCode: discountCodeController.text,
-                          discountAmount: double.tryParse(
-                            discountAmountController.text,
-                          ),
-                        );
+                          // Get a new order ID
+                          String orderId =
+                              await foodOrderProvider.getNewFoodOrderId();
 
-                        if (selectedTable != null) {
-                          TableProvider tableProvider = TableProvider();
+                          // Prepare customer data
+                          CustomerData customerData = CustomerData(
+                            customerName: customerNameController.text,
+                            customerPhoneNumber:
+                                customerPhoneNumberController.text,
+                            customerGender: selectedGender,
+                          );
 
-                          tableProvider.saveTable(selectedTable!);
-                        }
+                          // Prepare discount data
+                          DiscountData discountData = DiscountData(
+                            isDiscountApplied: isDiscountApplied,
+                            discountName: discountNameController.text,
+                            discountCode: discountCodeController.text,
+                            discountAmount: double.tryParse(
+                                    discountAmountController.text) ??
+                                0.0,
+                          );
 
-                        FoodOrder foodOrder = FoodOrder(
-                          orderStatus: FoodOrderStatus.PENDING,
-                          orderItems: controller.orderItems,
-                          orderId: orderId,
-                          customerData: customerData,
-                          specialInstructions:
-                              specialInstructionsController.text,
-                          orderTime: DateTime.now(),
-                          waiterData: WaiterData(
-                            waiterId: authController.userModel!.uid ?? "",
-                            waiterImage:
-                                authController.userModel!.photoUrl ?? "",
-                            waiterName: authController.userModel!.name ?? "",
-                          ),
-                          totalAmount: 0,
-                          queuePosition: 0,
-                          discountData: discountData,
-                          orderType: orderType,
-                          tableData: selectedTable,
-                        );
+                          // Save selected table if any
+                          if (selectedTable != null) {
+                            TableProvider tableProvider = TableProvider();
+                            await tableProvider.saveTable(selectedTable!);
+                          }
 
-                        QueryStatus status =
-                            await foodOrderProvider.createOrder(foodOrder);
+                          // Create a new food order
+                          FoodOrder foodOrder = FoodOrder(
+                            orderStatus: FoodOrderStatus.PENDING,
+                            orderItems: controller.orderItems,
+                            orderId: orderId,
+                            customerData: customerData,
+                            specialInstructions:
+                                specialInstructionsController.text,
+                            orderTime: DateTime.now(),
+                            waiterData: WaiterData(
+                              waiterId: authController.userModel?.uid ?? "",
+                              waiterImage:
+                                  authController.userModel?.photoUrl ?? "",
+                              waiterName: authController.userModel?.name ?? "",
+                            ),
+                            totalAmount: 0,
+                            queuePosition: 0,
+                            discountData: discountData,
+                            orderType: orderType,
+                            tableData: selectedTable,
+                          );
 
-                        AnalyticsProvider analyticsProvider =
-                            serviceLocator<AnalyticsProvider>();
+                          // Create the order
+                          QueryStatus status =
+                              await foodOrderProvider.createOrder(foodOrder);
 
-                        QueryStatus astatus =
-                            await analyticsProvider.recordAnalytics(foodOrder);
+                          // Record analytics
+                          AnalyticsProvider analyticsProvider =
+                              serviceLocator<AnalyticsProvider>();
+                          await analyticsProvider.recordAnalytics(foodOrder);
 
-                        if (status == QueryStatus.SUCCESS) {
-                          AnalyticsService _analyticsService =
-                              AnalyticsService();
-                          try {
+                          if (status == QueryStatus.SUCCESS) {
+                            // Log analytics event
+                            AnalyticsService _analyticsService =
+                                AnalyticsService();
                             await _analyticsService.logEvent(
                               eventName: 'add_achievement',
                               parameters: <String, Object>{
                                 Analytics.TAP_SKILL_CARD: 'created_new_order',
                               },
                             );
-                          } catch (error) {
-                            print('Error in logging event: $error');
+
+                            // Send notification to kitchen
+                            FcmNotificationProvider fcmNotificationProvider =
+                                serviceLocator<FcmNotificationProvider>();
+                            await fcmNotificationProvider
+                                .sendOrderNotificationToKitchen(foodOrder);
+
+                            // Show success message
+                            EasyLoading.dismiss();
+                            Get.until((route) => route.isFirst);
+                            CustomSnackBar.showSuccess(
+                              'Success',
+                              'Order has been placed successfully',
+                              context,
+                            );
+                          } else {
+                            // Show error message
+                            EasyLoading.dismiss();
+                            CustomSnackBar.showError(
+                              'Error',
+                              'Failed to place order',
+                              context,
+                            );
                           }
-                          EasyLoading.dismiss();
-                          Get.until((route) => route.isFirst);
-                          CustomSnackBar.showSuccess(
-                            'Success',
-                            'Order has been placed successfully',
-                            context,
-                          );
-                        } else {
+                        } catch (error) {
+                          // Handle any unexpected errors
                           EasyLoading.dismiss();
                           CustomSnackBar.showError(
                             'Error',
-                            'Failed to place order',
+                            'An unexpected error occurred: $error',
                             context,
                           );
                         }

@@ -1,7 +1,11 @@
 import 'package:cho_nun_btk/app/components/snackBars.dart';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Analytics/controller/admin_analytics_controller.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Home/controller/home_controller.dart';
+import 'package:cho_nun_btk/app/modules/Admin%20App/Menu/controllers/menu_controller.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Order%20Overview/controller/order_controller.dart';
 import 'package:cho_nun_btk/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -265,6 +269,10 @@ class AuthController extends GetxController {
       phoneController.clear();
 
       Get.delete<HomeController>();
+      Get.delete<AdminAnalyticsController>();
+      Get.delete<FoodMenuController>();
+      Get.delete<OrderController>();
+      Get.delete<WaiterOrderController>();
 
       selectedUserType = UserType.NONE;
 
@@ -301,5 +309,28 @@ class AuthController extends GetxController {
         context,
       );
     }
+  }
+
+  Future<List<UserModel>> getAllUsersByUserType(UserType type) async {
+    List<UserModel> users = [];
+    try {
+      // Convert the enum to its string representation
+      String userTypeString = type.toString();
+      debugPrint('Querying Firestore for user type: $userTypeString');
+
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .where('userType', isEqualTo: userTypeString)
+          .get();
+
+      users = snapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      debugPrint('Retrieved users: ${users.length}');
+    } catch (e) {
+      debugPrint("Error loading users: $e");
+    }
+    return users;
   }
 }

@@ -44,8 +44,8 @@ void main() async {
   authController.loadUserModel();
 
   final fcmToken = await FirebaseMessaging.instance.getToken();
-
   debugPrint('FirebaseMessaging: Token $fcmToken');
+
   await FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     debugPrint('FirebaseMessaging: Token refreshed');
     debugPrint('FirebaseMessaging: New Token: $newToken');
@@ -55,34 +55,17 @@ void main() async {
     }
   });
 
-  await FirebaseMessaging.onMessage
-      .listen(handleBackgroundMessageWhenAppIsOpen);
+  FirebaseMessaging.onMessage.listen(handleBackgroundMessageWhenAppIsOpen);
 
-  // When user taps on the notification
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     LocalNotificationService().handleNotificationClick(message.data);
   });
 
-  // Check if the app was opened by tapping a notification while terminated
-  // This is only for notifcations from Firebase Cloud Messaging
-  // Notifications from Local Notification Service will not be handled here (need to test)
   RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
-    LocalNotificationService().handleNotificationClick(initialMessage
-        .data); // Handle notification click when app was terminated
+    LocalNotificationService().handleNotificationClick(initialMessage.data);
   }
-
-  debugPrint("Received the initial message: $initialMessage");
-
-  await FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    debugPrint('FirebaseMessaging: Token refreshed');
-    debugPrint('FirebaseMessaging: New Token: $newToken');
-    if (FirebaseAuth.instance.currentUser != null) {
-      FirebaseHelper()
-          .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, newToken);
-    }
-  });
 
   initializeCrashAnalytics();
 
@@ -95,22 +78,21 @@ void main() async {
 }
 
 Future<void> getAndSaveFCMToken() async {
-  String? FCMToken = await FirebaseMessaging.instance.getToken();
+  String? fcmToken = await FirebaseMessaging.instance.getToken();
 
   AuthController authController = Get.find<AuthController>();
   String savedFCMToken = authController.userModel?.fcmToken ?? '';
-  if (FCMToken != null && FCMToken != savedFCMToken) {
+  if (fcmToken != null && fcmToken != savedFCMToken) {
     debugPrint('FirebaseMessaging: FCM Tokens are different');
-    debugPrint('FirebaseMessaging: New Token: $FCMToken');
+    debugPrint('FirebaseMessaging: New Token: $fcmToken');
     FirebaseHelper()
-        .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, FCMToken);
+        .saveFCMToken(FirebaseAuth.instance.currentUser!.uid, fcmToken);
   } else {
     debugPrint('FirebaseMessaging: FCM Tokens are same');
-    debugPrint('FirebaseMessaging: Token: $FCMToken');
+    debugPrint('FirebaseMessaging: Token: $fcmToken');
   }
 }
 
-// Define an async function to initialize FlutterFire
 void initializeCrashAnalytics() async {
   try {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -124,7 +106,6 @@ void initializeCrashAnalytics() async {
       return true;
     };
   } catch (e) {
-    // Set `_error` state to true if Firebase initialization fails
     debugPrint('Error: $e');
   }
 }
@@ -174,7 +155,7 @@ class _MyAppState extends State<MyApp> {
           darkTheme: themeProvider.darkTheme,
           themeMode:
               themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: SplashScreen(), // Set SplashScreen as the initial view
+          home: SplashScreen(),
           builder: EasyLoading.init());
     });
   }
@@ -190,51 +171,26 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    bool isLoggedIn = false;
-
-    isLoggedIn = FirebaseAuth.instance.currentUser != null;
+    super.initState();
     requestPermissions();
     if (FirebaseAuth.instance.currentUser != null) {
       getAndSaveFCMToken();
-    } else {}
-    super.initState();
+    }
   }
 
-  // void requestNotificationPermission() async {
-  //   NotificationSettings notificationPermission =
-  //       await FirebaseMessaging.instance.getNotificationSettings();
-  //   if (notificationPermission.authorizationStatus !=
-  //       AuthorizationStatus.authorized) {
-  //     debugPrint('FirebaseMessaging: Requesting permission');
-  //     await FirebaseMessaging.instance.requestPermission(
-  //       alert: true,
-  //       badge: true,
-  //       sound: true,
-  //       announcement: false,
-  //       carPlay: false,
-  //       criticalAlert: false,
-  //       provisional: false,
-  //     );
-  //   }
-  // }
-
   Future<void> requestPermissions() async {
-    // 1. Request Bluetooth permissions first
     Map<Permission, PermissionStatus> bluetoothStatuses = await [
       Permission.bluetooth,
-      Permission.bluetoothScan, // Required for Android 12+
-      Permission.bluetoothConnect, // Required for Android 12+
-      Permission.bluetoothAdvertise // Required for Android 12+
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.bluetoothAdvertise
     ].request();
 
     debugPrint('Bluetooth Permission Status: $bluetoothStatuses');
 
-    // 2. Request Location permissions (often required for BLE)
     PermissionStatus locationStatus = await Permission.location.request();
     debugPrint('Location Permission Status: $locationStatus');
 
-    // 3. Request Firebase Messaging permissions
     NotificationSettings notificationSettings =
         await FirebaseMessaging.instance.requestPermission(
       alert: true,
@@ -262,7 +218,6 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           );
         } else if (snapshot.hasError) {
-          // Handle error state
           return Scaffold(
             body: Center(
               child: Text('Error: ${snapshot.error}'),

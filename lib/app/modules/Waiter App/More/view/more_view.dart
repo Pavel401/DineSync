@@ -1,9 +1,15 @@
 import 'package:cho_nun_btk/app/components/custom_buttons.dart';
 import 'package:cho_nun_btk/app/components/settings_tile.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
+import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/constants/theme.dart';
+import 'package:cho_nun_btk/app/models/menu/menu.dart';
+import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/Profile/view/profile_view.dart';
+import 'package:cho_nun_btk/app/services/fcm_notification.dart';
+import 'package:cho_nun_btk/app/services/registry.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -112,6 +118,75 @@ class _WaiterMoreViewState extends State<WaiterMoreView> {
                 }
               },
             ),
+            SizedBox(height: 2.h),
+            kDebugMode
+                ? CafeMoreTileWidget(
+                    icon: Icons.logout_outlined,
+                    title: 'Test Order Notification',
+                    subtitle: 'Send a test order notification',
+                    onTap: () async {
+                      try {
+                        FcmNotificationProvider fcmNotificationProvider =
+                            serviceLocator<FcmNotificationProvider>();
+
+                        // Create a test FoodOrder object
+                        FoodOrder order = FoodOrder(
+                          waiterData: WaiterData(
+                            waiterId: 'test_waiter_id',
+                            waiterName: 'Test Waiter',
+                          ),
+                          orderId: 'test_order_id',
+                          orderTime: DateTime.now(),
+                          customerData:
+                              CustomerData(customerName: 'Test Customer'),
+                          orderItems: {
+                            FoodItem(
+                              foodId: 'test_food_id',
+                              foodDescription: "Test Description",
+                              foodCategory: FoodCategory(
+                                categoryId: 'test_category_id',
+                                categoryName: 'Test Category',
+                                categoryImage:
+                                    'https://firebasestorage.googleapis.com/v0/b/cho-nun-bar-to-kitchen.firebasestorage.app/o/categories%2F0r9HzwviHybzswNHDUUv.jpg?alt=media&token=3348afc1-6d9a-421b-993a-076443e6287a',
+                              ),
+                              foodName: 'Test Food',
+                              foodPrice: 100,
+                              foodImage:
+                                  'https://firebasestorage.googleapis.com/v0/b/cho-nun-bar-to-kitchen.firebasestorage.app/o/categories%2F0r9HzwviHybzswNHDUUv.jpg?alt=media&token=3348afc1-6d9a-421b-993a-076443e6287a',
+                            ): 1,
+                          },
+                          orderStatus: FoodOrderStatus.PENDING,
+                          orderType: OrderType.DINE_IN,
+                          totalAmount: 100,
+                        );
+
+                        // Send the test order notification
+                        QueryStatus status = await fcmNotificationProvider
+                            .sendOrderNotificationToKitchen(order);
+
+                        // Show feedback based on the result
+                        if (status == QueryStatus.SUCCESS) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Test notification sent successfully!')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Failed to send test notification.')),
+                          );
+                        }
+                      } catch (error) {
+                        // Handle any unexpected errors
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $error')),
+                        );
+                      }
+                    },
+                  )
+                : SizedBox(),
           ],
         ),
       ),
