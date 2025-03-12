@@ -22,6 +22,7 @@ class _OrderViewState extends State<OrderView> {
   late DateTime selectedDate;
   final ordersCollection = FirebaseFirestore.instance.collection('orders');
   FoodOrderStatus? selectedStatus;
+  bool isLoading = false; // State variable to track loading
 
   @override
   void initState() {
@@ -80,6 +81,18 @@ class _OrderViewState extends State<OrderView> {
     });
   }
 
+  // Method to reload orders
+  void _reloadOrders() async {
+    setState(() {
+      isLoading = true;
+    });
+    // Simulate a delay for reloading data
+    await Future.delayed(Duration(seconds: 2));
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +127,17 @@ class _OrderViewState extends State<OrderView> {
                 ],
               ),
             ),
+          ),
+          IconButton(
+            icon: isLoading
+                ? CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primaryDark,
+                    ),
+                  )
+                : Icon(Icons.refresh),
+            tooltip: 'Reload Orders',
+            onPressed: _reloadOrders,
           ),
         ],
       ),
