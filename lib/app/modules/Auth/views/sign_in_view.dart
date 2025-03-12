@@ -58,7 +58,6 @@ class _SignInViewState extends State<SignInView> {
                 child: Column(
                   children: [
                     SizedBox(height: isLargeScreen ? 8.h : 5.h),
-
                     Center(
                       child: SvgPicture.asset(
                         authController.selectedUserType == UserType.CHEF
@@ -70,9 +69,7 @@ class _SignInViewState extends State<SignInView> {
                         height: isLargeScreen ? 15.h : 20.h,
                       ),
                     ),
-
                     SizedBox(height: isLargeScreen ? 8.h : 5.h),
-
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
@@ -94,9 +91,6 @@ class _SignInViewState extends State<SignInView> {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 4.h : 2.h),
-
-                    // Email Field
-
                     TextFormField(
                       controller: authController.emailController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -109,10 +103,7 @@ class _SignInViewState extends State<SignInView> {
                         border: const OutlineInputBorder(),
                       ),
                     ),
-
                     SizedBox(height: isLargeScreen ? 3.h : 2.h),
-
-                    // Password Field
                     TextFormField(
                       controller: authController.passwordController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -139,8 +130,6 @@ class _SignInViewState extends State<SignInView> {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 4.h : 3.h),
-
-                    // Login Button
                     Row(
                       mainAxisAlignment: widget.userType == UserType.ADMIN
                           ? MainAxisAlignment.center
@@ -290,7 +279,58 @@ class _SignInViewState extends State<SignInView> {
                               ),
                       ],
                     ),
-                    SizedBox(height: isLargeScreen ? 3.h : 2.h),
+                    SizedBox(height: isLargeScreen ? 5.h : 3.h),
+                    widget.userType == UserType.ADMIN
+                        ? SizedBox()
+                        : GestureDetector(
+                            onTap: () async {
+                              QueryStatus status =
+                                  await authController.signInWithGoogle();
+                              if (status == QueryStatus.SUCCESS) {
+                                Widget view = Container();
+                                debugPrint('User Signed In with Google');
+
+                                await authController.loadUserModel();
+
+                                if (authController.firebaseUser != null &&
+                                    authController.userModel != null) {
+                                  if (authController.userModel!.userType ==
+                                      UserType.ADMIN) {
+                                    view = AdminHomeView();
+                                  } else if (authController
+                                          .userModel!.userType ==
+                                      UserType.CHEF) {
+                                    view = ChefHomeView();
+                                  } else if (authController
+                                          .userModel!.userType ==
+                                      UserType.WAITER) {
+                                    view = WaiterHomeView();
+                                  }
+                                }
+
+                                Get.offAll(view);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Google Sign-In failed'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/svg/google.svg', // Add the Google logo SVG to your assets
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                SizedBox(width: 8),
+                                Text("Sign In with Google"),
+                              ],
+                            ),
+                          ),
                   ],
                 ),
               ),
