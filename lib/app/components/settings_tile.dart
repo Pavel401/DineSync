@@ -1,9 +1,7 @@
 import 'package:cho_nun_btk/app/constants/colors.dart';
-import 'package:cho_nun_btk/app/constants/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class CafeMoreTileWidget extends StatelessWidget {
@@ -12,6 +10,7 @@ class CafeMoreTileWidget extends StatelessWidget {
   final String subtitle;
   final Function()? onTap;
   final bool showRightArrow;
+
   const CafeMoreTileWidget({
     super.key,
     required this.icon,
@@ -23,15 +22,12 @@ class CafeMoreTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
     return Bounceable(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
-          color: themeProvider.isDarkMode
-              ? AppColors.searchBarDark
-              : AppColors.searchBarLight,
+          color: AppColors.searchBarLight, // Always use light mode color
         ),
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
         child: Row(
@@ -45,15 +41,13 @@ class CafeMoreTileWidget extends StatelessWidget {
                     padding: EdgeInsets.all(2.w),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: themeProvider.isDarkMode
-                          ? AppColors.tertiaryDark
-                          : AppColors.tertiaryLight,
+                      color: AppColors
+                          .tertiaryLight, // Always use light mode color
                     ),
                     child: Icon(
                       icon,
-                      color: themeProvider.isDarkMode
-                          ? AppColors.primaryDark
-                          : AppColors.primaryLight,
+                      color:
+                          AppColors.primaryLight, // Always use light mode color
                     ),
                   ),
                   SizedBox(width: 4.w),
@@ -76,9 +70,7 @@ class CafeMoreTileWidget extends StatelessWidget {
             if (showRightArrow)
               Icon(
                 Icons.chevron_right_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.primaryDark
-                    : AppColors.primaryLight,
+                color: AppColors.primaryLight, // Always use light mode color
               ),
           ],
         ),
