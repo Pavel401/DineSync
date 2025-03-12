@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -48,7 +49,7 @@ class AuthController extends GetxController {
   }
 
   Future<UserType> checkUserType() async {
-    if (_auth.currentUser != null) {
+    if (_auth.currentUser != null && _userModel.value == null) {
       try {
         DocumentSnapshot snapshot = await _firestore
             .collection('users')
@@ -59,7 +60,6 @@ class AuthController extends GetxController {
               UserModel.fromJson(snapshot.data() as Map<String, dynamic>);
           return _userModel.value!.userType;
         }
-        debugPrint("User model loaded: ${_userModel.value}");
       } catch (e) {
         debugPrint("Error loading user model: $e");
       }
@@ -79,7 +79,6 @@ class AuthController extends GetxController {
           _userModel.value =
               UserModel.fromJson(snapshot.data() as Map<String, dynamic>);
         }
-        debugPrint("User model loaded: ${_userModel.value}");
       } catch (e) {
         debugPrint("Error loading user model: $e");
       }
@@ -90,22 +89,21 @@ class AuthController extends GetxController {
   Future<void> saveUserToFirestore(UserModel user) async {
     try {
       await _firestore.collection('users').doc(user.uid).set(user.toJson());
-      _userModel.value = user; // Update the cached user model
+      _userModel.value = user;
     } catch (e) {
       debugPrint("Error saving user to Firestore: $e");
     }
   }
 
-  Future<void> updatePassword(String new_password, UserModel model) async {
-    debugPrint("Updating password...");
-    UserModel updatedModel = model.copyWith(password: new_password);
+  Future<void> updatePassword(String newPassword, UserModel model) async {
     try {
+      await firebaseUser?.updatePassword(newPassword);
+      UserModel updatedModel = model.copyWith(password: newPassword);
       await _firestore
           .collection('users')
           .doc(updatedModel.uid)
           .update(updatedModel.toJson());
-      _userModel.value = model; // Update the cached user model
-
+      _userModel.value = updatedModel;
       signOut();
     } catch (e) {
       debugPrint("Error updating password: $e");
@@ -199,59 +197,39 @@ class AuthController extends GetxController {
   Future<QueryStatus> signIn(
       String email, String password, BuildContext context) async {
     try {
+      debugPrint("Attempting to sign in with email: $email");
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      debugPrint("Sign-in successful, loading user model...");
       await loadUserModel(); // Load the user model after login
-      // CustomSnackBar.showSuccess(
-      //   "Success",
-      //   "Logged in successfully!",
-      //   context,
-      // );
-
       return QueryStatus.SUCCESS;
     } on FirebaseAuthException catch (e) {
+      debugPrint("FirebaseAuthException: ${e.code} - ${e.message}");
       switch (e.code) {
         case 'user-not-found':
           CustomSnackBar.showError(
-            "Error",
-            "No user found with this email.",
-            context,
-          );
+              "Error", "No user found with this email.", context);
           break;
         case 'wrong-password':
           CustomSnackBar.showError(
-            "Error",
-            "Incorrect password. Please try again.",
-            context,
-          );
+              "Error", "Incorrect password. Please try again.", context);
           break;
         case 'invalid-email':
           CustomSnackBar.showError(
-            "Error",
-            "The email address is not valid.",
-            context,
-          );
+              "Error", "The email address is not valid.", context);
           break;
         case 'user-disabled':
           CustomSnackBar.showError(
-            "Error",
-            "This account has been disabled.",
-            context,
-          );
+              "Error", "This account has been disabled.", context);
           break;
         default:
           CustomSnackBar.showError(
-            "Error",
-            e.message ?? "An unknown error occurred.",
-            context,
-          );
+              "Error", e.message ?? "An unknown error occurred.", context);
       }
       return QueryStatus.ERROR;
     } catch (e) {
+      debugPrint("Unexpected error: $e");
       CustomSnackBar.showError(
-        "Error",
-        "An unexpected error occurred: $e",
-        context,
-      );
+          "Error", "An unexpected error occurred: $e", context);
       return QueryStatus.ERROR;
     }
   }
@@ -314,23 +292,67 @@ class AuthController extends GetxController {
   Future<List<UserModel>> getAllUsersByUserType(UserType type) async {
     List<UserModel> users = [];
     try {
-      // Convert the enum to its string representation
-      String userTypeString = type.toString();
-      debugPrint('Querying Firestore for user type: $userTypeString');
-
       QuerySnapshot snapshot = await _firestore
           .collection('users')
-          .where('userType', isEqualTo: "UserType.CHEF")
+          .where('userType', isEqualTo: type.toString())
           .get();
 
       users = snapshot.docs
           .map((doc) => UserModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
-
-      debugPrint('Retrieved users: ${users.length}');
     } catch (e) {
       debugPrint("Error loading users: $e");
     }
     return users;
+  }
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  Future<QueryStatus> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        // The user canceled the sign-in flow
+        return QueryStatus.ERROR;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in with the credential
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      // Create or update the user in Firestore
+      UserModel newUser = UserModel(
+        uid: userCredential.user!.uid,
+        email: userCredential.user!.email ?? '',
+        name: userCredential.user!.displayName ?? '',
+        photoUrl: userCredential.user!.photoURL ?? '',
+        phone: '',
+        address: '',
+        userType: selectedUserType,
+        blocked: false,
+        joinedOn: DateTime.now(),
+        lastLogin: DateTime.now(),
+        password: '', // Not applicable for Google Sign-In
+        fcmToken: '',
+      );
+
+      await saveUserToFirestore(newUser);
+
+      return QueryStatus.SUCCESS;
+    } catch (e) {
+      debugPrint("Error signing in with Google: $e");
+      return QueryStatus.ERROR;
+    }
   }
 }
