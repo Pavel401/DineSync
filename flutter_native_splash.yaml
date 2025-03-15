@@ -1,0 +1,41 @@
+# fvm dart run flutter_native_splash:create --path=flutter_native_splash.yaml
+flutter_native_splash:
+  # Background color for the light theme splash screen
+  color: "#FFFFFF"
+
+  # Splash screen image, centered
+  image: assets/logo.png
+
+  # Customize for dark mode
+  color_dark: "#000000" # surfaceDark (0xFF000000)
+  image_dark: assets/logo.png
+
+  android_12:
+    # Background color for Android 12 splash screen in light theme
+    color: "#FFFFFF" # surfaceLight
+
+    # App icon for Android 12 splash screen (centered and clipped to a circle)
+    image: assets/logo.png
+
+    # Background color for dark mode on Android 12
+    color_dark: "#000000" # surfaceDark
+
+    # App icon for dark mode on Android 12
+    image_dark: assets/logo.png
+
+  # Platform-specific configurations
+  color_android: "#FFFFFF"
+  color_dark_android: "#000000"
+  color_ios: "#FFFFFF"
+  color_dark_ios: "#000000"
+  image_android: assets/logo.png
+  image_dark_android: assets/logo.png
+  image_ios: assets/logo.png
+  image_dark_ios: assets/logo.png
+
+  # Center the splash image on iOS and Android
+  android_gravity: center
+  ios_content_mode: center
+
+  # Set screen orientation to portrait (optional)
+  android_screen_orientation: portrait

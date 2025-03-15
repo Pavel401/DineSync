@@ -178,8 +178,8 @@ class _MyAppState extends State<MyApp> {
             navigatorObservers: <NavigatorObserver>[
               AnalyticsService().getAnalyticsObserver()
             ],
-            darkTheme: themeProvider.lightTheme,
-            themeMode: ThemeMode.light,
+            // darkTheme: themeProvider.lightTheme,
+            // themeMode: ThemeMode.light,
             home: SplashScreen(),
             builder: EasyLoading.init()),
       );
