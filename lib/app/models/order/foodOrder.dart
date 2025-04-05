@@ -165,20 +165,23 @@ class WaiterData {
 }
 
 class CustomerData {
-  String customerName;
+  String? customerName;
   Gender? customerGender;
   String? customerPhoneNumber;
+  String? customerSeatingPlace;
 
   CustomerData({
     required this.customerName,
     this.customerGender,
     this.customerPhoneNumber,
+    this.customerSeatingPlace,
   });
 
   Map<String, dynamic> toJson() => {
         'customerName': customerName,
         'customerGender': customerGender?.name,
         'customerPhoneNumber': customerPhoneNumber,
+        'customerSeatingPlace': customerSeatingPlace,
       };
 
   CustomerData.fromJson(Map<String, dynamic> json)
@@ -186,7 +189,8 @@ class CustomerData {
         customerGender = json['customerGender'] != null
             ? Gender.values.firstWhere((e) => e.name == json['customerGender'])
             : null,
-        customerPhoneNumber = json['customerPhoneNumber'];
+        customerPhoneNumber = json['customerPhoneNumber'],
+        customerSeatingPlace = json['customerSeatingPlace'];
 }
 
 class KitchenData {
