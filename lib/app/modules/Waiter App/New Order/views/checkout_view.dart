@@ -30,6 +30,9 @@ class _CheckoutViewState extends State<CheckoutView> {
       Get.find<WaiterOrderController>();
 
   final TextEditingController customerNameController = TextEditingController();
+  final TextEditingController optionalTableNameController =
+      TextEditingController();
+
   final TextEditingController customerPhoneNumberController =
       TextEditingController();
   final TextEditingController discountNameController = TextEditingController();
@@ -358,9 +361,24 @@ class _CheckoutViewState extends State<CheckoutView> {
             ),
             SizedBox(height: 2.h),
             TextFormField(
+              controller: optionalTableNameController,
+              decoration: InputDecoration(
+                labelText: "Table Name/Number (Optional)",
+                prefixText: "Table ",
+                prefixStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            SizedBox(height: 2.h),
+            TextFormField(
               controller: customerNameController,
-              validator: (value) =>
-                  value!.isEmpty ? 'Enter customer name' : null,
+              // validator: (value) =>
+              //     value!.isEmpty ? 'Enter customer name' : null,
               decoration: InputDecoration(
                 labelText: 'Customer Name *',
                 border: OutlineInputBorder(
@@ -641,6 +659,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                             customerPhoneNumber:
                                 customerPhoneNumberController.text,
                             customerGender: selectedGender,
+                            customerSeatingPlace:
+                                optionalTableNameController.text ?? "",
                           );
 
                           // Prepare discount data
