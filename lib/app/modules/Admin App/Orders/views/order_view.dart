@@ -1,11 +1,9 @@
-import 'package:cho_nun_btk/app/components/order_status_chip.dart';
+import 'package:cho_nun_btk/app/components/foodCard.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Orders/views/read_only_oder_view.dart';
-import 'package:cho_nun_btk/app/utils/date_utils.dart';
 import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -251,135 +249,11 @@ class _OrderViewState extends State<OrderView> {
                       bool flag = isOrderNeededToKitchen(order);
 
                       return flag
-                          ? GestureDetector(
+                          ? OrderCard(
+                              order: order,
                               onTap: () {
                                 Get.to(() => AdminOrderFlow(order: order));
                               },
-                              child: Card(
-                                color: AppColors.white,
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(2.w),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Order No: ",
-                                                style: context
-                                                    .textTheme.bodyLarge!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  "#" +
-                                                      parseOrderId(order
-                                                                  .orderId)[
-                                                              'counter']
-                                                          .toString(),
-                                                  style: context
-                                                      .textTheme.bodyLarge!
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  softWrap: false,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              Spacer(),
-                                              OrderStatusChip(
-                                                  status: order.orderStatus),
-                                            ],
-                                          ),
-                                          SizedBox(height: 2.h),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "Name: ",
-                                                style: context
-                                                    .textTheme.bodyLarge!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  order.customerData
-                                                          .customerName ??
-                                                      "",
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  softWrap: false,
-                                                  style: context
-                                                      .textTheme.bodyLarge!
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(height: 1.h),
-                                    DottedLine(
-                                      dashColor: AppColors.primaryDark,
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(2.w),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryDark
-                                            .withOpacity(0.2),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            "X${order.orderItems.length}",
-                                            style: context.textTheme.bodyLarge!
-                                                .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Icon(Icons.schedule),
-                                          Text(
-                                            DateUtilities.formatDateTime(
-                                                order.orderTime),
-                                            style: context.textTheme.bodySmall!
-                                                .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            // overflow: TextOverflow.ellipsis,
-                                            softWrap: false,
-                                          ),
-                                          Spacer(),
-                                          Text(
-                                            order.orderType!.name ==
-                                                    OrderType.DINE_IN.name
-                                                ? "Dine In"
-                                                : "Take Away",
-                                            style: context.textTheme.bodyLarge!
-                                                .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryLight,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
                             )
                           : SizedBox();
                     },
