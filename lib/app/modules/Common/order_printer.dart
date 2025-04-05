@@ -48,19 +48,44 @@ class _OldPrinterState extends State<OldPrinter> {
   }
 
   String getOrderData() {
-    String orderData = "";
-    orderData += "Order: # ${parseOrderId(widget.order.orderId)["counter"]}\n";
-    orderData += "Customer Name: ${widget.order.customerData.customerName}\n";
-    orderData += widget.order.tableData != null
-        ? "Table No: ${widget.order.tableData?.tableName}\n"
-        : "";
-    orderData +=
-        "Order Type: ${widget.order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away"}\n";
-    orderData += "Items:\n";
-    orderData += widget.order.orderItems.entries
-        .map((entry) => "${entry.key.foodName} x${entry.value}\n")
-        .join();
+    final order = widget.order;
+    final customerName = order.customerData?.customerName;
+    final tableName = order.tableData?.tableName;
+    final seatingPlace = order.customerData?.customerSeatingPlace;
+    final orderId = parseOrderId(order.orderId)["counter"];
 
+    final buffer = StringBuffer();
+
+    buffer.writeln("INVOICE");
+    buffer.writeln("------------------------------");
+    buffer.writeln("Order #:        $orderId");
+
+    if (customerName != null && customerName.trim().isNotEmpty) {
+      buffer.writeln("Customer:       $customerName");
+    }
+
+    if (tableName != null && tableName.trim().isNotEmpty) {
+      buffer.writeln("Table No:       $tableName");
+    }
+
+    buffer.writeln(
+        "Order Type:     ${order.orderType == OrderType.DINE_IN ? "Dine In" : "Take Away"}");
+    buffer.writeln("------------------------------");
+    buffer.writeln("Items:");
+
+    order.orderItems.forEach((item, quantity) {
+      buffer.writeln("- ${item.foodName} x$quantity");
+    });
+
+    if (seatingPlace != null && seatingPlace.trim().isNotEmpty) {
+      buffer.writeln("\nSeating Place:  $seatingPlace");
+    }
+
+    buffer.writeln("------------------------------");
+    buffer.writeln("Thank you for your order! ");
+    buffer.writeln("Please visit again.");
+
+    final orderData = buffer.toString();
     print(orderData);
     return orderData;
   }
@@ -94,202 +119,209 @@ class _OldPrinterState extends State<OldPrinter> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Invoice Printer'),
-          leading: IconButton(
-            icon: Icon(Icons.chevron_left),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            PopupMenuButton(
-              elevation: 3.2,
-              //initialValue: _options[1],
-              onCanceled: () {
-                print('You have not chossed anything');
-              },
-              tooltip: 'Menu',
-              onSelected: (Object select) async {
-                String sel = select as String;
-                if (sel == "permission bluetooth granted") {
-                  bool status =
-                      await PrintBluetoothThermal.isPermissionBluetoothGranted;
-                  setState(() {
-                    _info = "permission bluetooth granted: $status";
-                  });
-                  //open setting permision if not granted permision
-                } else if (sel == "bluetooth enabled") {
-                  bool state = await PrintBluetoothThermal.bluetoothEnabled;
-                  setState(() {
-                    _info = "Bluetooth enabled: $state";
-                  });
-                } else if (sel == "update info") {
-                  initPlatformState();
-                } else if (sel == "connection status") {
-                  final bool result =
-                      await PrintBluetoothThermal.connectionStatus;
-                  connected = result;
-                  setState(() {
-                    _info = "connection status: $result";
-                  });
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return _options.map((String option) {
-                  return PopupMenuItem(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList();
-              },
-            )
-          ],
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          connected ? this.printWithoutPackage : null;
+        },
+        child: Icon(Icons.print),
+      ),
+      appBar: AppBar(
+        title: const Text('Invoice Printer'),
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('info: $_info\n '),
-                Text(_msj),
-                Row(
-                  children: [
-                    Text("Type print"),
-                    SizedBox(width: 10),
-                    DropdownButton<String>(
-                      value: optionprinttype,
-                      items: options.map((String option) {
-                        return DropdownMenuItem<String>(
-                          value: option,
-                          child: Text(option),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          optionprinttype = newValue!;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        this.getBluetoots();
-                      },
-                      child: Row(
-                        children: [
-                          Visibility(
-                            visible: _progress,
-                            child: SizedBox(
-                              width: 25,
-                              height: 25,
-                              child: CircularProgressIndicator.adaptive(
-                                  strokeWidth: 1,
-                                  backgroundColor: Colors.white),
-                            ),
+        actions: [
+          PopupMenuButton(
+            elevation: 3.2,
+            //initialValue: _options[1],
+            onCanceled: () {
+              print('You have not chossed anything');
+            },
+            tooltip: 'Menu',
+            onSelected: (Object select) async {
+              String sel = select as String;
+              if (sel == "permission bluetooth granted") {
+                bool status =
+                    await PrintBluetoothThermal.isPermissionBluetoothGranted;
+                setState(() {
+                  _info = "permission bluetooth granted: $status";
+                });
+                //open setting permision if not granted permision
+              } else if (sel == "bluetooth enabled") {
+                bool state = await PrintBluetoothThermal.bluetoothEnabled;
+                setState(() {
+                  _info = "Bluetooth enabled: $state";
+                });
+              } else if (sel == "update info") {
+                initPlatformState();
+              } else if (sel == "connection status") {
+                final bool result =
+                    await PrintBluetoothThermal.connectionStatus;
+                connected = result;
+                setState(() {
+                  _info = "connection status: $result";
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return _options.map((String option) {
+                return PopupMenuItem(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList();
+            },
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('info: $_info\n '),
+              Text(_msj),
+              Row(
+                children: [
+                  Text("Type print"),
+                  SizedBox(width: 10),
+                  DropdownButton<String>(
+                    value: optionprinttype,
+                    items: options.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        optionprinttype = newValue!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      this.getBluetoots();
+                    },
+                    child: Row(
+                      children: [
+                        Visibility(
+                          visible: _progress,
+                          child: SizedBox(
+                            width: 25,
+                            height: 25,
+                            child: CircularProgressIndicator.adaptive(
+                                strokeWidth: 1, backgroundColor: Colors.white),
                           ),
-                          SizedBox(width: 5),
-                          Text(_progress ? _msjprogress : "Search"),
-                        ],
-                      ),
+                        ),
+                        SizedBox(width: 5),
+                        Text(_progress ? _msjprogress : "Search"),
+                      ],
                     ),
-                    ElevatedButton(
-                      onPressed: connected ? this.disconnect : null,
-                      child: Text("Disconnect"),
-                    ),
-                    ElevatedButton(
-                      onPressed: connected ? this.printTest : null,
-                      child: Text("Test"),
-                    ),
-                  ],
-                ),
-                Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      color: Colors.grey.withOpacity(0.3),
-                    ),
-                    child: ListView.builder(
-                      itemCount: items.length > 0 ? items.length : 0,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          onTap: () {
-                            String mac = items[index].macAdress;
-                            this.connect(mac);
-                          },
-                          title: Text(
-                            'Name: ${items[index].name}',
-                            style: TextStyle(
-                              fontSize: 12,
-                            ),
-                          ),
-                          subtitle: Text(
-                            "macAddress: ${items[index].macAdress}",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      },
-                    )),
-                SizedBox(height: 10),
-                Container(
-                  padding: EdgeInsets.all(10),
+                  ),
+                  ElevatedButton(
+                    onPressed: connected ? this.disconnect : null,
+                    child: Text("Disconnect"),
+                  ),
+                  ElevatedButton(
+                    onPressed: connected ? this.printTest : null,
+                    child: Text("Test"),
+                  ),
+                ],
+              ),
+              Container(
+                  height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     color: Colors.grey.withOpacity(0.3),
                   ),
-                  child: Column(children: [
-                    Text(
-                        "Text size without the library without external packets, print images still it should not use a library"),
-                    SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _txtText,
-                            maxLines: 10,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: "Text",
-                            ),
+                  child: ListView.builder(
+                    itemCount: items.length > 0 ? items.length : 0,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        onTap: () {
+                          String mac = items[index].macAdress;
+                          this.connect(mac);
+                        },
+                        title: Text(
+                          'Name: ${items[index].name}',
+                          style: TextStyle(
+                            fontSize: 12,
                           ),
                         ),
-                        SizedBox(width: 5),
-                        DropdownButton<String>(
-                          hint: Text('Size'),
-                          value: _selectSize,
-                          items: <String>['1', '2', '3', '4', '5']
-                              .map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: new Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? select) {
-                            setState(() {
-                              _selectSize = select.toString();
-                            });
-                          },
-                        )
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: connected ? this.printWithoutPackage : null,
-                      child: Text("Print"),
-                    ),
-                  ]),
+                        subtitle: Text(
+                          "macAddress: ${items[index].macAdress}",
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    },
+                  )),
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.grey.withOpacity(0.3),
                 ),
-                SizedBox(height: 10),
-              ],
-            ),
+                child: Column(children: [
+                  // Text(
+                  //     "Text size without the library without external packets, print images still it should not use a library"),
+                  // SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _txtText,
+                          maxLines: 14,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: "Text",
+                          ),
+                          style: TextStyle(
+                            fontSize: double.tryParse(_selectSize ?? '1')! *
+                                8, // Scale as needed
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      DropdownButton<String>(
+                        hint: Text('Size'),
+                        value: _selectSize,
+                        items: <String>['1', '2', '3', '4', '5']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? select) {
+                          setState(() {
+                            _selectSize = select!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  // ElevatedButton(
+                  //   onPressed: connected ? this.printWithoutPackage : null,
+                  //   child: Text("Print"),
+                  // ),
+                ]),
+              ),
+              SizedBox(height: 10),
+            ],
           ),
         ),
       ),
