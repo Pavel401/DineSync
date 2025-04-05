@@ -50,3 +50,8 @@ android/build/ios/XCBuildData/PIFCache/target/TARGET@v11_hash=ea838d8e663890f602
 # android/
 # android/app/
 firebase_options.dart
+
+# FVM Version Cache
+.fvm/
+/android/
+
