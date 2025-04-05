@@ -97,9 +97,9 @@ class _OldPrinterState extends State<OldPrinter> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Invoice Printer'),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(Icons.chevron_left),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -225,9 +225,17 @@ class _OldPrinterState extends State<OldPrinter> {
                             String mac = items[index].macAdress;
                             this.connect(mac);
                           },
-                          title: Text('Name: ${items[index].name}'),
-                          subtitle:
-                              Text("macAddress: ${items[index].macAdress}"),
+                          title: Text(
+                            'Name: ${items[index].name}',
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "macAddress: ${items[index].macAdress}",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
                         );
                       },
                     )),
