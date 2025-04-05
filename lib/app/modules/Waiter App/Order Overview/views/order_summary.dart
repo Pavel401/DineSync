@@ -5,7 +5,6 @@ import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
 import 'package:cho_nun_btk/app/modules/Chef%20App/components/steppers.dart';
-import 'package:cho_nun_btk/app/modules/Common/invoice_printer.dart';
 import 'package:cho_nun_btk/app/modules/Common/order_printer.dart';
 import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
 import 'package:cho_nun_btk/app/provider/food_order_provider.dart';
@@ -64,16 +63,16 @@ class _WaiterFlowState extends State<WaiterFlow> {
       appBar: AppBar(
         title: Text('Order: # ${parseOrderId(order.orderId)["counter"]}'),
         actions: [
-          IconButton(
-            onPressed: () {
-              Get.to(
-                () => InvoicePrinter(
-                  order: order,
-                ),
-              );
-            },
-            icon: Icon(Icons.print),
-          ),
+          // IconButton(
+          //   onPressed: () {
+          //     Get.to(
+          //       () => InvoicePrinter(
+          //         order: order,
+          //       ),
+          //     );
+          //   },
+          //   icon: Icon(Icons.print),
+          // ),
           IconButton(
             onPressed: () {
               Get.to(
@@ -151,6 +150,24 @@ class _WaiterFlowState extends State<WaiterFlow> {
               ],
             ),
             SizedBox(height: 2.h),
+            if (order.customerData.customerSeatingPlace != null &&
+                order.customerData.customerSeatingPlace!.isNotEmpty) ...[
+              Text(
+                "Table No",
+                style: context.textTheme.bodyMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.errorLight,
+                ),
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                order.customerData.customerSeatingPlace!.isEmpty
+                    ? "No table assigned"
+                    : order.customerData.customerSeatingPlace!,
+                style: context.textTheme.bodyMedium!.copyWith(),
+              ),
+              SizedBox(height: 2.h),
+            ],
             GestureDetector(
               onTap: () {
                 setState(() {
