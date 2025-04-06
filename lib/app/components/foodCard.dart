@@ -556,11 +556,13 @@ import 'package:sizer/sizer.dart';
 class OrderCard extends StatefulWidget {
   final FoodOrder order;
   final VoidCallback? onTap;
+  final bool? isAdmin;
 
   const OrderCard({
     Key? key,
     required this.order,
     this.onTap,
+    this.isAdmin,
   }) : super(key: key);
 
   @override
@@ -624,8 +626,9 @@ class _OrderCardState extends State<OrderCard> {
 
   @override
   Widget build(BuildContext context) {
-    final flag = isOrderNeededToKitchen(widget.order);
-    if (!flag) return const SizedBox();
+    final shouldShowOrder =
+        widget.isAdmin == true || isOrderNeededToKitchen(widget.order);
+    if (!shouldShowOrder) return const SizedBox();
 
     final textTheme = Theme.of(context).textTheme;
     final bool isUrgent = _isOrderUrgent(widget.order);
