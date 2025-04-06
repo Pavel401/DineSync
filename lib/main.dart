@@ -173,7 +173,7 @@ class _MyAppState extends State<MyApp> {
         online: GetMaterialApp(
             defaultTransition: Transition.rightToLeftWithFade,
             transitionDuration: const Duration(milliseconds: 300),
-            debugShowCheckedModeBanner: true,
+            debugShowCheckedModeBanner: false,
             theme: themeProvider.lightTheme,
             navigatorObservers: <NavigatorObserver>[
               AnalyticsService().getAnalyticsObserver()
