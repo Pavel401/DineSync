@@ -26,6 +26,7 @@ class CustomNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print("Rebuilding CustomNetworkImage");
     final isImageUrlEmpty = imageUrl.trim().isEmpty;
 
     final Widget fallbackWidget = Container(
