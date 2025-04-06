@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cho_nun_btk/app/constants/enums.dart';
 import 'package:cho_nun_btk/app/models/auth/authmodels.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
+import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -43,8 +44,22 @@ class FcmNotificationProvider {
         return QueryStatus.ERROR;
       }
 
-      String messageTitle = "New Order!";
-      String messageBody = "Check the new order!";
+      // String tableName = order.customerData.customerSeatingPlace ?? "";
+      // int noOfItems = order.orderItems.length;
+      // String orderId =
+      //     "#" + " " + parseOrderId(order.orderId)['counter'].toString();
+      // String messageTitle = "New Order!";
+      // String messageBody = "Check the new order!";
+      // String imageUrl = order.orderItems.entries.first.key.foodImage;
+      // String messageId = order.orderId;
+
+      String tableName =
+          order.customerData.customerSeatingPlace ?? "Unknown Table";
+      int noOfItems = order.orderItems.length;
+      String orderId = "#" + parseOrderId(order.orderId)['counter'].toString();
+      String messageTitle = "🧾 New Order Received!";
+      String messageBody =
+          "Order $orderId from Table - $tableName - $noOfItems item(s). Please prepare.";
       String imageUrl = order.orderItems.entries.first.key.foodImage;
       String messageId = order.orderId;
 
@@ -55,6 +70,8 @@ class FcmNotificationProvider {
         "messageId": messageId,
         "tokens": tokens,
       };
+
+      print("Tokens: $tokens");
 
       print('Notification payload: $body');
 
