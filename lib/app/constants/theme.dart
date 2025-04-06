@@ -45,7 +45,7 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   ThemeData get currentTheme {
-    return isDarkMode ? darkTheme : lightTheme;
+    return lightTheme;
   }
 
   ThemeData lightTheme = ThemeData(
