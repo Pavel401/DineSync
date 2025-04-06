@@ -7,6 +7,7 @@ import 'package:cho_nun_btk/app/models/menu/menu.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/models/table/table.dart';
 import 'package:cho_nun_btk/app/modules/Auth/controllers/auth_controller.dart';
+import 'package:cho_nun_btk/app/modules/Waiter%20App/Home/views/waiter_view.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/controller/new_order_controller.dart';
 import 'package:cho_nun_btk/app/modules/Waiter%20App/New%20Order/views/table_selection_view.dart';
 import 'package:cho_nun_btk/app/provider/analytics_provider.dart';
@@ -729,7 +730,7 @@ class _CheckoutViewState extends State<CheckoutView> {
 
                             // Show success message
                             EasyLoading.dismiss();
-                            Get.until((route) => route.isFirst);
+                            Get.offAll(() => WaiterHomeView());
                             CustomSnackBar.showSuccess(
                               'Success',
                               'Order has been placed successfully',
