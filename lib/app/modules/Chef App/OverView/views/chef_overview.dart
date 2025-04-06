@@ -34,7 +34,7 @@ class KitchenOverView extends StatelessWidget {
               FoodOrderStatus.READY,
             ]),
             // 'Pending': buildOrderList(statuses: [FoodOrderStatus.PENDING]),
-            'Completed': buildOrderList(statuses: [
+            'Archived': buildOrderList(statuses: [
               FoodOrderStatus.COMPLETED,
               FoodOrderStatus.CANCELLED,
             ]),
