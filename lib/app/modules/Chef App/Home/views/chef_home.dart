@@ -50,14 +50,10 @@ class ChefHomeView extends StatelessWidget {
       BuildContext context, ThemeProvider themeProvider) {
     return NavigationBarTheme(
       data: NavigationBarThemeData(
-        // indicatorColor: Colors.red,
-
         labelTextStyle: WidgetStateProperty.all(
           context.textTheme.bodySmall!.copyWith(
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode
-                ? AppColors.secondaryDark
-                : AppColors.secondaryLight,
+            color: AppColors.secondaryLight,
           ),
         ),
       ),
@@ -66,51 +62,22 @@ class ChefHomeView extends StatelessWidget {
           onDestinationSelected: (int index) {
             homeController.changeIndex(index);
           },
-
           elevation: 0.4,
-          backgroundColor: themeProvider.isDarkMode
-              ? AppColors.surfaceDark
-              : AppColors.surfaceLight,
-          indicatorColor: themeProvider.isDarkMode
-              ? AppColors.tertiaryDark
-              : AppColors.tertiaryLight,
+          backgroundColor: AppColors.primaryLight.withOpacity(0.1),
+          indicatorColor: AppColors.tertiaryLight,
           selectedIndex: homeController.currentIndex.value,
-          // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-
           destinations: <Widget>[
-            // NavigationDestination(
-            //   icon: Icon(
-            //     Icons.history_outlined,
-            //     color: themeProvider.isDarkMode
-            //         ? AppColors.secondaryDark
-            //         : AppColors.secondaryLight,
-            //   ),
-            //   label: 'History',
-            // ),
             NavigationDestination(
               icon: Icon(
                 Icons.list_alt_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'Orders',
             ),
-            // NavigationDestination(
-            //   icon: Icon(
-            //     Icons.menu_book_outlined,
-            //     color: themeProvider.isDarkMode
-            //         ? AppColors.secondaryDark
-            //         : AppColors.secondaryLight,
-            //   ),
-            //   label: 'Menu',
-            // ),
             NavigationDestination(
               icon: Icon(
                 Icons.menu_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'More',
             ),
