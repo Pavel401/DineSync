@@ -163,6 +163,8 @@
 //     );
 //   }
 // }
+import 'dart:async';
+
 import 'package:cho_nun_btk/app/components/order_status_chip.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
@@ -551,8 +553,7 @@ import 'package:sizer/sizer.dart';
 //     );
 //   }
 // }
-
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final FoodOrder order;
   final VoidCallback? onTap;
 
@@ -563,15 +564,74 @@ class OrderCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> {
+  late ValueNotifier<Duration> elapsedTimeNotifier;
+  Timer? _timer;
+  bool isCompleted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    elapsedTimeNotifier = ValueNotifier(_getElapsedTime());
+    _checkOrderCompletion();
+    if (!isCompleted) {
+      _startTimer();
+    }
+  }
+
+  Duration _getElapsedTime() {
+    final now = DateTime.now();
+    return now.difference(widget.order.orderTime);
+  }
+
+  void _checkOrderCompletion() {
+    isCompleted = widget.order.orderStatus == FoodOrderStatus.COMPLETED ||
+        widget.order.orderStatus == FoodOrderStatus.CANCELLED;
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      elapsedTimeNotifier.value = _getElapsedTime();
+      if (widget.order.orderStatus == FoodOrderStatus.COMPLETED ||
+          widget.order.orderStatus == FoodOrderStatus.CANCELLED) {
+        isCompleted = true;
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant OrderCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.order.orderStatus != widget.order.orderStatus) {
+      _checkOrderCompletion();
+      if (isCompleted) {
+        _timer?.cancel();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    elapsedTimeNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final flag = isOrderNeededToKitchen(order);
+    final flag = isOrderNeededToKitchen(widget.order);
     if (!flag) return const SizedBox();
 
     final textTheme = Theme.of(context).textTheme;
-    final bool isUrgent = _isOrderUrgent(order);
+    final bool isUrgent = _isOrderUrgent(widget.order);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Card(
         color: AppColors.white,
         elevation: 1,
@@ -595,21 +655,22 @@ class OrderCard extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          "#${parseOrderId(order.orderId)['counter']}",
+                          "#${parseOrderId(widget.order.orderId)['counter']}",
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
                         ),
-                        if (order.orderType != null)
+                        if (widget.order.orderType != null)
                           Padding(
                             padding: EdgeInsets.only(left: 1.5.w),
-                            child: _buildOrderTypeIndicator(order.orderType!),
+                            child: _buildOrderTypeIndicator(
+                                widget.order.orderType!),
                           ),
                       ],
                     ),
                   ),
-                  OrderStatusChip(status: order.orderStatus),
+                  OrderStatusChip(status: widget.order.orderStatus),
                 ],
               ),
             ),
@@ -620,7 +681,7 @@ class OrderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (order.customerData.customerSeatingPlace != null)
+                  if (widget.order.customerData.customerSeatingPlace != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -646,7 +707,7 @@ class OrderCard extends StatelessWidget {
                                   size: 14, color: AppColors.errorLight),
                               SizedBox(width: 1.w),
                               Text(
-                                order.customerData.customerSeatingPlace!,
+                                widget.order.customerData.customerSeatingPlace!,
                                 style: textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
@@ -658,8 +719,8 @@ class OrderCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                  if (order.customerData.customerName != null &&
-                      order.customerData.customerName!.isNotEmpty)
+                  if (widget.order.customerData.customerName != null &&
+                      widget.order.customerData.customerName!.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(top: 0.8.h),
                       child: Column(
@@ -674,7 +735,7 @@ class OrderCard extends StatelessWidget {
                           ),
                           SizedBox(height: 0.3.h),
                           Text(
-                            order.customerData.customerName!,
+                            widget.order.customerData.customerName!,
                             style: textTheme.bodyMedium?.copyWith(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -700,7 +761,7 @@ class OrderCard extends StatelessWidget {
                                 size: 14, color: AppColors.primaryDark),
                             SizedBox(width: 1.w),
                             Text(
-                              "${order.orderItems.length} items",
+                              "${widget.order.orderItems.length} items",
                               style: textTheme.bodySmall?.copyWith(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -709,7 +770,7 @@ class OrderCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (order.specialInstructions?.isNotEmpty ?? false)
+                      if (widget.order.specialInstructions?.isNotEmpty ?? false)
                         Padding(
                           padding: EdgeInsets.only(left: 2.w),
                           child: Icon(Icons.info_outline,
@@ -725,7 +786,8 @@ class OrderCard extends StatelessWidget {
                                   : Colors.grey[600]),
                           SizedBox(width: 1.w),
                           Text(
-                            DateUtilities.formatDateTime(order.orderTime),
+                            DateUtilities.formatDateTime(
+                                widget.order.orderTime),
                             style: textTheme.bodySmall?.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
@@ -743,9 +805,10 @@ class OrderCard extends StatelessWidget {
             ),
 
             DottedLine(
-                dashColor: AppColors.primaryDark,
-                dashLength: 5,
-                lineThickness: 0.8),
+              dashColor: AppColors.primaryDark,
+              dashLength: 5,
+              lineThickness: 0.8,
+            ),
 
             // Footer
             Container(
@@ -759,7 +822,14 @@ class OrderCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildTimeElapsedIndicator(order.orderTime),
+                  ValueListenableBuilder<Duration>(
+                    valueListenable: elapsedTimeNotifier,
+                    builder: (context, value, _) {
+                      return isCompleted
+                          ? _buildCompletionTimeIndicator(value)
+                          : _buildRealTimeElapsedIndicator(value);
+                    },
+                  ),
                   Row(
                     children: [
                       Text(
@@ -824,24 +894,26 @@ class OrderCard extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-                fontSize: 10, fontWeight: FontWeight.w500, color: color),
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTimeElapsedIndicator(DateTime orderTime) {
-    final currentTime = DateTime.now();
-    final difference = currentTime.difference(orderTime).inMinutes;
-    if (difference > 180) return const SizedBox();
+  Widget _buildRealTimeElapsedIndicator(Duration elapsedTime) {
+    if (elapsedTime.inMinutes > 180) return const SizedBox();
+
+    final minutes = elapsedTime.inMinutes;
+    final seconds = elapsedTime.inSeconds % 60;
 
     Color indicatorColor;
-    String text = "$difference min";
-
-    if (difference < 10) {
+    if (minutes < 10) {
       indicatorColor = Colors.green;
-    } else if (difference < 20) {
+    } else if (minutes < 20) {
       indicatorColor = Colors.amber;
     } else {
       indicatorColor = AppColors.errorLight;
@@ -852,14 +924,46 @@ class OrderCard extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration:
-              BoxDecoration(color: indicatorColor, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: indicatorColor,
+            shape: BoxShape.circle,
+          ),
         ),
         SizedBox(width: 1.w),
         Text(
-          text,
+          '${minutes.toString().padLeft(2, '0')}m ${seconds.toString().padLeft(2, '0')}s',
           style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w500, color: indicatorColor),
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: indicatorColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompletionTimeIndicator(Duration elapsedTime) {
+    final minutes = elapsedTime.inMinutes;
+    final seconds = elapsedTime.inSeconds % 60;
+
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: Colors.green[700],
+            shape: BoxShape.circle,
+          ),
+        ),
+        SizedBox(width: 1.w),
+        Text(
+          'Completed in ${minutes.toString().padLeft(2, '0')}m ${seconds.toString().padLeft(2, '0')}s',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: Colors.green[700],
+          ),
         ),
       ],
     );
