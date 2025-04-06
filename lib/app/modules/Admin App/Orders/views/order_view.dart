@@ -2,7 +2,6 @@ import 'package:cho_nun_btk/app/components/foodCard.dart';
 import 'package:cho_nun_btk/app/constants/colors.dart';
 import 'package:cho_nun_btk/app/models/order/foodOrder.dart';
 import 'package:cho_nun_btk/app/modules/Admin%20App/Orders/views/read_only_oder_view.dart';
-import 'package:cho_nun_btk/app/utils/order_parser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -246,16 +245,15 @@ class _OrderViewState extends State<OrderView> {
                     itemCount: filteredOrders.length,
                     itemBuilder: (context, index) {
                       final order = filteredOrders[index];
-                      bool flag = isOrderNeededToKitchen(order);
+                      // bool flag = isOrderNeededToKitchen(order);
 
-                      return flag
-                          ? OrderCard(
-                              order: order,
-                              onTap: () {
-                                Get.to(() => AdminOrderFlow(order: order));
-                              },
-                            )
-                          : SizedBox();
+                      return OrderCard(
+                        isAdmin: true,
+                        order: order,
+                        onTap: () {
+                          Get.to(() => AdminOrderFlow(order: order));
+                        },
+                      );
                     },
                   ),
                 );
