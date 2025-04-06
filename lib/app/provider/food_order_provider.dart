@@ -88,6 +88,9 @@ class FoodOrderProvider {
           .doc(order.orderId)
           .set(order.toJson());
 
+      print("Order created successfully");
+      print("Order ID: ${order.orderId}");
+
       return QueryStatus.SUCCESS;
     } catch (e) {
       print(e);
