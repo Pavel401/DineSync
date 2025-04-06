@@ -17,7 +17,7 @@ class WaiterHomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    AuthController authController = Get.put(AuthController());
+    AuthController authController = Get.find<AuthController>();
 
     bool isBlocked = authController.userModel!.blocked ?? false;
 
@@ -51,14 +51,11 @@ class WaiterHomeView extends StatelessWidget {
       BuildContext context, ThemeProvider themeProvider) {
     return NavigationBarTheme(
       data: NavigationBarThemeData(
-        // indicatorColor: Colors.red,
-
+        elevation: 4, // More shadow to distinguish from body
         labelTextStyle: WidgetStateProperty.all(
           context.textTheme.bodySmall!.copyWith(
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode
-                ? AppColors.secondaryDark
-                : AppColors.secondaryLight,
+            color: AppColors.secondaryLight,
           ),
         ),
       ),
@@ -67,33 +64,22 @@ class WaiterHomeView extends StatelessWidget {
           onDestinationSelected: (int index) {
             homeController.changeIndex(index);
           },
-
-          elevation: 0.4,
-          backgroundColor: themeProvider.isDarkMode
-              ? AppColors.surfaceDark
-              : AppColors.surfaceLight,
-          indicatorColor: themeProvider.isDarkMode
-              ? AppColors.tertiaryDark
-              : AppColors.tertiaryLight,
+          elevation: 4, // Consistent with theme data
+          backgroundColor: AppColors.primaryLight.withOpacity(0.1),
+          indicatorColor: AppColors.tertiaryLight,
           selectedIndex: homeController.currentIndex.value,
-          // labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-
           destinations: <Widget>[
             NavigationDestination(
               icon: Icon(
                 Icons.list_alt_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'Orders',
             ),
             NavigationDestination(
               icon: Icon(
                 Icons.menu_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'More',
             ),
