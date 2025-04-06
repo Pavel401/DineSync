@@ -50,9 +50,7 @@ class AdminHomeView extends StatelessWidget {
         labelTextStyle: WidgetStateProperty.all(
           context.textTheme.bodySmall!.copyWith(
             fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode
-                ? AppColors.secondaryDark
-                : AppColors.secondaryLight,
+            color: AppColors.secondaryLight,
           ),
         ),
       ),
@@ -62,57 +60,40 @@ class AdminHomeView extends StatelessWidget {
             homeController.changeIndex(index);
           },
           elevation: 0.4,
-          backgroundColor: themeProvider.isDarkMode
-              ? AppColors.surfaceDark
-              : AppColors.surfaceLight,
-          indicatorColor: themeProvider.isDarkMode
-              ? AppColors.tertiaryDark
-              : AppColors.tertiaryLight,
+          backgroundColor: AppColors.primaryLight.withOpacity(0.1),
+          indicatorColor: AppColors.tertiaryLight,
           selectedIndex: homeController.currentIndex.value,
           destinations: <Widget>[
             NavigationDestination(
               icon: Icon(
                 Icons.list_alt_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'Orders',
             ),
             NavigationDestination(
               icon: Icon(
                 Icons.analytics_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'Analytics',
             ),
             NavigationDestination(
               icon: Icon(
                 Icons.table_bar,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'Table',
             ),
             NavigationDestination(
               icon: Icon(
                 Icons.menu_book_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
+                color: AppColors.secondaryLight,
               ),
               label: 'Menu',
             ),
             NavigationDestination(
-              icon: Icon(
-                Icons.menu_outlined,
-                color: themeProvider.isDarkMode
-                    ? AppColors.secondaryDark
-                    : AppColors.secondaryLight,
-              ),
+              icon: Icon(Icons.menu_outlined, color: AppColors.secondaryLight),
               label: 'More',
             ),
           ],
