@@ -40,6 +40,7 @@ class _FoodCardReadWidgetState extends State<FoodCardReadWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // print("Rebuilding FoodCardReadWidget");
     return Bounceable(
       onTap: () {
         widget.onTap();
