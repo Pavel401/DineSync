@@ -80,6 +80,14 @@ class OrderOverview extends StatelessWidget {
               Get.to(() => WaiterFlow(order: order));
             },
           );
+          // Container(
+          //   child: GestureDetector(
+          //       onTap: () {
+          //         Clipboard.setData(
+          //             ClipboardData(text: order.toJson().toString()));
+          //       },
+          //       child: Text(order.toJson().toString())),
+          // );
         },
       );
     });
